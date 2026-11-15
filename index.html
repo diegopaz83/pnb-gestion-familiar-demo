@@ -446,6 +446,12 @@ label.btn{cursor:pointer;position:relative}
 }
 
 @media(max-width:959px){.face b{font-size:11px;letter-spacing:-.01em;overflow:visible;text-overflow:clip}.faces{gap:4px}}
+
+.tgl{font-weight:700;color:var(--fg-1);min-width:22px;text-align:right}
+
+.opts .btn{white-space:nowrap;font-size:15px;padding-left:10px;padding-right:10px;gap:6px}
+.opts .btn .ic{width:20px;height:20px}
+@media(max-width:360px){.opts .btn{font-size:14px}}
 </style>
 </head>
 <body>
@@ -984,7 +990,7 @@ function modal(){
   <div class="fld"><label for="dname">¿Qué papel es?</label><input class="inp ${er.n?'err':''}" id="dname" value="${esc(m.n||'')}" placeholder="Ej.: Licencia de conducción de Luis">${er.n?'<div class="er">Ponle un nombre.</div>':''}</div>
   <div><span class="lbl">¿De quién?</span><div class="chips">${Object.values(ENT).filter(e=>seesEnt(e.id)).map(e=>`<button class="chip ${m.ent===e.id?'on':''}" data-a="setf" data-f="ent" data-v="${e.id}"><span class="dt" style="background:${e.fg}"></span>${e.name}</button>`).join('')}</div>${er.ent?'<div class="er">Elige de quién es.</div>':''}</div>
   <div><span class="lbl">¿En qué carpeta?</span><div class="chips">${CATS.filter(c=>!isCare()||!['Identidad','Propiedad'].includes(c[0])).map(c=>`<button class="chip ${m.cat===c[0]?'on':''}" data-a="setf" data-f="cat" data-v="${c[0]}">${c[0]}</button>`).join('')}</div>${er.cat?'<div class="er">Elige la carpeta.</div>':''}</div>
-  <div class="setrow" style="padding:4px 0;border:0"><div class="tx"><div class="t">¿Tiene fecha de vencimiento?</div><div class="s">Si vence, la app crea sola la tarea de renovarlo.</div></div><div class="seg"><button class="${m.hasV?'':'on'}" data-a="hasv" data-v="">No</button><button class="${m.hasV?'on':''}" data-a="hasv" data-v="1">Sí</button></div></div>
+  <div class="setrow" style="padding:4px 0;border:0"><div class="tx"><div class="t">¿Tiene fecha de vencimiento?</div><div class="s">Si vence, la app crea sola la tarea de renovarlo.</div></div><div style="display:flex;align-items:center;gap:10px"><span class="tgl">${m.hasV?'Sí':'No'}</span><button class="tg ${m.hasV?'on':''}" data-a="hasv" data-v="${m.hasV?'':'1'}" role="switch" aria-checked="${!!m.hasV}" aria-label="Tiene fecha de vencimiento"></button></div></div>
   ${m.hasV?`<div class="fld"><label for="dvence">Fecha de vencimiento</label><input type="date" class="inp ${m.err&&m.err.v?'err':''}" id="dvence" value="${m.v||''}">${m.err&&m.err.v?'<div class="er">Indica la fecha o cambia a No.</div>':''}</div>`:''}
   <button class="btn pri big full" data-a="savedoc">Guardar</button></div>`;
  }
@@ -1075,7 +1081,7 @@ function modal(){
   h=`<div class="sh"><h2>Editar papel</h2>${X}</div><div class="sb">
   <div class="fld"><label for="dn">Nombre</label><input class="inp ${er.n?'err':''}" id="dn" value="${esc(m.n)}">${er.n?'<div class="er">Ponle un nombre.</div>':''}</div>
   <div><span class="lbl">Carpeta</span><div class="chips">${CATS.map(c=>`<button class="chip ${m.cat===c[0]?'on':''}" data-a="setf" data-f="cat" data-v="${c[0]}">${c[0]}</button>`).join('')}</div></div>
-  <div class="setrow" style="padding:4px 0;border:0"><div class="tx"><div class="t">¿Tiene fecha de vencimiento?</div></div><div class="seg"><button class="${m.hasV?'':'on'}" data-a="hasv" data-v="">No</button><button class="${m.hasV?'on':''}" data-a="hasv" data-v="1">Sí</button></div></div>
+  <div class="setrow" style="padding:4px 0;border:0"><div class="tx"><div class="t">¿Tiene fecha de vencimiento?</div></div><div style="display:flex;align-items:center;gap:10px"><span class="tgl">${m.hasV?'Sí':'No'}</span><button class="tg ${m.hasV?'on':''}" data-a="hasv" data-v="${m.hasV?'':'1'}" role="switch" aria-checked="${!!m.hasV}" aria-label="Tiene fecha de vencimiento"></button></div></div>
   ${m.hasV?`<div class="fld"><label for="dv">Fecha de vencimiento</label><input type="date" class="inp ${m.err&&m.err.v?'err':''}" id="dv" value="${m.v||''}">${m.err&&m.err.v?'<div class="er">Indica la fecha o cambia a No.</div>':''}</div>`:''}
   <button class="btn pri big full" data-a="savedocedit">Guardar cambios</button></div>`}
  if(m.k==='deldoc'){const d=S.docs.find(x=>x.id===m.id);
