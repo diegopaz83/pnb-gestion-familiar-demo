@@ -339,6 +339,10 @@ button.av{border:0;cursor:pointer}
 @media(max-width:959px){.hubpic{width:96px;height:96px}.hubtx h1{font-size:24px}.hub{gap:16px}}
 
 label.btn{cursor:pointer;position:relative}
+
+.hubpic.edit{position:relative;cursor:pointer;display:block}
+.hubpic .camb{position:absolute;right:6px;bottom:6px;width:36px;height:36px;border-radius:50%;background:var(--gold-500);color:var(--navy-800);display:grid;place-items:center;box-shadow:var(--sh-md);border:3px solid #fff}
+.hubpic.edit:hover{outline:3px solid var(--gold-300)}
 </style>
 </head>
 <body>
@@ -472,10 +476,12 @@ function portrait(key,bg){const L=LOOK[key]||{skin:'#d9b08f',hair:'#5a4636',styl
  return `<svg viewBox="0 0 64 64" aria-hidden="true" style="display:block;width:100%;height:100%"><rect width="64" height="64" fill="${bg}"/>${back}<path d="M9 64c2-12 11-18 23-18s21 6 23 18z" fill="${L.shirt}"/><rect x="28" y="38" width="8" height="9" rx="3" fill="${L.skin}"/><circle cx="32" cy="28.5" r="11" fill="${L.skin}"/>${hair}${gl}${bd}</svg>`}
 function scene(type,bg){return type==='casa'?`<svg viewBox="0 0 64 64" aria-hidden="true" style="display:block;width:100%;height:100%"><rect width="64" height="64" fill="${bg}"/><rect y="48" width="64" height="16" fill="#a9d9c2"/><path d="M14 30 32 15l18 15v20H14z" fill="#fbf7ee"/><path d="M10 31 32 12l22 19-3 3-19-16-19 16z" fill="#17785a"/><rect x="28" y="36" width="8" height="14" rx="1" fill="#8a6d0f"/><rect x="18" y="34" width="7" height="6" fill="#d6e5f6"/><rect x="39" y="34" width="7" height="6" fill="#d6e5f6"/></svg>`
  :`<svg viewBox="0 0 64 64" aria-hidden="true" style="display:block;width:100%;height:100%"><rect width="64" height="64" fill="${bg}"/><rect y="44" width="64" height="20" fill="#e5d7a6"/><path d="M8 42v-6c0-3 2-5 5-5h5l6-7h16l7 7h5c3 0 4 2 4 5v6z" fill="#c4cddb"/><path d="M25 25h14l5 6H20z" fill="#d6e5f6"/><circle cx="19" cy="43" r="5.5" fill="#0d1b33"/><circle cx="45" cy="43" r="5.5" fill="#0d1b33"/><circle cx="19" cy="43" r="2" fill="#c4cddb"/><circle cx="45" cy="43" r="2" fill="#c4cddb"/><rect x="26" y="34" width="12" height="4" rx="1" fill="#fff" stroke="#8a6d0f" stroke-width=".8"/></svg>`}
-function entPic(e){const E_=ENT[e];return E_.type==='persona'?portrait(e,E_.bg):scene(E_.type,E_.bg)}
+const imgTag=u=>`<img src="${u}" alt="" style="width:100%;height:100%;object-fit:cover;display:block">`;
+function photoOf(id){return (ENT[id]&&ENT[id].photo)||(P[id]&&P[id].photo)||null}
+function entPic(e){if(photoOf(e))return imgTag(photoOf(e));const E_=ENT[e];return E_.type==='persona'?portrait(e,E_.bg):scene(E_.type,E_.bg)}
 function entInner(e,cls=''){const E_=ENT[e];return E_.type==='persona'?E_.ini:ic(E_.type==='casa'?'house':'car',cls)}
 function entTile(e,cls=''){const E_=ENT[e];return `<span class="tile pic ${cls} ${E_.type==='persona'?'round':''}">${entPic(e)}</span>`}
-function av(id,cls=''){const p=P[id];if(p.status==='pendiente')return `<span class="av ${cls} pend">${p.ini}</span>`;return `<span class="av pic ${cls}" title="${esc(p.name)}">${portrait(id,p.kind==='afuera'?'#e4e9f1':p.bg)}</span>`}
+function av(id,cls=''){const p=P[id];if(p.status==='pendiente')return `<span class="av ${cls} pend">${p.ini}</span>`;return `<span class="av pic ${cls}" title="${esc(p.name)}">${photoOf(id)?imgTag(photoOf(id)):portrait(id,p.kind==='afuera'?'#e4e9f1':p.bg)}</span>`}
 function counts(eid){const its=S.items.filter(i=>i.ent===eid&&i.open&&seesItem(i));return {late:its.filter(i=>stat(i)==='bad').length,week:its.filter(i=>stat(i)==='warn').length,open:its.length}}
 function facesRow(remoteMode){return `<div class="faces">${Object.values(ENT).filter(e=>seesEnt(e.id)).map(e=>{const c=counts(e.id);const n=c.late||c.week;return `<button class="face" data-a="ent" data-id="${e.id}"><span class="fpic ${e.type==='persona'?'':'sq'}">${entPic(e.id)}</span>${n?`<span class="fb ${c.late?'bad':'warn'}">${n}</span>`:''}<b>${esc(e.name)}</b>${remoteMode?`<small>${c.late?c.late+' atrasado':c.week?c.week+' esta semana':'Al día'}</small>`:''}</button>`}).join('')}</div>`}
 /* alcance */
@@ -519,7 +525,7 @@ function weekStrip(list){
   const col=late?'#e4806f':its.length?'#f1c18f':'transparent';
   out.push(`<button class="wd ${k===0?'on':''}" data-a="nav" data-v="cal"><span>${['DOM','LUN','MAR','MIÉ','JUE','VIE','SÁB'][d.getDay()]}</span><b>${d.getDate()}</b><i style="background:${col}"></i></button>`)}
  return `<div class="week">${out.join('')}</div>`}
-function heroTools(){const n=avisos().length;return `<div class="htools"><button class="bell" data-a="avisos" aria-label="Avisos">${ic('bell')}${n?`<span class="n">${n}</span>`:''}</button><button class="av rg pic" data-a="nav" data-v="set" aria-label="Ajustes">${me().status==='activo'&&!S.user.startsWith('u')?portrait(S.user,'#e4e9f1'):portrait(S.user,'#e4e9f1')}</button></div>`}
+function heroTools(){const n=avisos().length;return `<div class="htools"><button class="bell" data-a="avisos" aria-label="Avisos">${ic('bell')}${n?`<span class="n">${n}</span>`:''}</button><button class="av rg pic" data-a="nav" data-v="set" aria-label="Ajustes">${photoOf(S.user)?imgTag(photoOf(S.user)):portrait(S.user,'#e4e9f1')}</button></div>`}
 
 /* ============ vistas ============ */
 function vHomeLocal(){
@@ -679,7 +685,7 @@ function vEnt(id){
  const details=e.type==='carro'?[['Marca',e.marca],['Modelo',e.modelo],['Año',e.anio],['Placa',e.placa]]:e.type==='casa'?[['Dirección',e.dir],['Ciudad',e.ciudad]]:f?[['Documento',f.doc],['EPS',f.eps]].concat(!isCare()||P[S.user].salud?[['Sangre',f.sangre]]:[]):[];
  return `<div class="wrap"><button class="back" data-a="back">${ic('back','s')}Volver</button>
  <div class="hub card hi">
-  <span class="hubpic ${e.type==='persona'?'':'sq'}">${entPic(id)}</span>
+  ${canEdit()?`<label class="hubpic edit ${e.type==='persona'?'':'sq'}" title="Cambiar foto">${entPic(id)}<span class="camb">${ic('cam','s')}</span><input type="file" accept="image/*" data-a="photoin" data-id="${id}" ${FIN}></label>`:`<span class="hubpic ${e.type==='persona'?'':'sq'}">${entPic(id)}</span>`}
   <div class="hubtx"><div class="eb dk">${e.type==='persona'?'Persona':e.type==='casa'?'Casa':'Vehículo'}</div><h1>${esc(e.full)}</h1>
   <div class="hubfacts">${details.filter(d=>d[1]).map(d=>`<span><small>${d[0]}</small><b>${esc(d[1])}</b></span>`).join('')}</div>
   <div class="hubstats">${g.bad.length?`<span class="pill bad">${g.bad.length} atrasado</span>`:''}${g.warn.length?`<span class="pill warn">${g.warn.length} esta semana</span>`:''}<span class="pill neu">${g.neu.length} más adelante</span><span class="pill ok">${g.ok.length} hechas</span></div>
@@ -700,7 +706,8 @@ function vSet(){
  const tg=(k,on,dis)=>`<button class="tg ${on?'on':''}" data-a="tg" data-k="${k}" ${dis?'disabled':''} aria-pressed="${on}" aria-label="${k}"></button>`;
  return `<div class="wrap"><div class="ph"><div><div class="eb dk">Ajustes</div><h1>Configuración</h1><p>Tu perfil, los avisos y quiénes participan.</p></div></div>
  <div class="h2s">Mi perfil</div>
- <div class="setsec"><div class="setrow">${av(S.user)}<div class="tx"><div class="t">${u.name}</div><div class="s">${ROLE[u.role]} · ${KIND[u.kind]}</div></div></div>
+ <div class="setsec"><div class="setrow"><label class="av pic lg edit" title="Cambiar mi foto" style="position:relative;cursor:pointer">${photoOf(S.user)?imgTag(photoOf(S.user)):portrait(S.user,u.kind==='afuera'?'#e4e9f1':u.bg)}<input type="file" accept="image/*" data-a="photoin" data-id="${S.user}" ${FIN}></label><div class="tx"><div class="t">${u.name}</div><div class="s">${ROLE[u.role]} · ${KIND[u.kind]}</div></div>
+ <label class="btn gh sm">${ic('cam','s')}Cambiar mi foto<input type="file" accept="image/*" data-a="photoin" data-id="${S.user}" ${FIN}></label>${photoOf(S.user)?`<button class="lnk" style="color:var(--bad)" data-a="rmphoto" data-id="${S.user}">Quitar</button>`:''}</div>
  <div class="setrow"><div class="tx"><div class="t">Tamaño de la letra</div><div class="s">Solo cambia en tu cuenta. Los demás ven el suyo.</div></div>
  <div class="sz">${['normal','grande','muy'].map(k=>`<button class="szo ${f===k?'on':''}" data-a="font" data-v="${k}"><b style="font-size:${k==='normal'?20:k==='grande'?26:32}px">Aa</b><span>${SCALE_L[k]}</span></button>`).join('')}</div></div></div>
  <div class="h2s">Avisos</div>
@@ -844,6 +851,10 @@ function modal(){
  if(m.k==='editent'){const e=ENT[m.id],er=m.err||{},f=m.f;
   const fld=(id,lab,ph,help)=>`<div class="fld"><label for="f_${id}">${lab}</label><input class="inp ${er[id]?'err':''}" id="f_${id}" value="${esc(f[id]||'')}" placeholder="${ph||''}">${er[id]?`<div class="er">${er[id]}</div>`:help?`<div class="help">${help}</div>`:''}</div>`;
   h=`<div class="sh"><h2>Editar ${e.type==='persona'?'persona':e.type==='casa'?'casa':'vehículo'}</h2>${X}</div><div class="sb">
+  <div style="display:flex;gap:16px;align-items:center;flex-wrap:wrap"><span class="hubpic ${e.type==='persona'?'':'sq'}" style="width:96px;height:96px">${entPic(e.id)}</span>
+  <div style="display:flex;flex-direction:column;gap:8px;flex:1;min-width:180px"><span class="lbl" style="margin:0">Foto</span>
+  <div class="opts"><label class="btn dark sm">${ic('cam','s')}Tomar<input type="file" accept="image/*" capture="environment" data-a="photoin" data-id="${e.id}" ${FIN}></label><label class="btn gh sm">${ic('up','s')}Elegir<input type="file" accept="image/*" data-a="photoin" data-id="${e.id}" ${FIN}></label></div>
+  ${photoOf(e.id)?`<button class="lnk" style="align-self:flex-start;color:var(--bad)" data-a="rmphoto" data-id="${e.id}">Quitar foto</button>`:''}</div></div>
   ${e.type==='carro'?fld('marca','Marca','Renault')+fld('modelo','Modelo','Logan')+fld('anio','Año','2016')+fld('placa','Placa','ABC 123','Carro: 3 letras y 3 números. Moto: 3 letras, 2 números y 1 letra.')
    :e.type==='casa'?fld('nombre','Nombre','Casa familiar')+fld('dir','Dirección','Calle 00 # 00-00')+fld('ciudad','Ciudad','Cali')
    :fld('full','Nombre completo','Luis')+fld('short','Cómo le dicen','Luis')}
@@ -908,6 +919,7 @@ const val=id=>{const e=document.getElementById(id);return e?e.value.trim():''};
 function adminsLeft(except,newRole){return Object.values(P).filter(p=>p.status==='activo'&&(p.id===except?newRole==='admin':p.role==='admin')).length}
 
 document.addEventListener('change',e=>{const t=e.target,a=t.dataset.a;
+ if(a==='photoin'){const f=t.files&&t.files[0];if(!f)return;if(!f.type.startsWith('image/')){toast('Elige una imagen (foto)');return}const id=t.dataset.id,u=URL.createObjectURL(f);if(ENT[id])ENT[id].photo=u;if(P[id])P[id].photo=u;if(S.modal&&S.modal.k==='editent'){const f2={};document.querySelectorAll('[id^=f_]').forEach(x=>f2[x.id.slice(2)]=x.value.trim());S.modal.f=f2}render();toast('Foto actualizada');return}
  if(a==='filein'){const f=t.files&&t.files[0];const m=S.modal;if(!f||!m)return;
   if(!(f.type.startsWith('image/')||f.type==='application/pdf')){m.err=t.dataset.ctx==='report'?'Ese archivo no sirve. Usa una foto o un PDF.':null;if(m.k==='adddoc'){m.err={f:1}}render();return}
   if(f.size>15*1024*1024){if(m.k==='report')m.err='El archivo pesa más de 15 MB. Prueba con una foto.';render();return}
@@ -955,6 +967,7 @@ document.addEventListener('click',e=>{
  case 'savedocedit':{const d=S.docs.find(x=>x.id===m.id);m.n=val('dn');m.v=val('dv');if(!m.n){m.err={n:1};render();break}d.name=m.n;d.cat=m.cat;d.until=m.v?fromIso(m.v):undefined;(d.log=d.log||[]).push([me().short+' (editó)',nowS()]);S.modal={k:'doc',id:d.id,opened:true};render();toast('Cambios guardados');break}
  case 'm-del-doc':S.menu=null;S.modal={k:'deldoc',id:t.dataset.id};render();break;
  case 'dodeldoc':{const d=S.docs.find(x=>x.id===m.id);S.docs=S.docs.filter(x=>x.id!==m.id);S.feed.unshift({at:'Ahora',who:S.user,x:`eliminó el papel “${d.name}”`});S.modal=null;render();toast('Papel enviado al archivo');break}
+ case 'rmphoto':{const id=t.dataset.id;if(ENT[id])delete ENT[id].photo;if(P[id])delete P[id].photo;if(S.modal&&S.modal.k==='editent'){const f2={};document.querySelectorAll('[id^=f_]').forEach(x=>f2[x.id.slice(2)]=x.value.trim());S.modal.f=f2}render();toast('Foto quitada');break}
  case 'nav':S.stack=[];if(t.dataset.v==='docs'){S.docCat=null}nav(t.dataset.v,null,false);break;
  case 'open':nav('item',t.dataset.id);break;
  case 'ent':nav('ent',t.dataset.id);break;
