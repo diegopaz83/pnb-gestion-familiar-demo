@@ -984,7 +984,8 @@ function modal(){
   <div class="fld"><label for="dname">¿Qué papel es?</label><input class="inp ${er.n?'err':''}" id="dname" value="${esc(m.n||'')}" placeholder="Ej.: Licencia de conducción de Luis">${er.n?'<div class="er">Ponle un nombre.</div>':''}</div>
   <div><span class="lbl">¿De quién?</span><div class="chips">${Object.values(ENT).filter(e=>seesEnt(e.id)).map(e=>`<button class="chip ${m.ent===e.id?'on':''}" data-a="setf" data-f="ent" data-v="${e.id}"><span class="dt" style="background:${e.fg}"></span>${e.name}</button>`).join('')}</div>${er.ent?'<div class="er">Elige de quién es.</div>':''}</div>
   <div><span class="lbl">¿En qué carpeta?</span><div class="chips">${CATS.filter(c=>!isCare()||!['Identidad','Propiedad'].includes(c[0])).map(c=>`<button class="chip ${m.cat===c[0]?'on':''}" data-a="setf" data-f="cat" data-v="${c[0]}">${c[0]}</button>`).join('')}</div>${er.cat?'<div class="er">Elige la carpeta.</div>':''}</div>
-  <div class="fld"><label for="dvence">¿Tiene fecha de vencimiento? (opcional)</label><input type="date" class="inp" id="dvence" value="${m.v||''}"><div class="help">Si vence, la app crea sola la tarea de renovarlo.</div></div>
+  <div class="setrow" style="padding:4px 0;border:0"><div class="tx"><div class="t">¿Tiene fecha de vencimiento?</div><div class="s">Si vence, la app crea sola la tarea de renovarlo.</div></div><div class="seg"><button class="${m.hasV?'':'on'}" data-a="hasv" data-v="">No</button><button class="${m.hasV?'on':''}" data-a="hasv" data-v="1">Sí</button></div></div>
+  ${m.hasV?`<div class="fld"><label for="dvence">Fecha de vencimiento</label><input type="date" class="inp ${m.err&&m.err.v?'err':''}" id="dvence" value="${m.v||''}">${m.err&&m.err.v?'<div class="er">Indica la fecha o cambia a No.</div>':''}</div>`:''}
   <button class="btn pri big full" data-a="savedoc">Guardar</button></div>`;
  }
  if(m.k==='doc'){
@@ -1074,7 +1075,8 @@ function modal(){
   h=`<div class="sh"><h2>Editar papel</h2>${X}</div><div class="sb">
   <div class="fld"><label for="dn">Nombre</label><input class="inp ${er.n?'err':''}" id="dn" value="${esc(m.n)}">${er.n?'<div class="er">Ponle un nombre.</div>':''}</div>
   <div><span class="lbl">Carpeta</span><div class="chips">${CATS.map(c=>`<button class="chip ${m.cat===c[0]?'on':''}" data-a="setf" data-f="cat" data-v="${c[0]}">${c[0]}</button>`).join('')}</div></div>
-  <div class="fld"><label for="dv">Vence (opcional)</label><input type="date" class="inp" id="dv" value="${m.v||''}"></div>
+  <div class="setrow" style="padding:4px 0;border:0"><div class="tx"><div class="t">¿Tiene fecha de vencimiento?</div></div><div class="seg"><button class="${m.hasV?'':'on'}" data-a="hasv" data-v="">No</button><button class="${m.hasV?'on':''}" data-a="hasv" data-v="1">Sí</button></div></div>
+  ${m.hasV?`<div class="fld"><label for="dv">Fecha de vencimiento</label><input type="date" class="inp ${m.err&&m.err.v?'err':''}" id="dv" value="${m.v||''}">${m.err&&m.err.v?'<div class="er">Indica la fecha o cambia a No.</div>':''}</div>`:''}
   <button class="btn pri big full" data-a="savedocedit">Guardar cambios</button></div>`}
  if(m.k==='deldoc'){const d=S.docs.find(x=>x.id===m.id);
   h=`<div class="sh"><h2>Eliminar “${esc(d.name)}”</h2>${X}</div><div class="sb">
@@ -1159,8 +1161,8 @@ document.addEventListener('click',e=>{
   i.title=m.t;i.due=fromIso(m.d);i.time=m.h||undefined;i.resp=m.resp;i.rec=m.rec==='Única'?undefined:m.rec;i.hist.push(['Hoy',me().short,'Editó: '+ch.join(', ')]);S.modal=null;render();toast('Cambios guardados');break}
  case 'm-del-item':S.menu=null;S.modal={k:'delitem',id:t.dataset.id};render();break;
  case 'dodelitem':{if(m.r==='Otro')m.o=val('dr');if(!m.r||(m.r==='Otro'&&!m.o)){m.err=1;render();break}const i=IT(m.id);S.items=S.items.filter(x=>x.id!==m.id);S.docs.forEach(d=>{if(d.link===m.id)delete d.link});S.feed.unshift({at:'Ahora',who:S.user,x:`eliminó “${i.title}”: ${m.r==='Otro'?m.o:m.r.toLowerCase()}`});S.modal=null;S.stack=[];S.view='home';render();toast('Eliminado. Quedó registrado con el motivo');break}
- case 'm-edit-doc':{const d=S.docs.find(x=>x.id===t.dataset.id);S.menu=null;S.modal={k:'editdoc',id:d.id,n:d.name,cat:d.cat,v:d.until?iso(d.until):''};render();break}
- case 'savedocedit':{const d=S.docs.find(x=>x.id===m.id);m.n=val('dn');m.v=val('dv');if(!m.n){m.err={n:1};render();break}d.name=m.n;d.cat=m.cat;d.until=m.v?fromIso(m.v):undefined;(d.log=d.log||[]).push([me().short+' (editó)',nowS()]);S.modal={k:'doc',id:d.id,opened:true};render();toast('Cambios guardados');break}
+ case 'm-edit-doc':{const d=S.docs.find(x=>x.id===t.dataset.id);S.menu=null;S.modal={k:'editdoc',id:d.id,n:d.name,cat:d.cat,v:d.until?iso(d.until):'',hasV:!!d.until};render();break}
+ case 'savedocedit':{const d=S.docs.find(x=>x.id===m.id);m.n=val('dn');m.v=m.hasV?val('dv'):'';if(!m.n||(m.hasV&&!m.v)){m.err={n:!m.n,v:m.hasV&&!m.v};render();break}d.name=m.n;d.cat=m.cat;d.until=m.v?fromIso(m.v):undefined;(d.log=d.log||[]).push([me().short+' (editó)',nowS()]);S.modal={k:'doc',id:d.id,opened:true};render();toast('Cambios guardados');break}
  case 'm-del-doc':S.menu=null;S.modal={k:'deldoc',id:t.dataset.id};render();break;
  case 'dodeldoc':{const d=S.docs.find(x=>x.id===m.id);S.docs=S.docs.filter(x=>x.id!==m.id);S.feed.unshift({at:'Ahora',who:S.user,x:`eliminó el papel “${d.name}”`});S.modal=null;render();toast('Papel enviado al archivo');break}
  case 'rmphoto':{const id=t.dataset.id;if(ENT[id])delete ENT[id].photo;if(P[id])delete P[id].photo;if(S.modal&&S.modal.k==='editent'){const f2={};document.querySelectorAll('[id^=f_]').forEach(x=>f2[x.id.slice(2)]=x.value.trim());S.modal.f=f2}render();toast('Foto quitada');break}
@@ -1240,8 +1242,9 @@ document.addEventListener('click',e=>{
  case 'sendmsg':{const i=IT(m.id);i.hist.push(['Hoy',me().short,'Le escribió a '+P[i.resp].short]);S.modal=null;render();toast('Mensaje enviado a '+P[i.resp].short+' (simulado)');break}
  case 'take':{const i=IT(t.dataset.id);i.resp=S.user;i.hist.push(['Hoy',me().short,'Lo tomó para hacerlo desde afuera']);addFeed(`se encargó de “${i.title.toLowerCase()}”`,i.id);render();toast('Ahora lo tienes tú');break}
  case 'adddoc':S.modal={k:'adddoc',ent:S.docF!=='todos'?S.docF:null,cat:S.docCat};render();break;
+ case 'hasv':if(m.k==='adddoc'){m.n=val('dname');if(m.hasV)m.v=val('dvence')}if(m.k==='editdoc'){m.n=val('dn');if(m.hasV)m.v=val('dv')}m.hasV=!!t.dataset.v;if(m.err)m.err.v=0;render();break;
  case 'dockind':m.n=val('dname');m.v=val('dvence');m.has=true;if(m.err)m.err.f=0;render();break;
- case 'savedoc':{m.n=val('dname');m.v=val('dvence');const er={};if(!m.n)er.n=1;if(!m.ent)er.ent=1;if(!m.file)er.f=1;if(!m.cat)er.cat=1;if(Object.keys(er).length){m.err=er;render();break}
+ case 'savedoc':{m.n=val('dname');m.v=m.hasV?val('dvence'):'';const er={};if(m.hasV&&!m.v)er.v=1;if(!m.n)er.n=1;if(!m.ent)er.ent=1;if(!m.file)er.f=1;if(!m.cat)er.cat=1;if(Object.keys(er).length){m.err=er;render();break}
   const doc={id:'d'+Date.now(),ent:m.ent,cat:m.cat,name:m.n,fmt:m.file.type.includes('pdf')?'PDF':'JPG',by:S.user,log:[],url:m.file.url,mime:m.file.type};let msg='Guardado en '+m.cat;
   if(m.v){const[y,mo,dd]=m.v.split('-').map(Number);doc.until=new Date(y,mo-1,dd);const id='r'+Date.now();S.items.push({id,ent:m.ent,title:'Renovar '+m.n.toLowerCase(),sub:'Vence el '+fdate(doc.until),cat:'otro',resp:ENT[m.ent].type==='persona'||P[S.user].kind!=='afuera'?'luis':S.user,due:doc.until,open:true,hist:[['Hoy','Sistema','Se creó desde el documento por su vencimiento']]});doc.link=id;msg+='. Creamos la tarea de renovarlo'}
   S.docs.push(doc);S.modal=null;S.docCat=m.cat;render();toast(msg);break}
