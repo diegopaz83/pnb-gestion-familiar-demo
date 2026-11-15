@@ -452,6 +452,10 @@ label.btn{cursor:pointer;position:relative}
 .opts .btn{white-space:nowrap;font-size:15px;padding-left:10px;padding-right:10px;gap:6px}
 .opts .btn .ic{width:20px;height:20px}
 @media(max-width:360px){.opts .btn{font-size:14px}}
+
+.rec.live{background:var(--bad-50);border-color:var(--bad-bg);color:var(--bad-t)}
+.wave.live{opacity:1!important;background:repeating-linear-gradient(90deg,var(--bad) 0 3px,transparent 3px 7px);animation:pulse 1s ease-in-out infinite}
+@keyframes pulse{50%{opacity:.4}}
 </style>
 </head>
 <body>
@@ -750,7 +754,7 @@ function vItem(id){
  </div>
  ${c?`<div class="card"><h2 style="font-size:20px">${isAppt(i)?'Cómo le fue':'Cómo se cerró'}</h2>
   <div style="display:flex;gap:14px;align-items:center;margin-top:14px">${c.kind==='nota'||c.kind==='nofui'?`<span class="docic" style="background:var(--info-50);color:var(--info)">${ic('msg')}</span>`:c.kind==='voz'?`<span class="docic" style="background:var(--gold-50);color:var(--gold-700)">${ic('mic')}</span>`:`<span class="docic">${(c.file||'').split('.').pop().toUpperCase()}</span>`}
-  <div><div style="font-weight:700;color:var(--fg-1)">${c.kind==='voz'?'Audio de '+P[c.by].short:c.kind==='nota'?'Nota de '+P[c.by].short:c.kind==='nofui'?'No fue':esc(c.file)}</div>${c.url&&(c.mime||'').startsWith('image/')?`<img src="${c.url}" alt="" style="max-width:220px;max-height:160px;border-radius:12px;margin-top:8px;display:block">`:''}<div class="muted">${P[c.by].short} · ${c.at}</div>${c.how?`<span class="pill ${c.how==='Bien'?'ok':c.how==='Regular'?'warn':'info'}" style="margin-top:6px">${esc(c.how)}</span>`:''}${c.note?`<div style="margin-top:4px">“${esc(c.note)}”</div>`:''}</div></div>
+  <div><div style="font-weight:700;color:var(--fg-1)">${c.kind==='voz'?'Audio de '+P[c.by].short:c.kind==='nota'?'Nota de '+P[c.by].short:c.kind==='nofui'?'No fue':esc(c.file)}</div>${c.url&&(c.mime||'').startsWith('image/')?`<img src="${c.url}" alt="" style="max-width:220px;max-height:160px;border-radius:12px;margin-top:8px;display:block">`:''}<div class="muted">${P[c.by].short} · ${c.at}</div>${c.audio?`<audio controls src="${c.audio.url}" style="width:100%;max-width:320px;margin-top:8px"></audio><div class="muted" style="font-size:13px">Audio de ${fmtDur(c.audio.dur)} · se borra a los 90 días</div>`:''}${c.how?`<span class="pill ${c.how==='Bien'?'ok':c.how==='Regular'?'warn':'info'}" style="margin-top:6px">${esc(c.how)}</span>`:''}${c.note?`<div style="margin-top:4px">“${esc(c.note)}”</div>`:''}</div></div>
   ${c.kind==='voz'?`<div class="banner warn" style="margin-top:12px">${ic('info','s')}<div>Se cerró sin papel. Queda la palabra de ${P[c.by].short}.</div></div>`:`<div class="muted" style="margin-top:10px">Guardado en Papeles · Recibos</div>`}
   ${remote()?`<div style="margin-top:14px"><button class="btn gh sm" data-a="reopen" data-id="${i.id}">Pedir que se revise</button></div>`:''}</div>`:''}
  </div>
@@ -920,7 +924,7 @@ function feedbackModal(m,X){
  if(m.res==='fui')return head+`<div class="sb"><h2>¿Cómo le fue?</h2>
   <div class="chips">${['Bien','Regular','Me pidieron algo más'].map(x=>`<button class="chip ${m.how===x?'on':''}" data-a="fbhow" data-v="${x}">${x}</button>`).join('')}</div>
   <div class="fld"><label for="fbnote">Cuéntalo en pocas palabras</label><textarea class="inp" id="fbnote" placeholder="Ej.: todo bien, cambió la dosis, control en 3 meses">${esc(m.note||'')}</textarea></div>
-  <div class="rec">${ic('mic')}<span>${m.rec?'Audio de 0:18':'O deja un audio'}</span><span class="wave" style="${m.rec?'':'opacity:.15'}"></span></div><button class="btn ${m.rec?'gh':'dark'} full" data-a="recvoice">${ic('mic')}${m.rec?'Grabar de nuevo':'Grabar audio'}</button>
+  ${recUI(m,'O deja un audio')}
   <div><span class="lbl">Foto de lo que le dieron (opcional)</span><div class="help" style="margin:-4px 0 8px">Orden, fórmula, resultados o constancia.</div>${pickers('report',!!m.file)}${m.file?`<div style="background:var(--navy-50);border-radius:14px;padding:10px;margin-top:8px">${filePreview(m.file)}</div>`:''}</div>
   ${er?`<div class="banner bad">${ic('alert','s')}<div>${er}</div></div>`:''}
   <button class="btn pri big full" data-a="fbsave">Guardar y cerrar la cita</button></div>`;
@@ -938,6 +942,22 @@ function modalPres(m){const e=ENT[m.id];
   <span class="prespic">${entPic(m.id)}</span><div class="presname">${esc(e.full)}</div>
   <div class="presrows">${[['Documento',pf.doc],['Fecha de nacimiento',pf.nace],['Celular',pf.cel],['Correo',pf.mail],['Dirección',pf.dir],['EPS',pf.eps]].filter(r=>r[1]).map(r=>`<div><small>${r[0]}</small><b>${esc(r[1])}</b></div>`).join('')}</div>
   ${m.share?`<div class="banner warn">${ic('alert','s')}<div>Vas a enviar estos datos por WhatsApp. Solo hazlo con quien te los pidió.</div></div><div class="opts"><button class="btn gh" data-a="noshare">Cancelar</button><button class="btn pri" data-a="toast" data-m="Abriría WhatsApp con los datos (simulado)">Enviar</button></div>`:`<button class="btn gh full" data-a="share">${ic('share','s')}Compartir por WhatsApp</button>`}</div></div>`}
+let REC=null;
+const fmtDur=s=>`${Math.floor(s/60)}:${String(Math.floor(s%60)).padStart(2,'0')}`;
+function recUI(m,label){
+ if(m.recording)return `<div class="rec live">${ic('mic')}<span>Grabando… <b id="recT">0:00</b> / 1:00</span><span class="wave live"></span></div><button class="btn danger full" data-a="recstop">Detener</button>`;
+ if(m.audio)return `<div class="rec">${ic('mic')}<span>Audio de ${fmtDur(m.audio.dur)}</span></div><audio controls src="${m.audio.url}" style="width:100%"></audio><button class="btn gh full" data-a="recvoice">${ic('mic')}Grabar de nuevo</button>`;
+ return `<div class="rec">${ic('mic')}<span>${m.rec?'Audio de 0:14 (simulado)':label}</span><span class="wave" style="${m.rec?'':'opacity:.15'}"></span></div>${m.recErr?`<div class="banner warn">${ic('info','s')}<div>${m.recErr}</div></div>`:''}<button class="btn ${m.rec?'gh':'dark'} full" data-a="recvoice">${ic('mic')}${m.rec?'Grabar de nuevo':'Grabar audio'}</button>`}
+async function startRec(m){
+ if(!navigator.mediaDevices||!window.MediaRecorder){m.rec=true;m.recErr='Este navegador no permite grabar aquí. En la app real sí se graba; en la demo queda un audio simulado.';render();return}
+ try{const st=await navigator.mediaDevices.getUserMedia({audio:true});
+  const mr=new MediaRecorder(st);const chunks=[];const t0=Date.now();
+  mr.ondataavailable=e=>{if(e.data.size)chunks.push(e.data)};
+  mr.onstop=()=>{st.getTracks().forEach(t=>t.stop());clearInterval(REC.iv);const blob=new Blob(chunks,{type:mr.mimeType||'audio/webm'});const dur=(Date.now()-t0)/1000;
+   if(S.modal===m){m.recording=false;m.audio={url:URL.createObjectURL(blob),dur,size:blob.size};m.rec=true;m.err=null;render()}REC=null};
+  REC={mr,iv:setInterval(()=>{const s=(Date.now()-t0)/1000;const el=document.getElementById('recT');if(el)el.textContent=fmtDur(s);if(s>=60)mr.stop()},250)};
+  mr.start();m.recording=true;m.recErr=null;m.audio=null;render();
+ }catch(err){m.rec=false;m.recErr='No se pudo usar el micrófono. Revisa el permiso del navegador'+(location.hostname.includes('claude')?' (dentro de Claude no se permite el micrófono: ábrelo en GitHub Pages)':'')+'.';render()}}
 function modal(){
  const m=S.modal;if(!m)return '';
  let h='';
@@ -954,8 +974,8 @@ function modal(){
   } else {
    h=`<div class="sh"><div><div class="eb dk">${esc(i.title)}</div></div>${X}</div>
    <div class="sb"><h2>${m.kind==='voz'?'Cuéntalo con un audio':v[1]}</h2>
-   ${m.kind==='voz'?`<div class="rec">${ic('mic')}<span>${m.rec?'Audio de 0:14':'Toca para grabar'}</span><span class="wave" style="${m.rec?'':'opacity:.15'}"></span></div>
-    <button class="btn ${m.rec?'gh':'dark'} full" data-a="recvoice">${ic('mic')}${m.rec?'Grabar de nuevo':'Grabar audio'}</button>
+   ${m.kind==='voz'?`${recUI(m,'Toca para grabar')}
+
     <button class="lnk" style="align-self:center" data-a="kind" data-v="foto">Mejor tomo una foto</button>`
    :`<div class="viewer">${m.file?'':'<div class="frame"></div>'}${m.file?filePreview(m.file,true)+`<div style="color:var(--on-1);font-weight:600;display:flex;gap:8px;align-items:center;position:relative">${ic('check','s')}Listo, se ve</div>`:`<div style="color:var(--on-2);text-align:center;position:relative">${ic('cam','l')}<div style="margin-top:6px">Todavía no hay foto</div></div>`}</div>
    ${pickers('report',!!m.file)}
@@ -1192,14 +1212,15 @@ document.addEventListener('click',e=>{
  case 'avisos':S.modal={k:'avisos'};render();break;
  case 'font':S.font[S.user]=t.dataset.v;render();toast('Letra: '+SCALE_L[t.dataset.v]);break;
  case 'tg':S.notif[t.dataset.k]=!S.notif[t.dataset.k];render();break;
- case 'close':case 'scrim':S.modal=null;render();break;
+ case 'close':case 'scrim':if(REC){try{REC.mr.stop()}catch(e){}}S.modal=null;render();break;
  case 'report':S.modal={k:'report',id:t.dataset.id,res:t.dataset.res||null};render();break;
  case 'kind':m.note=val('note');m.kind=t.dataset.v;if(m.kind==='voz')m.file=null;m.err=null;if(m.kind!=='voz')m.rec=false;render();break;
- case 'recvoice':m.note=val('note')||val('fbnote');m.rec=true;m.err=null;render();break;
+ case 'recvoice':m.note=val('note')||val('fbnote');m.err=null;m.audio=null;startRec(m);break;
+ case 'recstop':if(REC)REC.mr.stop();break;
  case 'nopaper':m.note=val('note');m.err=IT(m.id).cat==='pago'?'Para un pago necesitamos el recibo. Si pagaste por internet, sube el pantallazo. Si se perdió, pide un duplicado en la empresa o avísale a Diego.':'Sin papel no se puede cerrar. Si lo tienes en el correo, súbelo como archivo.';render();break;
- case 'send':{m.note=val('note');const i=IT(m.id);
+ case 'send':{if(m.recording)break;m.note=val('note');const i=IT(m.id);
   if(!m.kind||(m.kind==='voz'&&!m.rec)||(m.kind!=='voz'&&!m.file)){m.err=m.kind==='voz'?'Graba el audio contando qué hiciste.':'Falta la foto. Sin el papel no queda cerrado.';render();break}
-  i.open=false;i.closed={by:S.user,at:nowS(),kind:m.kind,file:m.file?m.file.name:null,url:m.file?m.file.url:null,mime:m.file?m.file.type:null,note:m.note};
+  i.open=false;i.closed={by:S.user,at:nowS(),kind:m.kind,audio:m.audio||null,file:m.file?m.file.name:null,url:m.file?m.file.url:null,mime:m.file?m.file.type:null,note:m.note};
   i.reopened=null;
   i.hist.push(['Hoy',me().short,`Lo cerró con ${m.kind==='foto'?'foto':m.kind==='archivo'?'archivo':'audio (sin papel)'}`]);
   if(m.kind!=='voz')S.docs.push({id:'d'+Date.now(),ent:i.ent,cat:'Recibos',name:`${i.title} · soporte`,fmt:m.file.type.includes('pdf')?'PDF':'JPG',by:S.user,url:m.file.url,mime:m.file.type});
@@ -1233,8 +1254,8 @@ document.addEventListener('click',e=>{
  case 'fbres':m.res=t.dataset.v;m.err=null;render();break;
  case 'fbhow':m.note=val('fbnote');m.how=t.dataset.v;m.err=null;render();break;
  case 'fbwhy':m.d=val('fbd');m.why=t.dataset.v;m.err=null;render();break;
- case 'fbsave':{m.note=val('fbnote');const i=IT(m.id);if(!m.how){m.err='Elige cómo le fue.';render();break}if(!m.note&&!m.rec&&!m.file){m.err='Cuéntalo con una nota, un audio o una foto. Así queda la constancia.';render();break}
-  i.open=false;i.closed={by:S.user,at:nowS(),kind:m.file?'foto':m.rec?'voz':'nota',file:m.file?m.file.name:null,url:m.file?m.file.url:null,mime:m.file?m.file.type:null,note:m.note,how:m.how};i.reopened=null;
+ case 'fbsave':{if(m.recording){m.err='Detén la grabación primero.';render();break}m.note=val('fbnote');const i=IT(m.id);if(!m.how){m.err='Elige cómo le fue.';render();break}if(!m.note&&!m.rec&&!m.file){m.err='Cuéntalo con una nota, un audio o una foto. Así queda la constancia.';render();break}
+  i.open=false;i.closed={by:S.user,at:nowS(),audio:m.audio||null,kind:m.file?'foto':m.rec?'voz':'nota',file:m.file?m.file.name:null,url:m.file?m.file.url:null,mime:m.file?m.file.type:null,note:m.note,how:m.how};i.reopened=null;
   i.hist.push(['Hoy',me().short,`Contó cómo le fue: ${m.how.toLowerCase()}${m.note?' · '+m.note:''}`]);
   if(m.file)S.docs.push({id:'d'+Date.now(),ent:i.ent,cat:'Salud',name:`${i.title} · ${fshort(i.due)}`,fmt:m.file.type.includes('pdf')?'PDF':'JPG',by:S.user,url:m.file.url,mime:m.file.type,log:[]});
   addFeed(`contó cómo fue “${i.title.toLowerCase()}” de ${ENT[i.ent].name}: ${m.how.toLowerCase()}`,i.id,m.file?'foto':m.rec?'voz':null);m.done=true;render();break}
