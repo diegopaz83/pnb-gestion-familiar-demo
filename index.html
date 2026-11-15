@@ -343,6 +343,25 @@ label.btn{cursor:pointer;position:relative}
 .hubpic.edit{position:relative;cursor:pointer;display:block}
 .hubpic .camb{position:absolute;right:6px;bottom:6px;width:36px;height:36px;border-radius:50%;background:var(--gold-500);color:var(--navy-800);display:grid;place-items:center;box-shadow:var(--sh-md);border:3px solid #fff}
 .hubpic.edit:hover{outline:3px solid var(--gold-300)}
+
+.tipos{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.tipo{background:var(--white);border:2px solid var(--line);border-radius:20px;padding:16px;display:flex;flex-direction:column;gap:10px;align-items:flex-start;text-align:left;color:var(--fg-1)}
+.tipo:hover{border-color:var(--gold-500);background:var(--gold-50)}
+.tipo .fic{width:48px;height:48px;border-radius:15px;background:var(--gold-50);color:var(--gold-700);display:grid;place-items:center}
+.tipo b{font-size:16px}
+.cds{display:grid;gap:10px}
+@media(min-width:960px){.cds{grid-template-columns:repeat(2,1fr)}}
+.cd{display:flex;gap:14px;align-items:center;background:var(--white);border-radius:22px;padding:12px;box-shadow:var(--sh-sm);border:2px solid transparent;text-align:left;width:100%}
+.cd:hover{border-color:var(--gold-300)}
+.cdn{width:72px;height:72px;border-radius:18px;background:var(--navy-800);color:var(--gold-500);display:flex;flex-direction:column;align-items:center;justify-content:center;flex:none}
+.cdn b{font-size:28px;font-weight:300;line-height:1}
+.cdn small{font-size:12px;color:var(--on-2);margin-top:2px}
+.cdt{display:flex;gap:10px;align-items:center;min-width:0}
+.cdt .t{font-weight:700;color:var(--fg-1);font-size:17px}
+.cdt .s{font-size:14px;color:var(--fg-3)}
+.apbox{display:flex;flex-direction:column;gap:8px;margin-top:16px}
+.aprow{display:flex;gap:12px;align-items:center;background:var(--cream);border-radius:14px;padding:10px 12px;flex-wrap:wrap}
+.aprow>.ic{color:var(--gold-700)}
 </style>
 </head>
 <body>
@@ -369,7 +388,8 @@ const ROLE={admin:'Administrador',miembro:'Miembro',cuidador:'Cuidador/a'};
 const KIND={casa:'Vive en la casa',afuera:'Acompaña desde afuera',cuidador:'Cuidador/a'};
 const SCALE={normal:.88,grande:1,muy:1.12};
 const SCALE_L={normal:'Normal',grande:'Grande',muy:'Muy grande'};
-const VERB={pago:['Ya lo pagué','Toma una foto del recibo pagado','Si pagaste por internet, sube el pantallazo.'],medicamento:['Ya los compré','Toma una foto de la factura de la droguería','La compra no dice si se están tomando: eso es otra cosa.'],cita:['Ya fui','Toma una foto de la constancia o de la orden que te dieron','Si no te dieron papel, puedes contarlo con un audio.'],vehiculo:['Ya la hice','Toma una foto del certificado nuevo','El certificado debe mostrar la nueva fecha.'],otro:['Ya lo hice','Toma una foto que lo muestre','']};
+const actLabel=i=>isAppt(i)?'¿Cómo le fue?':VERB[i.cat][0];
+const VERB={pago:['Ya lo pagué','Toma una foto del recibo pagado','Si pagaste por internet, sube el pantallazo.'],medicamento:['Ya los compré','Toma una foto de la factura de la droguería','La compra no dice si se están tomando: eso es otra cosa.'],cita:['Ya fui','Toma una foto de la constancia o de la orden que te dieron','Si no te dieron papel, puedes contarlo con un audio.'],examen:['Ya fui','Toma una foto de la constancia','Si no te dieron papel, cuéntalo con un audio.'],vehiculo:['Ya la hice','Toma una foto del certificado nuevo','El certificado debe mostrar la nueva fecha.'],otro:['Ya lo hice','Toma una foto que lo muestre','']};
 const CATS=[['Identidad','id',true,'Cédulas, licencia, pasaporte'],['Propiedad','house',true,'Escrituras, certificados'],['Salud','heart',true,'Carnés, fórmulas, órdenes'],['Seguros','shield',false,'SOAT, pólizas'],['Vehículo','car',false,'Tarjeta, certificados'],['Recibos','file',false,'Soportes de pagos y gestiones']];
 const FICHA={
  luis:{doc:'CC •••• 4521',eps:'EPS Ejemplo (ficticia)',sangre:'O+ (ejemplo)',alergias:'Ninguna conocida (ejemplo)',medico:'Dra. Ejemplo · cardiología',nace:'Ejemplo: 1950'},
@@ -380,19 +400,22 @@ function seed(){P=baseP();ENT=baseEnt();return{
  user:'luis',view:'home',arg:null,stack:[],modal:null,toast:null,calM:10,docF:'todos',docCat:null,
  font:{luis:'grande',lucero:'grande',diego:'normal',adriana:'normal'},
  notif:{app:true,mail:true,wa:false,hora:'7:00 a. m.'},
+ places:{p1:{name:'Clínica del Valle (ficticia)',dir:'Av. Ejemplo # 10-20',tel:'602 000 0001'},p2:{name:'EPS Ejemplo · sede Norte',dir:'Calle Ejemplo # 40-15',tel:'602 000 0002'},p3:{name:'Consultorio dental Norte (ficticio)',dir:'Carrera Ejemplo # 5-30',tel:'602 000 0003'},p4:{name:'Laboratorio Central (ficticio)',dir:'Calle Ejemplo # 22-08',tel:'602 000 0004'}},
  items:[
   {id:'gas',ent:'casa',title:'Pagar el gas',sub:'Factura de octubre',cat:'pago',resp:'luis',due:D(11,12),amount:'$ 86.400',rec:'Cada mes',open:true,hist:[['1 nov','Sistema','Se creó para este mes']]},
   {id:'rtm',ent:'carro',title:'Revisión técnico-mecánica',sub:'Certificado anual',cat:'vehiculo',resp:'luis',due:D(11,10),rec:'Cada año',open:true,hist:[['10 oct','Sistema','Se creó al acercarse el vencimiento del certificado']]},
   {id:'remlu',ent:'lucero',title:'Remedios de Lucero',sub:'Compra del mes',cat:'medicamento',resp:'luis',due:D(11,17),rec:'Cada mes',open:true,sens:true,hist:[['1 nov','Sistema','Se creó para este mes']]},
   {id:'luz',ent:'casa',title:'Pagar la luz',sub:'Factura de noviembre',cat:'pago',resp:'adriana',due:D(11,18),amount:'$ 214.900',rec:'Cada mes',open:true,hist:[['13 nov','Adriana','Se encargó: la paga por internet']]},
-  {id:'cardio',ent:'luis',title:'Cita del corazón',sub:'Control de cardiología',cat:'cita',resp:'luis',due:D(11,20),time:'9:30 a. m.',open:true,sens:true,prep:'Llevar la orden y los exámenes',hist:[['2 nov','Luis','Anotó la cita']]},
+  {id:'cardio',ent:'luis',title:'Cita de cardiología',sub:'Control',cat:'cita',resp:'luis',due:D(11,20),time:'9:30 a. m.',place:'p1',acomp:'lucero',open:true,sens:true,prep:'Llevar la orden y los exámenes',attach:{name:'orden_cardiologia.jpg'},hist:[['2 nov','Luis','Anotó la cita']]},
+  {id:'tension',ent:'lucero',title:'Control de tensión',sub:'Medicina general',cat:'cita',resp:'lucero',due:D(11,13),time:'10:00 a. m.',place:'p2',open:true,sens:true,hist:[['3 nov','Lucero','Anotó la cita']]},
+  {id:'eco',ent:'luis',title:'Ecografía abdominal',sub:'Examen',cat:'examen',resp:'luis',due:D(11,24),time:'7:00 a. m.',place:'p4',ayunas:true,open:true,sens:true,attach:{name:'orden_ecografia.jpg'},hist:[['10 nov','Lucero','Anotó el examen y adjuntó la orden']]},
   {id:'remluis',ent:'luis',title:'Remedios de Luis',sub:'Compra del mes',cat:'medicamento',resp:'luis',due:D(11,21),rec:'Cada mes',open:true,sens:true,hist:[['1 nov','Sistema','Se creó para este mes']]},
   {id:'soat',ent:'carro',title:'Renovar el SOAT',sub:'Vence la póliza actual',cat:'vehiculo',resp:'diego',due:D(11,28),rec:'Cada año',open:true,hist:[['29 oct','Sistema','Se creó porque el SOAT vence el 28 nov'],['30 oct','Diego','Se encargó: lo compra por internet']]},
-  {id:'odonto',ent:'lucero',title:'Odontología de Lucero',sub:'Cita de control · la acompaña Luis',cat:'cita',resp:'lucero',due:D(12,3),time:'2:00 p. m.',open:true,sens:true,hist:[['14 nov','Lucero','Anotó la cita']]},
+  {id:'odonto',ent:'lucero',title:'Cita de odontología',sub:'Control',cat:'cita',resp:'lucero',due:D(12,3),time:'2:00 p. m.',place:'p3',acomp:'luis',open:true,sens:true,hist:[['14 nov','Lucero','Anotó la cita']]},
   {id:'predial',ent:'casa',title:'Impuesto predial',sub:'Año 2026',cat:'pago',resp:'diego',due:D(12,15),amount:'$ 1.120.000',rec:'Cada año',open:true,hist:[['1 nov','Sistema','Se creó para este año']]},
   {id:'licencia',ent:'luis',title:'Renovar licencia de conducción',sub:'Vence el 20 de enero de 2027',cat:'otro',resp:'luis',due:new Date(2027,0,20),open:true,hist:[['15 nov','Sistema','Se creó desde el documento: la licencia vence en enero']]},
   {id:'agua',ent:'casa',title:'Pagar el agua',sub:'Factura de octubre',cat:'pago',resp:'luis',due:D(11,5),amount:'$ 97.300',rec:'Cada mes',open:false,closed:{by:'luis',at:'3 nov · 10:12 a. m.',kind:'foto',file:'recibo_agua_oct.jpg',note:''},hist:[['1 oct','Sistema','Se creó para este mes'],['3 nov','Luis','Lo cerró con foto del recibo']]},
-  {id:'labs',ent:'luis',title:'Exámenes de sangre',sub:'Laboratorio',cat:'cita',resp:'luis',due:D(11,14),open:false,sens:true,closed:{by:'luis',at:'14 nov · 8:40 a. m.',kind:'voz',file:null,note:'No me dieron papel. Los resultados llegan al correo en 3 días'},hist:[['5 nov','Luis','Anotó los exámenes'],['14 nov','Luis','Lo cerró con un audio: no le dieron papel']]}
+  {id:'labs',ent:'luis',title:'Exámenes de sangre',sub:'Laboratorio',cat:'examen',resp:'luis',due:D(11,14),time:'6:30 a. m.',place:'p4',ayunas:true,open:false,sens:true,closed:{by:'luis',at:'14 nov · 8:40 a. m.',kind:'voz',file:null,note:'No me dieron papel. Los resultados llegan al correo en 3 días'},hist:[['5 nov','Luis','Anotó los exámenes'],['14 nov','Luis','Lo cerró con un audio: no le dieron papel']]}
  ],
  docs:[
   {id:'d9',ent:'luis',cat:'Identidad',name:'Cédula de Luis',fmt:'JPG',log:[['Diego','2 nov · 9:15 a. m.']]},
@@ -448,6 +471,9 @@ heart:'<path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1-1.1a5.5 5.5 0 0 0-7.8 7.
 shield:'<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>',
 phone:'<path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1.9.4 1.8.7 2.7a2 2 0 0 1-.5 2.1L8 9.8a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.7.7a2 2 0 0 1 1.7 2z"/>',
 card:'<rect x="3" y="4" width="18" height="16" rx="2"/><path d="M7 9h10M7 13h6"/>',
+flask:'<path d="M9 3h6M10 3v6l-5 9a2 2 0 0 0 1.7 3h10.6a2 2 0 0 0 1.7-3l-5-9V3"/><path d="M7.5 15h9"/>',
+pill:'<path d="M10.5 20.5a5 5 0 0 1-7-7l7-7a5 5 0 0 1 7 7z"/><path d="m8.5 8.5 7 7"/>',
+pin:'<path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0z"/><circle cx="12" cy="10" r="3"/>',
 kebab:'<circle cx="12" cy="5" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="12" cy="19" r="1.6"/>',
 edit:'<path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/>',
 trash:'<path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6"/>',
@@ -465,7 +491,9 @@ const fday=d=>{const n=days(d);if(n===0)return 'Hoy';if(n===1)return 'Mañana';i
 const fdate=d=>`${DIA[d.getDay()]} ${d.getDate()} de ${MES[d.getMonth()]}${d.getFullYear()!==2026?' de '+d.getFullYear():''}`;
 const fshort=d=>`${d.getDate()} ${MES[d.getMonth()].slice(0,3)}${d.getFullYear()!==2026?' '+d.getFullYear():''}`;
 function stat(i){if(!i.open)return 'ok';const n=days(i.due);if(n<0)return 'bad';if(n<=7)return 'warn';return 'neu'}
-function statTxt(i){if(!i.open)return 'Hecho';const n=days(i.due);if(n<0)return `Atrasado ${-n} ${-n===1?'día':'días'}`;return fday(i.due)}
+const isAppt=i=>i.cat==='cita'||i.cat==='examen';
+const PL=i=>i.place&&S.places[i.place];
+function statTxt(i){if(!i.open)return 'Hecho';if(isAppt(i)){const n=days(i.due);if(n<0)return `Fue hace ${-n} ${-n===1?'día':'días'} · ¿cómo le fue?`;if(n===0)return `Hoy${i.time?' '+i.time:''}`;if(n===1)return `Mañana${i.time?' '+i.time:''}`;return `Faltan ${n} días`}const n=days(i.due);if(n<0)return `Atrasado ${-n} ${-n===1?'día':'días'}`;return fday(i.due)}
 const statColor={bad:'var(--bad)',warn:'var(--warn)',neu:'var(--fg-3)',ok:'var(--ok)'};
 const LOOK={luis:{skin:'#e3b48e',hair:'#cfcfcf',style:'short',glasses:1,shirt:'#2c4673'},lucero:{skin:'#eec29f',hair:'#d9d4cc',style:'bob',shirt:'#b4570f'},diego:{skin:'#d9a57f',hair:'#2a2420',style:'short',beard:1,shirt:'#0d1b33'},adriana:{skin:'#e8b996',hair:'#3a2a20',style:'long',shirt:'#8a6d0f'}};
 function portrait(key,bg){const L=LOOK[key]||{skin:'#d9b08f',hair:'#5a4636',style:(key.charCodeAt(key.length-1)%2?'long':'short'),shirt:'#5b7096'};
@@ -488,7 +516,9 @@ function facesRow(remoteMode){return `<div class="faces">${Object.values(ENT).fi
 function seesEnt(eid,u=S.user){const p=P[u];if(p.kind!=='cuidador')return true;return (p.scope||[]).includes(eid)}
 function seesItem(i,u=S.user){if(!seesEnt(i.ent,u))return false;if(i.sens&&isCare(u)&&!P[u].salud)return i.resp===u;return true}
 function seesDoc(d,u=S.user){if(!seesEnt(d.ent,u))return false;if(isCare(u)){if(['Identidad','Propiedad'].includes(d.cat))return false;if(d.cat==='Salud'&&!P[u].salud)return false}return true}
-function canReport(i,u=S.user){if(!i.open)return false;const k=P[u].kind;if(k==='casa')return i.resp==='luis'||i.resp==='lucero';if(k==='cuidador')return seesItem(i,u)&&(i.resp==='luis'||i.resp==='lucero'||i.resp===u);return i.resp===u}
+function canReport(i,u=S.user){if(!i.open)return false;if(isAppt(i)&&days(i.due)>0)return false;const k=P[u].kind;if(k==='casa')return i.resp==='luis'||i.resp==='lucero';if(k==='cuidador')return seesItem(i,u)&&(i.resp==='luis'||i.resp==='lucero'||i.resp===u);return i.resp===u}
+function collectA(m){document.querySelectorAll('[id^=a_]').forEach(x=>m.f[x.id.slice(2)]=x.value.trim())}
+function fmtTime(h){const[H,M]=h.split(':').map(Number);const ap=H>=12?'p. m.':'a. m.';return `${H%12||12}:${String(M).padStart(2,'0')} ${ap}`}
 const iso=d=>`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
 const fromIso=s=>{const[y,m,d]=s.split('-').map(Number);return new Date(y,m-1,d)};
 const canEdit=()=>!isCare();
@@ -505,6 +535,7 @@ function addFeed(x,id,kind){S.feed.unshift({at:'Ahora',who:S.user,x,id,kind})}
 function avisos(){
  const out=[];const u=S.user;
  S.items.filter(i=>i.open&&seesItem(i)&&stat(i)==='bad'&&(i.resp===u||canReport(i)||remote())).forEach(i=>out.push({ic:'alert',c:'var(--bad)',x:`${i.title}: ${statTxt(i).toLowerCase()}`,id:i.id}));
+ S.items.filter(i=>i.open&&isAppt(i)&&seesItem(i)&&days(i.due)>=0&&days(i.due)<=7).forEach(i=>{const n=days(i.due);out.push({ic:'cal',c:'var(--info)',x:`${n===0?'Hoy':n===1?'Mañana':'Faltan '+n+' días'}: ${i.title} de ${ENT[i.ent].name}${i.time?' · '+i.time:''}${PL(i)?' · '+PL(i).name:''}`,id:i.id})});
  S.items.filter(i=>i.open&&i.reopened&&canReport(i)).forEach(i=>out.push({ic:'msg',c:'var(--warn)',x:`${P[i.reopened.by].short} pidió revisar: ${i.title}`,id:i.id}));
  S.feed.filter(f=>f.who!==u&&IT(f.id)&&seesItem(IT(f.id))).slice(0,3).forEach(f=>out.push({ic:'info',c:'var(--info)',x:`${P[f.who].short} ${f.x}`,id:f.id,at:f.at}));
  return out}
@@ -513,11 +544,11 @@ function avisos(){
 function taskRow(i,{showWho=true}={}){
  const st=stat(i),deleg=i.open&&P[i.resp].kind==='afuera'&&!remote();
  const can=canReport(i);
- const whoLine=i.resp!==S.user?`<div class="s">${i.open?'Lo hace '+P[i.resp].short:'Lo hizo '+P[i.closed.by].short}</div>`:(i.prep?`<div class="s">${esc(i.prep)}</div>`:'');
+ const whoLine=isAppt(i)&&i.open?`<div class="s">${PL(i)?esc(PL(i).name):''}${i.time&&days(i.due)>1?' · '+fday(i.due).toLowerCase()+' '+i.time:''}${i.acomp?' · acompaña '+P[i.acomp].short:''}</div>`:i.resp!==S.user?`<div class="s">${i.open?'Lo hace '+P[i.resp].short:'Lo hizo '+P[i.closed.by].short}</div>`:(i.prep?`<div class="s">${esc(i.prep)}</div>`:'');
  return `<div class="task click ${deleg?'deleg':''}" data-a="open" data-id="${i.id}" role="button" tabindex="0">
  ${entTile(i.ent,'sm')}
- <div class="tx"><div class="t">${esc(i.title)}</div><div class="m" style="color:${statColor[st]}">${statTxt(i)}${i.time&&i.open?' · '+i.time:''}${i.reopened&&i.open?' · revisar':''}</div>${showWho?whoLine:''}</div>
- ${can?`<button class="chk" data-a="report" data-id="${i.id}" aria-label="${VERB[i.cat][0]}">${ic('check','l')}</button>`:(!i.open?`<span class="chk" style="background:var(--ok-bg);border-color:var(--ok-bg);color:var(--ok)">${ic('check','l')}</span>`:'')}
+ <div class="tx"><div class="t">${esc(i.title)}</div><div class="m" style="color:${statColor[st]}">${statTxt(i)}${i.time&&i.open&&!isAppt(i)?' · '+i.time:''}${i.reopened&&i.open?' · revisar':''}</div>${showWho?whoLine:''}</div>
+ ${can?`<button class="chk" data-a="report" data-id="${i.id}" aria-label="${actLabel(i)}">${ic('check','l')}</button>`:(!i.open?`<span class="chk" style="background:var(--ok-bg);border-color:var(--ok-bg);color:var(--ok)">${ic('check','l')}</span>`:'')}
  </div>`}
 function weekStrip(list){
  const out=[];for(let k=0;k<7;k++){const d=new Date(2026,10,15+k);const its=list.filter(i=>i.open&&i.due.toDateString()===d.toDateString());
@@ -528,6 +559,9 @@ function weekStrip(list){
 function heroTools(){const n=avisos().length;return `<div class="htools"><button class="bell" data-a="avisos" aria-label="Avisos">${ic('bell')}${n?`<span class="n">${n}</span>`:''}</button><button class="av rg pic" data-a="nav" data-v="set" aria-label="Ajustes">${photoOf(S.user)?imgTag(photoOf(S.user)):portrait(S.user,'#e4e9f1')}</button></div>`}
 
 /* ============ vistas ============ */
+function countdown(){const ap=S.items.filter(i=>i.open&&isAppt(i)&&seesItem(i)&&days(i.due)>=0&&days(i.due)<=14).sort((a,b)=>a.due-b.due);
+ if(!ap.length)return '';
+ return `<div class="shd"><span class="dot" style="background:var(--info)"></span><h2>Citas y exámenes</h2><span class="c">${ap.length}</span></div><div class="cds">${ap.map(i=>{const n=days(i.due);return `<button class="cd" data-a="open" data-id="${i.id}"><div class="cdn"><b>${n===0?'Hoy':n===1?'1':n}</b><small>${n===0?(i.time||''):n===1?'día':'días'}</small></div><div class="cdt">${entTile(i.ent,'sm')}<div><div class="t">${esc(i.title)}</div><div class="s">${ENT[i.ent].name} · ${fday(i.due)}${i.time?', '+i.time:''}</div>${PL(i)?`<div class="s">${esc(PL(i).name)}</div>`:''}${i.ayunas?'<span class="pill warn" style="margin-top:4px">En ayunas</span>':''}</div></div></button>`}).join('')}</div>`}
 function vHomeLocal(){
  const u=me();
  const care=isCare();
@@ -536,22 +570,24 @@ function vHomeLocal(){
  const week=mine.filter(i=>stat(i)==='warn');
  const later=mine.filter(i=>stat(i)==='neu');
  const deleg=care?[]:S.items.filter(i=>i.open&&P[i.resp].kind==='afuera'&&days(i.due)<=14);
- const first=late[0]||week[0];
- const rest=[...late,...week].filter(i=>i!==first);
- const head=first?`${u.short}, ${stat(first)==='bad'?'hoy toca':'lo próximo es'}: ${first.title.toLowerCase()}`:`Todo al día, ${u.short}`;
+ const first=late[0]||week.filter(i=>!isAppt(i))[0]||week[0];
+ const upA=i=>isAppt(i)&&days(i.due)>=0;
+ const rest=[...late,...week].filter(i=>i!==first&&!upA(i));
+ const head=first?(isAppt(first)&&days(first.due)<0?`${u.short}, falta contar cómo fue: ${first.title.toLowerCase()}`:`${u.short}, ${stat(first)==='bad'?'hoy toca':'lo próximo es'}: ${first.title.toLowerCase()}`):`Todo al día, ${u.short}`;
  const mainCard=first?`<div class="card hi main-task">
-  <div class="row">${entTile(first.ent)}<div><span class="pill ${stat(first)}">${statTxt(first)}${first.time?' · '+first.time:''}</span><h3 style="margin-top:6px">${esc(first.title)}</h3><div class="muted" style="font-size:16px">${esc(first.sub)}${first.amount?' · '+first.amount:''}${first.resp!==S.user?' · lo tiene '+P[first.resp].short:''}</div></div></div>
+  <div class="row">${entTile(first.ent)}<div><span class="pill ${stat(first)}">${statTxt(first)}${first.time&&!isAppt(first)?' · '+first.time:''}</span><h3 style="margin-top:6px">${esc(first.title)}</h3><div class="muted" style="font-size:16px">${isAppt(first)&&PL(first)?esc(PL(first).name):esc(first.sub)}${first.amount?' · '+first.amount:''}${first.resp!==S.user?' · lo tiene '+P[first.resp].short:''}</div></div></div>
   ${first.reopened?`<div class="banner warn">${ic('alert','s')}<div><b>${P[first.reopened.by].short} pidió revisar:</b> ${esc(first.reopened.reason)}</div></div>`:''}
-  ${canReport(first)?`<button class="btn pri big full" data-a="report" data-id="${first.id}">${ic('cam')}${VERB[first.cat][0]}</button>`:''}
+  ${canReport(first)?`<button class="btn pri big full" data-a="report" data-id="${first.id}">${isAppt(first)?ic('msg'):ic('cam')}${actLabel(first)}</button>`:''}
   <button class="lnk" style="align-self:center" data-a="open" data-id="${first.id}">Ver detalles</button></div>`
   :`<div class="empty"><div class="big">${ic('check','l')}</div><h3>No hay nada pendiente esta semana</h3><p>Cuando haya algo por hacer, aparecerá aquí con tiempo.</p></div>`;
  const famHtml=Object.values(ENT).filter(e=>seesEnt(e.id)).map(e=>{const al=S.items.some(i=>i.ent===e.id&&seesItem(i)&&stat(i)==='bad');return `<button class="famb" data-a="ent" data-id="${e.id}"><span class="av" style="background:${e.bg};color:${e.fg}">${entInner(e.id)}</span>${al?'<span class="badge"></span>':''}${e.name}</button>`}).join('');
  return `<section class="hero"><div class="top"><span class="eb">${fdate(TODAY)}</span>${heroTools()}</div><h1>${esc(head)}</h1>${facesRow(false)}</section>
  <div class="wrap lift"><div class="cols"><div>
  ${mainCard}
+ ${countdown()}
  ${rest.length?`<div class="shd"><span class="dot" style="background:var(--warn)"></span><h2>Esta semana</h2><span class="c">${rest.length}</span></div><div class="stack">${rest.map(i=>taskRow(i)).join('')}</div>`:''}
  ${deleg.length?`<div class="shd"><h2>Lo hacen Diego y Adriana</h2></div><div class="stack">${deleg.map(i=>`<div class="task deleg">${entTile(i.ent,'sm')}<div class="tx"><div class="t" style="font-size:17px">${esc(i.title)} · ${fday(i.due).toLowerCase()}</div><div class="s">Lo hace ${P[i.resp].short} desde afuera. No tienes que hacer nada.</div></div></div>`).join('')}</div>`:''}
- ${later.length?`<div class="shd"><h2>Más adelante</h2><span class="c">${later.length}</span></div><div class="stack">${later.map(i=>taskRow(i)).join('')}</div>`:''}
+ ${later.filter(i=>!(upA(i)&&days(i.due)<=14)).length?`<div class="shd"><h2>Más adelante</h2><span class="c">${later.filter(i=>!(upA(i)&&days(i.due)<=14)).length}</span></div><div class="stack">${later.filter(i=>!(upA(i)&&days(i.due)<=14)).map(i=>taskRow(i)).join('')}</div>`:''}
  </div><div>
  ${care?'':`<div class="shd desk-only" style="margin-top:0"><h2>Lo último</h2></div><div class="shd mob-only"><h2>Lo último</h2></div><div class="card">${feedHtml(4)}</div>`}
  </div></div></div>`;
@@ -583,6 +619,7 @@ function vHomeRemote(){
  <div class="cols" style="margin-top:6px"><div>
  ${lateCasa.length?`<div class="shd"><span class="dot" style="background:var(--bad)"></span><h2>Necesita tu atención</h2></div><div class="stack">${lateCasa.map(i=>`<div class="card alert"><div style="display:flex;gap:14px;align-items:center">${entTile(i.ent,'sm')}<div><div style="font-size:18px;font-weight:700;color:var(--fg-1)">${esc(i.title)}</div><div style="color:var(--bad);font-weight:600;font-size:15px">${statTxt(i)} · lo tiene ${P[i.resp].short}</div></div></div>
  <div style="display:flex;gap:10px;margin-top:14px;flex-wrap:wrap"><button class="btn pri sm" data-a="write" data-id="${i.id}">${ic('msg','s')}Escribirle a ${P[i.resp].short}</button><button class="btn sec sm" data-a="take" data-id="${i.id}">Lo gestiono yo</button></div></div>`).join('')}</div>`:''}
+ ${countdown()}
  <div class="shd"><h2>Lo que haces tú desde afuera</h2><span class="c">${mine.length}</span></div>
  ${mine.length?`<div class="stack">${mine.map(i=>taskRow(i,{showWho:false})).join('')}</div>`:`<div class="empty"><div class="big">${ic('check','l')}</div><h3>No tienes nada a tu cargo</h3><p>Puedes tomar algo que esté atrasado.</p></div>`}
  ${theirs.length?`<div class="shd"><h2>Lo de ${P[other].short}</h2></div><div class="stack">${theirs.map(i=>taskRow(i)).join('')}</div>`:''}
@@ -598,15 +635,21 @@ function vItem(id){
  <div class="card"><div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center"><span class="pill ${st}">${statTxt(i)}</span>${i.sens?'<span class="pill gold">Salud</span>':''}${i.reopened&&i.open?'<span class="pill warn">Pidieron revisar</span>':''}</div>
  <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:16px">
  <div><div class="muted">Fecha</div><div style="font-weight:700;color:var(--fg-1)">${fdate(i.due)}${i.time?', '+i.time:''}</div></div>
- <div><div class="muted">${i.open?'Lo hace':'Lo hizo'}</div><div style="font-weight:700;color:var(--fg-1);display:flex;gap:8px;align-items:center">${av(i.open?i.resp:c.by,'sm')}${P[i.open?i.resp:c.by].short}</div></div></div>
+ <div><div class="muted">${isAppt(i)?(i.open?'Va':'Fue'):i.open?'Lo hace':'Lo hizo'}</div><div style="font-weight:700;color:var(--fg-1);display:flex;gap:8px;align-items:center">${av(i.open?i.resp:c.by,'sm')}${P[i.open?i.resp:c.by].short}</div></div></div>
+ ${isAppt(i)?`<div class="apbox">${PL(i)?`<div class="aprow">${ic('pin')}<div style="flex:1"><b>${esc(PL(i).name)}</b><div class="muted">${esc(PL(i).dir||'')}</div></div><button class="btn gh sm" data-a="toast" data-m="Abriría el mapa (simulado)">Cómo llegar</button><button class="btn gh sm" data-a="toast" data-m="Llamada simulada a ${esc(PL(i).tel||'')}">${ic('phone','s')}</button></div>`:''}
+ ${i.acomp?`<div class="aprow">${av(i.acomp,'sm')}<div>Acompaña: <b>${P[i.acomp].short}</b></div></div>`:''}
+ ${i.ayunas?`<div class="aprow">${ic('alert')}<div><b>En ayunas</b></div></div>`:''}
+ ${i.attach?`<div class="aprow">${ic('file')}<div style="flex:1">Orden adjunta: <b>${esc(i.attach.name)}</b></div>${i.attach.url?`<a class="lnk" href="${i.attach.url}" target="_blank">Ver</a>`:''}</div>`:''}
+ ${i.open?`<div class="aprow">${ic('bell')}<div class="muted">En la app se recuerda todos los días. Avisos: 7, 3 y 1 día antes y el mismo día.</div></div>`:''}
+ ${i.open&&days(i.due)>0&&canEdit()?`<button class="btn gh sm" style="align-self:flex-start" data-a="report" data-id="${i.id}" data-res="cambio">Cambió la fecha</button>`:''}</div>`:''}
  ${i.prep?`<div class="banner info" style="margin-top:14px">${ic('info','s')}<div>${esc(i.prep)}</div></div>`:''}
  ${i.reopened&&i.open?`<div class="banner warn" style="margin-top:14px">${ic('alert','s')}<div><b>${P[i.reopened.by].short} pidió revisar:</b> ${esc(i.reopened.reason)}</div></div>`:''}
- ${can?`<button class="btn pri big full" style="margin-top:18px" data-a="report" data-id="${i.id}">${ic('cam')}${VERB[i.cat][0]}</button>`:''}
+ ${can?`<button class="btn pri big full" style="margin-top:18px" data-a="report" data-id="${i.id}">${isAppt(i)?ic('msg'):ic('cam')}${actLabel(i)}</button>`:''}
  ${i.open&&!can&&remote()&&i.resp!==S.user?`<div style="display:flex;gap:10px;margin-top:18px;flex-wrap:wrap"><button class="btn sec sm" data-a="take" data-id="${i.id}">Lo gestiono yo</button>${P[i.resp].kind!=='afuera'?`<button class="btn gh sm" data-a="write" data-id="${i.id}">${ic('msg','s')}Escribirle a ${P[i.resp].short}</button>`:''}</div>`:''}
  </div>
- ${c?`<div class="card"><h2 style="font-size:20px">Cómo se cerró</h2>
-  <div style="display:flex;gap:14px;align-items:center;margin-top:14px">${c.kind==='voz'?`<span class="docic" style="background:var(--gold-50);color:var(--gold-700)">${ic('mic')}</span>`:`<span class="docic">${(c.file||'').split('.').pop().toUpperCase()}</span>`}
-  <div><div style="font-weight:700;color:var(--fg-1)">${c.kind==='voz'?'Audio de '+P[c.by].short:esc(c.file)}</div>${c.url&&(c.mime||'').startsWith('image/')?`<img src="${c.url}" alt="" style="max-width:220px;max-height:160px;border-radius:12px;margin-top:8px;display:block">`:''}<div class="muted">${P[c.by].short} · ${c.at}</div>${c.note?`<div style="margin-top:4px">“${esc(c.note)}”</div>`:''}</div></div>
+ ${c?`<div class="card"><h2 style="font-size:20px">${isAppt(i)?'Cómo le fue':'Cómo se cerró'}</h2>
+  <div style="display:flex;gap:14px;align-items:center;margin-top:14px">${c.kind==='nota'||c.kind==='nofui'?`<span class="docic" style="background:var(--info-50);color:var(--info)">${ic('msg')}</span>`:c.kind==='voz'?`<span class="docic" style="background:var(--gold-50);color:var(--gold-700)">${ic('mic')}</span>`:`<span class="docic">${(c.file||'').split('.').pop().toUpperCase()}</span>`}
+  <div><div style="font-weight:700;color:var(--fg-1)">${c.kind==='voz'?'Audio de '+P[c.by].short:c.kind==='nota'?'Nota de '+P[c.by].short:c.kind==='nofui'?'No fue':esc(c.file)}</div>${c.url&&(c.mime||'').startsWith('image/')?`<img src="${c.url}" alt="" style="max-width:220px;max-height:160px;border-radius:12px;margin-top:8px;display:block">`:''}<div class="muted">${P[c.by].short} · ${c.at}</div>${c.how?`<span class="pill ${c.how==='Bien'?'ok':c.how==='Regular'?'warn':'info'}" style="margin-top:6px">${esc(c.how)}</span>`:''}${c.note?`<div style="margin-top:4px">“${esc(c.note)}”</div>`:''}</div></div>
   ${c.kind==='voz'?`<div class="banner warn" style="margin-top:12px">${ic('info','s')}<div>Se cerró sin papel. Queda la palabra de ${P[c.by].short}.</div></div>`:`<div class="muted" style="margin-top:10px">Guardado en Papeles · Recibos</div>`}
   ${remote()?`<div style="margin-top:14px"><button class="btn gh sm" data-a="reopen" data-id="${i.id}">Pedir que se revise</button></div>`:''}</div>`:''}
  </div>
@@ -671,6 +714,8 @@ const PROPS=[
  ['DEC-026','Cuidador/a con alcance por persona y permiso aparte para ver salud; sin acceso a identidad ni propiedad.'],
  ['DEC-027','Sin tema oscuro.'],
  ['DEC-030','La persona es el centro por jerarquía: página de cada persona, casa o carro ordenada por urgencia; se retira el mapa radial.'],
+ ['DEC-033','Anotar por tipo: cita, examen, remedios, pago, renovar documento u otra cosa; cada tipo pide sus datos (citas y exámenes: fecha, hora, lugar, orden).'],
+ ['DEC-034','Citas y exámenes: cuenta regresiva diaria en la app; avisos 7, 3, 1 día y el mismo día; se cierran con “¿Cómo le fue?”.'],
  ['DEC-031','Fotos en lugar de iniciales y fila de caritas con contador de pendientes en el inicio. Retratos ilustrados de ejemplo hasta subir fotos reales, que se guardan privadas.']
 ];
 function vEnt(id){
@@ -715,6 +760,7 @@ function vSet(){
  <div class="setrow"><div class="tx"><div class="t">Dentro de la app</div><div class="s">Siempre activos: la campana muestra lo atrasado y lo nuevo.</div></div>${tg('app',true,true)}</div>
  <div class="setrow"><div class="tx"><div class="t">Correo</div><div class="s">Un resumen diario y lo urgente.</div></div>${tg('mail',S.notif.mail)}</div>
  <div class="setrow"><div class="tx"><div class="t">WhatsApp <span class="pill neu" style="margin-left:6px">Más adelante</span></div><div class="s">Se evaluará en una etapa posterior.</div></div>${tg('wa',false,true)}</div>
+ <div class="setrow"><div class="tx"><div class="t">Citas y exámenes</div><div class="s">En la app: cuenta regresiva todos los días. Avisos: 7, 3 y 1 día antes y el mismo día. Después: “¿Cómo le fue?”.</div></div></div>
  <div class="setrow"><div class="tx"><div class="t">Resumen diario</div><div class="s">${remote()?'En tu hora local. Las fechas siempre se muestran con la hora de Cali.':'A esta hora llega el resumen del día.'}</div></div><select class="sel" data-a="hora">${['6:00 a. m.','7:00 a. m.','8:00 a. m.','7:00 p. m.'].map(h=>`<option ${S.notif.hora===h?'selected':''}>${h}</option>`).join('')}</select></div></div>
  <div class="h2s">Miembros y roles</div>
  ${adm?'':`<div class="banner info" style="margin-bottom:12px">${ic('info','s')}<div>Solo Diego y Adriana pueden invitar, cambiar roles o quitar accesos.</div></div>`}
@@ -733,11 +779,56 @@ function vSet(){
 const FIN='style="position:absolute;width:1px;height:1px;opacity:0;overflow:hidden"';
 function pickers(ctx,has){return `<div class="opts"><label class="btn ${has?'gh':'dark'}">${ic('cam')}${has?'Otra foto':'Tomar foto'}<input type="file" accept="image/*" capture="environment" data-a="filein" data-ctx="${ctx}" data-kind="foto" ${FIN}></label><label class="btn gh">${ic('up')}Subir archivo<input type="file" accept="image/*,application/pdf" data-a="filein" data-ctx="${ctx}" data-kind="archivo" ${FIN}></label></div>`}
 function filePreview(f,dark){if(!f)return '';if(f.type.startsWith('image/'))return `<img src="${f.url}" alt="${esc(f.name)}" style="max-width:100%;max-height:260px;border-radius:14px;display:block;position:relative">`;return `<div style="display:flex;gap:12px;align-items:center;position:relative;color:${dark?'var(--on-1)':'var(--fg-1)'}"><span class="docic">PDF</span><b style="word-break:break-all">${esc(f.name)}</b></div>`}
+const TIPOS=[['cita','Cita médica','heart'],['examen','Examen o laboratorio','flask'],['medicamento','Remedios','pill'],['pago','Pago','card'],['documento','Renovar documento','id'],['otro','Otra cosa','plus']];
+function chipsF(m,f,opts){return `<div class="chips">${opts.map(o=>`<button class="chip ${m.f[f]===o[0]?'on':''}" data-a="af" data-f="${f}" data-v="${o[0]}">${o[2]?`<span class="dt" style="background:${o[2]}"></span>`:''}${o[1]}</button>`).join('')}</div>`}
+function inF(m,id,lab,ph,type,er){return `<div class="fld"><label for="a_${id}">${lab}</label><input class="inp ${er[id]?'err':''}" id="a_${id}" type="${type||'text'}" value="${esc(m.f[id]||'')}" placeholder="${ph||''}">${er[id]?`<div class="er">${er[id]}</div>`:''}</div>`}
+function addModal(m,X){
+ if(!m.tipo){return `<div class="sh"><h2>¿Qué quieres anotar?</h2>${X}</div><div class="sb"><div class="tipos">${TIPOS.map(t=>`<button class="tipo" data-a="tipo" data-v="${t[0]}"><span class="fic">${ic(t[2])}</span><b>${t[1]}</b></button>`).join('')}</div></div>`}
+ const er=m.err||{},t=m.tipo,T=TIPOS.find(x=>x[0]===t);
+ const personas=Object.values(ENT).filter(e=>e.type==='persona'&&seesEnt(e.id)).map(e=>[e.id,e.name,e.fg]);
+ const todas=Object.values(ENT).filter(e=>seesEnt(e.id)).map(e=>[e.id,e.name,e.fg]);
+ const lbl=(x,req)=>`<span class="lbl">${x}</span>`;
+ const lugar=`<div>${lbl('¿Dónde?')}${chipsF(m,'place',Object.entries(S.places).map(([k,p])=>[k,p.name]).concat([['nuevo','+ Otro lugar']]))}${er.place?`<div class="er">${er.place}</div>`:''}
+  ${m.f.place==='nuevo'?`<div style="margin-top:10px">${inF(m,'pname','Nombre del lugar','Ej.: Clínica de la 5ta','text',er)}${inF(m,'pdir','Dirección (opcional)','Calle 5 # 10-20','text',er)}</div>`:''}</div>`;
+ const adj=`<div>${lbl('Adjuntar la orden (opcional)')}${pickers('add',!!m.file)}${m.file?`<div style="background:var(--navy-50);border-radius:14px;padding:10px;margin-top:8px">${filePreview(m.file)}</div>`:''}</div>`;
+ const fecha=(l)=>`<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">${inF(m,'fecha',l||'Fecha','','date',er)}${inF(m,'hora','Hora','','time',er)}</div>`;
+ let body='';
+ if(t==='cita')body=`<div>${lbl('¿Para quién?')}${chipsF(m,'para',personas)}${er.para?'<div class="er">Elige para quién.</div>':''}</div>${inF(m,'esp','Especialidad o motivo','Ej.: cardiología, control, odontología','text',er)}${fecha()}${lugar}<div>${lbl('¿Quién acompaña? (opcional)')}${chipsF(m,'acomp',[['','Nadie']].concat(Object.values(P).filter(p=>p.status==='activo').map(p=>[p.id,p.short])))}</div>${inF(m,'prep','Preparación (opcional)','Ej.: llevar los exámenes anteriores','text',er)}${adj}`;
+ if(t==='examen')body=`<div>${lbl('¿Para quién?')}${chipsF(m,'para',personas)}${er.para?'<div class="er">Elige para quién.</div>':''}</div>${inF(m,'esp','¿Qué examen?','Ej.: exámenes de sangre, ecografía','text',er)}${fecha()}${lugar}<div class="setrow" style="padding:4px 0;border:0"><div class="tx"><div class="t">En ayunas</div></div><button class="tg ${m.f.ayunas?'on':''}" data-a="af" data-f="ayunas" data-v="${m.f.ayunas?'':'1'}" aria-pressed="${!!m.f.ayunas}" aria-label="En ayunas"></button></div>${adj}`;
+ if(t==='medicamento')body=`<div>${lbl('¿Para quién?')}${chipsF(m,'para',personas)}${er.para?'<div class="er">Elige para quién.</div>':''}</div>${inF(m,'fecha','Próxima compra','','date',er)}<div>${lbl('¿Cada cuánto?')}${chipsF(m,'rec',[['Cada mes','Cada mes'],['Cada 15 días','Cada 15 días'],['Una vez','Una vez']])}</div><div>${lbl('Fórmula (opcional)')}${pickers('add',!!m.file)}${m.file?`<div style="background:var(--navy-50);border-radius:14px;padding:10px;margin-top:8px">${filePreview(m.file)}</div>`:''}</div>`;
+ if(t==='pago')body=`<div>${lbl('¿De qué?')}${chipsF(m,'para',todas.filter(x=>ENT[x[0]].type!=='persona').concat(todas.filter(x=>ENT[x[0]].type==='persona')))}${er.para?'<div class="er">Elige de qué es.</div>':''}</div>${inF(m,'esp','¿Qué se paga?','Ej.: internet, administración, gas','text',er)}${inF(m,'valor','Valor (opcional)','Ej.: 86400','text',er)}${inF(m,'fecha','Fecha límite','','date',er)}<div>${lbl('¿Se repite?')}${chipsF(m,'rec',[['Cada mes','Cada mes'],['Cada año','Cada año'],['Una vez','Una vez']])}</div>`;
+ if(t==='documento')body=`<div>${lbl('¿De quién?')}${chipsF(m,'para',todas.filter(x=>ENT[x[0]].type!=='casa'))}${er.para?'<div class="er">Elige de quién.</div>':''}</div>${inF(m,'esp','¿Qué documento?','Ej.: licencia de conducción, pasaporte','text',er)}${inF(m,'fecha','¿Cuándo vence?','','date',er)}<p class="help" style="margin:0">Se recuerda desde un mes antes.</p>`;
+ if(t==='otro')body=`${inF(m,'esp','¿Qué hay que hacer?','Ej.: llevar el televisor a arreglar','text',er)}<div>${lbl('¿Para quién o para qué?')}${chipsF(m,'para',todas)}${er.para?'<div class="er">Elige uno.</div>':''}</div>${fecha()}${inF(m,'lugar','Lugar (opcional)','','text',er)}`;
+ return `<div class="sh"><div><button class="lnk" data-a="tipo" data-v="">${ic('back','s')} Cambiar tipo</button><h2 style="margin-top:6px">${T[1]}</h2></div>${X}</div><div class="sb">${body}<p class="help" style="margin:0">Lo ve toda la familia y cualquiera lo puede gestionar.</p><button class="btn pri big full" data-a="saveadd">Guardar</button></div>`;
+}
+function feedbackModal(m,X){
+ const i=IT(m.id),E_=ENT[i.ent];
+ if(m.done){const fu=m.how==='Me pidieron algo más';return `<div class="sb"><div class="done"><div class="big">${ic('check')}</div><h2>${m.res==='cambio'?'Listo, cita movida.':'Listo, quedó registrado.'}</h2><p class="muted" style="font-size:17px;margin:0">${m.res==='cambio'?`Nueva fecha: ${fdate(i.due)}${i.time?', '+i.time:''}. Los recordatorios se ajustaron.`:'Toda la familia ya lo puede ver.'}</p>
+  ${fu?`<div style="width:100%"><span class="lbl">¿Qué le pidieron?</span><div class="stack"><button class="btn gh full" data-a="followup" data-v="cita" data-ent="${i.ent}">${ic('heart','s')}Anotar nueva cita</button><button class="btn gh full" data-a="followup" data-v="examen" data-ent="${i.ent}">${ic('flask','s')}Anotar exámenes</button><button class="btn gh full" data-a="followup" data-v="medicamento" data-ent="${i.ent}">${ic('pill','s')}Anotar remedios</button></div></div>`:''}
+  <button class="btn pri big full" data-a="close">Volver</button></div></div>`}
+ const head=`<div class="sh"><div style="display:flex;gap:12px;align-items:center">${entTile(i.ent,'sm')}<div><div class="eb dk">${esc(i.title)} · ${E_.name}</div><div class="muted">${fdate(i.due)}${i.time?', '+i.time:''}${PL(i)?' · '+esc(PL(i).name):''}</div></div></div>${X}</div>`;
+ if(!m.res)return head+`<div class="sb"><h2>¿Cómo le fue a ${E_.name}?</h2><div class="stack">
+  <button class="btn pri big full" data-a="fbres" data-v="fui">${ic('check')}Fue</button>
+  <button class="btn gh big full" data-a="fbres" data-v="cambio">${ic('cal')}La cambiaron de fecha</button>
+  <button class="btn gh big full" data-a="fbres" data-v="nofui">${ic('x')}No fue</button></div></div>`;
+ const er=m.err;
+ if(m.res==='fui')return head+`<div class="sb"><h2>¿Cómo le fue?</h2>
+  <div class="chips">${['Bien','Regular','Me pidieron algo más'].map(x=>`<button class="chip ${m.how===x?'on':''}" data-a="fbhow" data-v="${x}">${x}</button>`).join('')}</div>
+  <div class="fld"><label for="fbnote">Cuéntalo en pocas palabras</label><textarea class="inp" id="fbnote" placeholder="Ej.: todo bien, cambió la dosis, control en 3 meses">${esc(m.note||'')}</textarea></div>
+  <div class="rec">${ic('mic')}<span>${m.rec?'Audio de 0:18':'O deja un audio'}</span><span class="wave" style="${m.rec?'':'opacity:.15'}"></span></div><button class="btn ${m.rec?'gh':'dark'} full" data-a="recvoice">${ic('mic')}${m.rec?'Grabar de nuevo':'Grabar audio'}</button>
+  <div><span class="lbl">Foto de lo que le dieron (opcional)</span><div class="help" style="margin:-4px 0 8px">Orden, fórmula, resultados o constancia.</div>${pickers('report',!!m.file)}${m.file?`<div style="background:var(--navy-50);border-radius:14px;padding:10px;margin-top:8px">${filePreview(m.file)}</div>`:''}</div>
+  ${er?`<div class="banner bad">${ic('alert','s')}<div>${er}</div></div>`:''}
+  <button class="btn pri big full" data-a="fbsave">Guardar y cerrar la cita</button></div>`;
+ if(m.res==='cambio')return head+`<div class="sb"><h2>¿Para cuándo quedó?</h2><div style="display:grid;grid-template-columns:1fr 1fr;gap:10px"><div class="fld"><label for="fbd">Nueva fecha</label><input class="inp ${er?'err':''}" type="date" id="fbd" value="${m.d||''}"></div><div class="fld"><label for="fbh">Hora</label><input class="inp" type="time" id="fbh" value="${m.h||''}"></div></div>${er?`<div class="er">${er}</div>`:''}<button class="btn pri big full" data-a="fbcambio">Guardar nueva fecha</button></div>`;
+ if(m.res==='nofui')return head+`<div class="sb"><h2>¿Qué pasó?</h2><div class="chips">${['Se me olvidó','Se sintió mal','La cancelaron','Otro'].map(x=>`<button class="chip ${m.why===x?'on':''}" data-a="fbwhy" data-v="${x}">${x}</button>`).join('')}</div>
+  <div class="fld"><label for="fbd">¿Se reprograma? Nueva fecha (opcional)</label><input class="inp" type="date" id="fbd" value="${m.d||''}"><div class="help">Si no pones fecha, la cita se cierra como “no fue”.</div></div>${er?`<div class="er">${er}</div>`:''}<button class="btn pri big full" data-a="fbnofui">Guardar</button></div>`;
+}
 function modal(){
  const m=S.modal;if(!m)return '';
  let h='';
  const X=`<button class="x" data-a="close" aria-label="Cerrar">${ic('x')}</button>`;
- if(m.k==='report'){
+ if(m.k==='report'&&isAppt(IT(m.id))){h=feedbackModal(m,X)}
+ else if(m.k==='report'){
   const i=IT(m.id),v=VERB[i.cat];
   if(m.done){
    const others=Object.values(P).filter(p=>p.id!==S.user&&p.kind!=='cuidador'&&p.status==='activo').map(p=>p.short);
@@ -761,17 +852,7 @@ function modal(){
    <button class="lnk" style="align-self:center;font-size:13px;color:var(--fg-3)" data-a="send" data-off="1">Simular: sin internet</button></div>`;
   }
  }
- if(m.k==='add'){
-  const er=m.err||{};
-  const chip=(f,val,lab,dot)=>`<button class="chip ${m[f]===val?'on':''}" data-a="setf" data-f="${f}" data-v="${val}">${dot?`<span class="dt" style="background:${dot}"></span>`:''}${lab}</button>`;
-  h=`<div class="sh"><h2>Anotar algo</h2>${X}</div><div class="sb">
-  <div class="fld"><label for="ttl">¿Qué hay que hacer?</label><input class="inp ${er.t?'err':''}" id="ttl" value="${esc(m.t||'')}" placeholder="Ej.: Cita con el oftalmólogo">${er.t?'<div class="er">Escribe qué hay que hacer.</div>':''}</div>
-  <div><span class="lbl">¿Para quién o para qué?</span><div class="chips">${Object.values(ENT).filter(e=>seesEnt(e.id)).map(e=>chip('ent',e.id,e.name,e.fg)).join('')}</div>${er.ent?'<div class="er">Elige uno.</div>':''}</div>
-  <div><span class="lbl">¿Cuándo?</span><div class="chips">${chip('when','hoy','Hoy')}${chip('when','manana','Mañana')}${chip('when','semana','Esta semana')}${chip('when','fecha','Otra fecha')}</div>
-  ${m.when==='fecha'?`<input type="date" class="inp" id="fecha" style="margin-top:10px" value="${m.fecha||''}">`:''}${er.when?'<div class="er">Elige cuándo.</div>':''}</div>
-  <div><span class="lbl">¿Quién lo hace?</span><div class="chips">${Object.values(P).filter(p=>p.status==='activo').map(p=>chip('resp',p.id,p.short)).join('')}</div></div>
-  <button class="btn pri big full" data-a="saveadd">Guardar</button></div>`;
- }
+ if(m.k==='add'){h=addModal(m,X)}
  if(m.k==='reopen'){
   const i=IT(m.id),who=i.closed?.by||i.resp;
   h=`<div class="sh"><h2>Pedir que se revise</h2>${X}</div><div class="sb">
@@ -923,7 +1004,9 @@ document.addEventListener('change',e=>{const t=e.target,a=t.dataset.a;
  if(a==='filein'){const f=t.files&&t.files[0];const m=S.modal;if(!f||!m)return;
   if(!(f.type.startsWith('image/')||f.type==='application/pdf')){m.err=t.dataset.ctx==='report'?'Ese archivo no sirve. Usa una foto o un PDF.':null;if(m.k==='adddoc'){m.err={f:1}}render();return}
   if(f.size>15*1024*1024){if(m.k==='report')m.err='El archivo pesa más de 15 MB. Prueba con una foto.';render();return}
-  if(m.k==='report'){m.note=val('note');m.kind=t.dataset.kind;m.err=null;m.rec=false}
+  if(m.k==='report'&&!isAppt(IT(m.id))){m.note=val('note');m.kind=t.dataset.kind;m.err=null;m.rec=false}
+  if(m.k==='add'){collectA(m)}
+  if(m.k==='report'&&isAppt(IT(m.id))){m.note=val('fbnote');m.err=null}
   if(m.k==='adddoc'){m.n=val('dname')||f.name.replace(/\.[^.]+$/,'');m.v=val('dvence');if(m.err)m.err.f=0}
   m.file={name:f.name,type:f.type,url:URL.createObjectURL(f)};render();return}
  if(a==='who'){S.user=t.value;S.view='home';S.stack=[];S.modal=null;S.docCat=null;S.docF='todos';render();scrollTo(0,0);toast('Ahora ves como '+me().name)}
@@ -986,9 +1069,9 @@ document.addEventListener('click',e=>{
  case 'font':S.font[S.user]=t.dataset.v;render();toast('Letra: '+SCALE_L[t.dataset.v]);break;
  case 'tg':S.notif[t.dataset.k]=!S.notif[t.dataset.k];render();break;
  case 'close':case 'scrim':S.modal=null;render();break;
- case 'report':S.modal={k:'report',id:t.dataset.id};render();break;
+ case 'report':S.modal={k:'report',id:t.dataset.id,res:t.dataset.res||null};render();break;
  case 'kind':m.note=val('note');m.kind=t.dataset.v;if(m.kind==='voz')m.file=null;m.err=null;if(m.kind!=='voz')m.rec=false;render();break;
- case 'recvoice':m.note=val('note');m.rec=true;m.err=null;render();break;
+ case 'recvoice':m.note=val('note')||val('fbnote');m.rec=true;m.err=null;render();break;
  case 'nopaper':m.note=val('note');m.err=IT(m.id).cat==='pago'?'Para un pago necesitamos el recibo. Si pagaste por internet, sube el pantallazo. Si se perdió, pide un duplicado en la empresa o avísale a Diego.':'Sin papel no se puede cerrar. Si lo tienes en el correo, súbelo como archivo.';render();break;
  case 'send':{m.note=val('note');const i=IT(m.id);
   if(!m.kind||(m.kind==='voz'&&!m.rec)||(m.kind!=='voz'&&!m.file)){m.err=m.kind==='voz'?'Graba el audio contando qué hiciste.':'Falta la foto. Sin el papel no queda cerrado.';render();break}
@@ -999,12 +1082,39 @@ document.addEventListener('click',e=>{
   addFeed(`${i.cat==='pago'?'pagó':'cerró'} “${i.title.toLowerCase()}”`,i.id,m.kind);
   m.done=true;m.offline=!!t.dataset.off;render();break}
  case 'sync':S.modal=null;render();toast('Enviado. La familia ya lo puede ver');break;
- case 'add':S.modal={k:'add',ent:t.dataset.ent||null,resp:me().kind==='afuera'?S.user:'luis'};render();break;
- case 'setf':if(m.k==='add'){m.t=val('ttl');if(m.when==='fecha')m.fecha=val('fecha')}if(m.k==='adddoc'){m.n=val('dname');m.v=val('dvence')}if(m.k==='invite'){m.n=val('iname');m.c=val('icontact')}if(m.k==='addent')m.n=val('ename');if(m.k==='edititem'){m.t=val('et');m.d=val('ed');m.h=val('eh')}if(m.k==='editdoc'){m.n=val('dn');m.v=val('dv')}if(m.k==='delitem'&&m.r==='Otro')m.o=val('dr');m[t.dataset.f]=t.dataset.v;if(m.err)m.err[t.dataset.f]=0;render();break;
- case 'saveadd':{m.t=val('ttl');if(m.when==='fecha')m.fecha=val('fecha');const er={};if(!m.t)er.t=1;if(!m.ent)er.ent=1;if(!m.when||(m.when==='fecha'&&!m.fecha))er.when=1;if(Object.keys(er).length){m.err=er;render();break}
-  let d=new Date(TODAY);if(m.when==='manana')d.setDate(16);else if(m.when==='semana')d.setDate(20);else if(m.when==='fecha'){const[y,mo,dd]=m.fecha.split('-').map(Number);d=new Date(y,mo-1,dd)}
-  const id='n'+Date.now();S.items.push({id,ent:m.ent,title:m.t,sub:'Anotado por '+me().short,cat:'otro',resp:m.resp||'luis',due:d,open:true,by:S.user,hist:[['Hoy',me().short,'Lo anotó']]});
-  addFeed(`anotó “${m.t}”`,id);S.modal=null;render();toast('Anotado. Ya lo ve toda la familia');break}
+ case 'add':S.modal={k:'add',f:{para:t.dataset.ent||null,rec:null},tipo:null};render();break;
+ case 'followup':S.modal={k:'add',tipo:t.dataset.v,f:{para:t.dataset.ent,rec:t.dataset.v==='medicamento'?'Cada mes':null}};render();break;
+ case 'tipo':collectA(m);m.tipo=t.dataset.v||null;m.err=null;if(m.tipo==='pago'&&!m.f.rec)m.f.rec='Cada mes';if(m.tipo==='medicamento'&&!m.f.rec)m.f.rec='Cada mes';render();break;
+ case 'af':collectA(m);m.f[t.dataset.f]=t.dataset.v;if(m.err)m.err[t.dataset.f]=0;render();break;
+ case 'saveadd':{collectA(m);const f=m.f,tp=m.tipo,er={};
+  if(!f.para)er.para=1;
+  if(['cita','examen','pago','documento','otro'].includes(tp)&&!f.esp)er.esp=tp==='otro'?'Escribe qué hay que hacer.':'Completa este dato.';
+  if(!f.fecha)er.fecha='Indica la fecha.';
+  if((tp==='cita'||tp==='examen')){if(!f.hora)er.hora='Indica la hora.';if(!f.place)er.place='Elige el lugar.';if(f.place==='nuevo'&&!f.pname)er.pname='Escribe el nombre del lugar.'}
+  if(Object.keys(er).length){m.err=er;render();break}
+  let place=f.place;if(place==='nuevo'){place='p'+Date.now();S.places[place]={name:f.pname,dir:f.pdir||'',tel:''}}
+  const due=fromIso(f.fecha);const time=f.hora?fmtTime(f.hora):undefined;const id='n'+Date.now();
+  const ent=f.para,isP=ENT[ent].type==='persona';const resp=isP&&P[ent]?ent:'luis';
+  const titles={cita:'Cita de '+(f.esp||'').toLowerCase(),examen:f.esp,medicamento:'Remedios de '+ENT[ent].name,pago:'Pagar '+(f.esp||'').toLowerCase(),documento:'Renovar '+(f.esp||'').toLowerCase(),otro:f.esp};
+  const it={id,ent,title:titles[tp].charAt(0).toUpperCase()+titles[tp].slice(1),sub:{cita:'Cita médica',examen:'Examen',medicamento:'Compra',pago:'Pago',documento:'Vence el '+fdate(due),otro:f.lugar||'Anotado por '+me().short}[tp],cat:tp==='documento'?'otro':tp,resp,due,time,open:true,by:S.user,hist:[['Hoy',me().short,'Lo anotó'+(m.file?' y adjuntó un archivo':'')]]};
+  if(tp==='cita'||tp==='examen'){it.place=place;it.acomp=f.acomp||undefined;it.prep=f.prep||undefined;it.ayunas=!!f.ayunas;it.sens=true}
+  if(tp==='medicamento'){it.sens=true;it.rec=f.rec==='Una vez'?undefined:f.rec}
+  if(tp==='pago'){it.rec=f.rec==='Una vez'?undefined:f.rec;if(f.valor)it.amount='$ '+Number(String(f.valor).replace(/\D/g,'')).toLocaleString('es-CO')}
+  if(m.file){it.attach={name:m.file.name,url:m.file.url};S.docs.push({id:'d'+Date.now(),ent,cat:tp==='pago'?'Recibos':'Salud',name:(tp==='medicamento'?'Fórmula · ':'Orden · ')+it.title,fmt:m.file.type.includes('pdf')?'PDF':'JPG',by:S.user,url:m.file.url,mime:m.file.type,log:[]})}
+  S.items.push(it);addFeed(`anotó “${it.title}”${tp==='cita'||tp==='examen'?' para el '+due.getDate()+' de '+MES[due.getMonth()]:''}`,id);S.modal=null;render();toast('Anotado. Ya lo ve toda la familia');break}
+ case 'setf':if(m.k==='adddoc'){m.n=val('dname');m.v=val('dvence')}if(m.k==='invite'){m.n=val('iname');m.c=val('icontact')}if(m.k==='addent')m.n=val('ename');if(m.k==='edititem'){m.t=val('et');m.d=val('ed');m.h=val('eh')}if(m.k==='editdoc'){m.n=val('dn');m.v=val('dv')}if(m.k==='delitem'&&m.r==='Otro')m.o=val('dr');m[t.dataset.f]=t.dataset.v;if(m.err)m.err[t.dataset.f]=0;render();break;
+ case 'fbres':m.res=t.dataset.v;m.err=null;render();break;
+ case 'fbhow':m.note=val('fbnote');m.how=t.dataset.v;m.err=null;render();break;
+ case 'fbwhy':m.d=val('fbd');m.why=t.dataset.v;m.err=null;render();break;
+ case 'fbsave':{m.note=val('fbnote');const i=IT(m.id);if(!m.how){m.err='Elige cómo le fue.';render();break}if(!m.note&&!m.rec&&!m.file){m.err='Cuéntalo con una nota, un audio o una foto. Así queda la constancia.';render();break}
+  i.open=false;i.closed={by:S.user,at:nowS(),kind:m.file?'foto':m.rec?'voz':'nota',file:m.file?m.file.name:null,url:m.file?m.file.url:null,mime:m.file?m.file.type:null,note:m.note,how:m.how};i.reopened=null;
+  i.hist.push(['Hoy',me().short,`Contó cómo le fue: ${m.how.toLowerCase()}${m.note?' · '+m.note:''}`]);
+  if(m.file)S.docs.push({id:'d'+Date.now(),ent:i.ent,cat:'Salud',name:`${i.title} · ${fshort(i.due)}`,fmt:m.file.type.includes('pdf')?'PDF':'JPG',by:S.user,url:m.file.url,mime:m.file.type,log:[]});
+  addFeed(`contó cómo fue “${i.title.toLowerCase()}” de ${ENT[i.ent].name}: ${m.how.toLowerCase()}`,i.id,m.file?'foto':m.rec?'voz':null);m.done=true;render();break}
+ case 'fbcambio':{m.d=val('fbd');m.h=val('fbh');if(!m.d){m.err='Indica la nueva fecha.';render();break}const i=IT(m.id);const old=fshort(i.due);i.due=fromIso(m.d);if(m.h)i.time=fmtTime(m.h);i.hist.push(['Hoy',me().short,`Cambió la fecha: ${old} → ${fshort(i.due)}`]);addFeed(`movió “${i.title.toLowerCase()}” al ${i.due.getDate()} de ${MES[i.due.getMonth()]}`,i.id);m.done=true;render();break}
+ case 'fbnofui':{m.d=val('fbd');if(!m.why){m.err='Elige qué pasó.';render();break}const i=IT(m.id);
+  if(m.d){const old=fshort(i.due);i.due=fromIso(m.d);i.hist.push(['Hoy',me().short,`No fue (${m.why.toLowerCase()}). Se reprogramó: ${old} → ${fshort(i.due)}`]);addFeed(`reprogramó “${i.title.toLowerCase()}”`,i.id);S.modal=null;render();toast('Reprogramada. Los recordatorios siguen');break}
+  i.open=false;i.closed={by:S.user,at:nowS(),kind:'nofui',note:m.why};i.hist.push(['Hoy',me().short,'No fue: '+m.why.toLowerCase()]);addFeed(`marcó que no fue a “${i.title.toLowerCase()}”`,i.id);S.modal=null;render();toast('Registrado como “no fue”');break}
  case 'reopen':S.modal={k:'reopen',id:t.dataset.id};render();break;
  case 'doreopen':{m.why=val('why');if(!m.why){m.err=1;render();break}const i=IT(m.id);const who=i.closed.by;i.open=true;i.resp=who;i.reopened={by:S.user,reason:m.why};i.hist.push(['Hoy',me().short,'Pidió revisar: '+m.why]);addFeed(`pidió revisar “${i.title.toLowerCase()}”`,i.id);S.modal=null;render();toast(`${P[who].short} lo verá como pendiente con tu mensaje`);break}
  case 'write':S.modal={k:'write',id:t.dataset.id};render();break;
