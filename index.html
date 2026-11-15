@@ -362,6 +362,24 @@ label.btn{cursor:pointer;position:relative}
 .apbox{display:flex;flex-direction:column;gap:8px;margin-top:16px}
 .aprow{display:flex;gap:12px;align-items:center;background:var(--cream);border-radius:14px;padding:10px 12px;flex-wrap:wrap}
 .aprow>.ic{color:var(--gold-700)}
+
+.hub.pres{align-items:center}
+.hub.pres .hubpic{width:168px;height:168px;border-radius:32px}
+.presgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px 18px}
+.presgrid small{display:block;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--fg-3);font-weight:700}
+.presgrid b{color:var(--fg-1);font-size:16px;word-break:break-word}
+.sumrow{display:flex;gap:10px;align-items:center;justify-content:space-between;flex-wrap:wrap;margin-top:16px}
+.presfs{position:fixed;inset:0;z-index:90;background:#fff;overflow:auto;animation:fd .2s var(--ease)}
+.presin{max-width:520px;margin:0 auto;padding:56px 22px 32px;display:flex;flex-direction:column;align-items:center;gap:16px;text-align:center}
+.prespic{width:190px;height:190px;border-radius:50%;overflow:hidden;box-shadow:var(--sh-md);border:5px solid var(--gold-500)}
+.prespic.sq{border-radius:36px}
+.presname{font-size:32px;font-weight:800;color:var(--fg-1);letter-spacing:-.02em;line-height:1.15}
+.placa{font-size:44px;font-weight:800;letter-spacing:.08em;background:#f7ce45;color:#0d1b33;border:4px solid #0d1b33;border-radius:12px;padding:4px 22px}
+.presrows{width:100%;display:flex;flex-direction:column;gap:10px;text-align:left}
+.presrows div{background:var(--cream);border-radius:16px;padding:12px 16px}
+.presrows small{display:block;font-size:13px;color:var(--fg-3);font-weight:700;letter-spacing:.06em;text-transform:uppercase}
+.presrows b{font-size:24px;color:var(--fg-1);word-break:break-word}
+@media(max-width:959px){.hub.pres{flex-direction:column;align-items:flex-start}.hub.pres .hubpic{width:136px;height:136px}.presgrid{grid-template-columns:1fr 1fr}}
 </style>
 </head>
 <body>
@@ -378,8 +396,8 @@ function baseP(){return{
  adriana:{id:'adriana',name:'Adriana',short:'Adriana',ini:'AP',kind:'afuera',role:'admin',where:'Exterior',bg:'#0d1b33',fg:'#c9a227',status:'activo'}
 }}
 function baseEnt(){return{
- luis:{id:'luis',name:'Luis',full:'Luis',type:'persona',ini:'LP',bg:'#d6e5f6',fg:'#2a63a8'},
- lucero:{id:'lucero',name:'Lucero',full:'Lucero',type:'persona',ini:'LS',bg:'#fbe3c8',fg:'#b4570f'},
+ luis:{id:'luis',name:'Luis',full:'Luis',type:'persona',ini:'LP',bg:'#d6e5f6',fg:'#2a63a8',perfil:{doc:'CC 00.000.4521',nace:'12 de marzo de 1950',cel:'300 000 0001',mail:'luis.ejemplo@correo.com',dir:'Calle Ejemplo # 00-00, Cali',eps:'EPS Ejemplo (ficticia)'}},
+ lucero:{id:'lucero',name:'Lucero',full:'Lucero',type:'persona',ini:'LS',bg:'#fbe3c8',fg:'#b4570f',perfil:{doc:'CC 00.000.7380',nace:'4 de agosto de 1954',cel:'300 000 0002',mail:'lucero.ejemplo@correo.com',dir:'Calle Ejemplo # 00-00, Cali',eps:'EPS Ejemplo (ficticia)'}},
  casa:{id:'casa',name:'Casa',full:'Casa familiar · Cali',type:'casa',nombre:'Casa familiar',dir:'Calle 00 # 00-00 (ficticia)',ciudad:'Cali',bg:'#d3f1e5',fg:'#17785a'},
  carro:{id:'carro',name:'Carro',full:'Renault Logan · KTZ 418',type:'carro',marca:'Renault',modelo:'Logan',anio:'2016',placa:'KTZ 418',bg:'#f8efcc',fg:'#8a6d0f'}
 }}
@@ -615,7 +633,7 @@ function vHomeRemote(){
  <div class="ringw" style="margin-top:16px"><div class="ring" style="background:conic-gradient(var(--gold-500) 0 ${pct}%, var(--navy-500) ${pct}% 100%)"><div><b>${ok}/${total}</b><small>al día</small></div></div>
  <div><h1 style="margin:0 0 6px">${late.length?`Hola, ${u.short}. Casi todo va al día`:`Tranquilo, ${u.short}. Todo va al día`}</h1><div style="color:var(--on-2)">${late.length?`${late.length} ${late.length>1?'cosas atrasadas':'cosa atrasada'} en casa`:'Nada atrasado en casa'}</div></div></div>${facesRow(true)}</section>
  <div class="wrap">
- <div style="display:flex;gap:10px;margin-top:18px;flex-wrap:wrap"><button class="btn gh sm" data-a="ficha" data-id="luis">${ic('card','s')}Ficha rápida de Luis</button><button class="btn gh sm" data-a="ficha" data-id="lucero">${ic('card','s')}Ficha rápida de Lucero</button></div>
+ <div style="display:flex;gap:10px;margin-top:18px;flex-wrap:wrap"><button class="btn gh sm" data-a="ficha" data-id="luis">${ic('card','s')}Ficha de emergencia de Luis</button><button class="btn gh sm" data-a="ficha" data-id="lucero">${ic('card','s')}Ficha de emergencia de Lucero</button></div>
  <div class="cols" style="margin-top:6px"><div>
  ${lateCasa.length?`<div class="shd"><span class="dot" style="background:var(--bad)"></span><h2>Necesita tu atención</h2></div><div class="stack">${lateCasa.map(i=>`<div class="card alert"><div style="display:flex;gap:14px;align-items:center">${entTile(i.ent,'sm')}<div><div style="font-size:18px;font-weight:700;color:var(--fg-1)">${esc(i.title)}</div><div style="color:var(--bad);font-weight:600;font-size:15px">${statTxt(i)} · lo tiene ${P[i.resp].short}</div></div></div>
  <div style="display:flex;gap:10px;margin-top:14px;flex-wrap:wrap"><button class="btn pri sm" data-a="write" data-id="${i.id}">${ic('msg','s')}Escribirle a ${P[i.resp].short}</button><button class="btn sec sm" data-a="take" data-id="${i.id}">Lo gestiono yo</button></div></div>`).join('')}</div>`:''}
@@ -716,6 +734,7 @@ const PROPS=[
  ['DEC-030','La persona es el centro por jerarquía: página de cada persona, casa o carro ordenada por urgencia; se retira el mapa radial.'],
  ['DEC-033','Anotar por tipo: cita, examen, remedios, pago, renovar documento u otra cosa; cada tipo pide sus datos (citas y exámenes: fecha, hora, lugar, orden).'],
  ['DEC-034','Citas y exámenes: cuenta regresiva diaria en la app; avisos 7, 3, 1 día y el mismo día; se cierran con “¿Cómo le fue?”.'],
+ ['DEC-035','Tarjeta de presentación por persona (documento, nacimiento, celular, correo, dirección, EPS) con “Mostrar mis datos” a pantalla completa; documento enmascarado fuera de ese modo; la ficha de emergencia queda aparte. El carro muestra placa, SOAT y técnico-mecánica.'],
  ['DEC-031','Fotos en lugar de iniciales y fila de caritas con contador de pendientes en el inicio. Retratos ilustrados de ejemplo hasta subir fotos reales, que se guardan privadas.']
 ];
 function vEnt(id){
@@ -727,15 +746,16 @@ function vEnt(id){
  const f=FICHA[id];
  const hist=S.feed.filter(x=>IT(x.id)&&IT(x.id).ent===id).slice(0,5);
  const sec=(t,arr,dot,lim)=>arr.length?`<div class="shd"><span class="dot" style="background:${dot}"></span><h2>${t}</h2><span class="c">${arr.length}</span></div><div class="stack">${arr.slice(0,lim||99).map(i=>taskRow(i)).join('')}</div>`:'';
- const details=e.type==='carro'?[['Marca',e.marca],['Modelo',e.modelo],['Año',e.anio],['Placa',e.placa]]:e.type==='casa'?[['Dirección',e.dir],['Ciudad',e.ciudad]]:f?[['Documento',f.doc],['EPS',f.eps]].concat(!isCare()||P[S.user].salud?[['Sangre',f.sangre]]:[]):[];
+ const pf=e.perfil||{};const mask=s=>s?s.replace(/^(\D*)[\d.]+(\d{4})$/,'$1•••• $2'):'';
+ const details=e.type==='carro'?[['Marca',e.marca],['Modelo',e.modelo],['Año',e.anio],['Placa',e.placa]]:e.type==='casa'?[['Dirección',e.dir],['Ciudad',e.ciudad]]:[['Documento',mask(pf.doc)],['Nacimiento',pf.nace],['Celular',pf.cel],['Correo',pf.mail],['Dirección',pf.dir],['EPS',pf.eps]];
  return `<div class="wrap"><button class="back" data-a="back">${ic('back','s')}Volver</button>
- <div class="hub card hi">
+ <div class="hub card hi ${e.type==='persona'?'pres':''}">
   ${canEdit()?`<label class="hubpic edit ${e.type==='persona'?'':'sq'}" title="Cambiar foto">${entPic(id)}<span class="camb">${ic('cam','s')}</span><input type="file" accept="image/*" data-a="photoin" data-id="${id}" ${FIN}></label>`:`<span class="hubpic ${e.type==='persona'?'':'sq'}">${entPic(id)}</span>`}
   <div class="hubtx"><div class="eb dk">${e.type==='persona'?'Persona':e.type==='casa'?'Casa':'Vehículo'}</div><h1>${esc(e.full)}</h1>
-  <div class="hubfacts">${details.filter(d=>d[1]).map(d=>`<span><small>${d[0]}</small><b>${esc(d[1])}</b></span>`).join('')}</div>
-  <div class="hubstats">${g.bad.length?`<span class="pill bad">${g.bad.length} atrasado</span>`:''}${g.warn.length?`<span class="pill warn">${g.warn.length} esta semana</span>`:''}<span class="pill neu">${g.neu.length} más adelante</span><span class="pill ok">${g.ok.length} hechas</span></div>
-  <div class="hubact">${f?`<button class="btn gh sm" data-a="ficha" data-id="${id}">${ic('card','s')}Ficha rápida</button>`:''}<button class="btn sec sm" data-a="add" data-ent="${id}">${ic('plus','s')}Anotar algo</button>${kebab('ent',id,e.full)}</div></div>
+  <div class="${e.type==='persona'?'presgrid':'hubfacts'}">${details.filter(d=>d[1]).map(d=>`<span><small>${d[0]}</small><b>${esc(d[1])}</b></span>`).join('')}</div>
+  <div class="hubact">${e.type==='persona'?`<button class="btn pri" data-a="presenta" data-id="${id}">${ic('id','s')}${S.user===id?'Mostrar mis datos':'Mostrar datos de '+esc(e.name)}</button>`:e.type==='carro'?`<button class="btn pri" data-a="presenta" data-id="${id}">${ic('car','s')}Mostrar documentos del carro</button>`:''}${f?`<button class="btn gh sm" data-a="ficha" data-id="${id}">${ic('heart','s')}Ficha de emergencia</button>`:''}${kebab('ent',id,e.full)}</div></div>
  </div>
+ <div class="sumrow"><div class="hubstats">${g.bad.length?`<span class="pill bad">${g.bad.length} atrasado</span>`:''}${g.warn.length?`<span class="pill warn">${g.warn.length} esta semana</span>`:''}<span class="pill neu">${g.neu.length} más adelante</span><span class="pill ok">${g.ok.length} hechas</span></div><button class="btn sec sm" data-a="add" data-ent="${id}">${ic('plus','s')}Anotar algo</button></div>
  <div class="cols" style="margin-top:6px"><div>
  ${its.length?sec('Atrasado',g.bad,'var(--bad)')+sec('Esta semana',g.warn,'var(--warn)')+sec('Más adelante',g.neu,'var(--navy-300)')+sec('Hecho',g.ok,'var(--ok)',3)
  :`<div class="empty" style="margin-top:18px"><div class="big">${ic('plus','l')}</div><h3>Sin nada anotado todavía</h3><p>Anota la primera cita, pago o revisión.</p></div>`}
@@ -823,10 +843,21 @@ function feedbackModal(m,X){
  if(m.res==='nofui')return head+`<div class="sb"><h2>¿Qué pasó?</h2><div class="chips">${['Se me olvidó','Se sintió mal','La cancelaron','Otro'].map(x=>`<button class="chip ${m.why===x?'on':''}" data-a="fbwhy" data-v="${x}">${x}</button>`).join('')}</div>
   <div class="fld"><label for="fbd">¿Se reprograma? Nueva fecha (opcional)</label><input class="inp" type="date" id="fbd" value="${m.d||''}"><div class="help">Si no pones fecha, la cita se cierra como “no fue”.</div></div>${er?`<div class="er">${er}</div>`:''}<button class="btn pri big full" data-a="fbnofui">Guardar</button></div>`;
 }
+function modalPres(m){const e=ENT[m.id];
+  if(e.type==='carro'){const dd=S.docs.filter(d=>d.ent===m.id&&d.until);const soat=S.docs.find(d=>d.ent===m.id&&/SOAT/i.test(d.name));const rtm=S.docs.find(d=>d.ent===m.id&&/mecánica/i.test(d.name));const vg=d=>!d?'Sin documento':!d.until?'Vigente':days(d.until)<0?`Vencido desde ${fshort(d.until)}`:`Vigente hasta ${fshort(d.until)}`;
+   return `<div class="presfs"><button class="x" data-a="close" aria-label="Cerrar" style="position:absolute;top:16px;right:16px">${ic('x')}</button><div class="presin"><span class="prespic sq">${entPic(m.id)}</span><div class="presname">${esc(e.marca)} ${esc(e.modelo)} ${esc(e.anio)}</div><div class="placa">${esc(e.placa)}</div>
+   <div class="presrows"><div><small>SOAT</small><b style="color:${soat&&soat.until&&days(soat.until)<0?'var(--bad)':'inherit'}">${vg(soat)}</b></div><div><small>Técnico-mecánica</small><b style="color:${rtm&&rtm.until&&days(rtm.until)<0?'var(--bad)':'inherit'}">${vg(rtm)}</b></div><div><small>Tarjeta de propiedad</small><b>${S.docs.some(d=>d.ent===m.id&&/propiedad/i.test(d.name))?'En Papeles':'Sin documento'}</b></div></div>
+   <button class="btn gh full" data-a="docjump" data-ent="${m.id}">${ic('file','s')}Ver los documentos</button></div></div>`}
+  const pf=e.perfil||{};
+  return `<div class="presfs"><button class="x" data-a="close" aria-label="Cerrar" style="position:absolute;top:16px;right:16px">${ic('x')}</button><div class="presin">
+  <span class="prespic">${entPic(m.id)}</span><div class="presname">${esc(e.full)}</div>
+  <div class="presrows">${[['Documento',pf.doc],['Fecha de nacimiento',pf.nace],['Celular',pf.cel],['Correo',pf.mail],['Dirección',pf.dir],['EPS',pf.eps]].filter(r=>r[1]).map(r=>`<div><small>${r[0]}</small><b>${esc(r[1])}</b></div>`).join('')}</div>
+  ${m.share?`<div class="banner warn">${ic('alert','s')}<div>Vas a enviar estos datos por WhatsApp. Solo hazlo con quien te los pidió.</div></div><div class="opts"><button class="btn gh" data-a="noshare">Cancelar</button><button class="btn pri" data-a="toast" data-m="Abriría WhatsApp con los datos (simulado)">Enviar</button></div>`:`<button class="btn gh full" data-a="share">${ic('share','s')}Compartir por WhatsApp</button>`}</div></div>`}
 function modal(){
  const m=S.modal;if(!m)return '';
  let h='';
  const X=`<button class="x" data-a="close" aria-label="Cerrar">${ic('x')}</button>`;
+ if(m.k==='presenta'){return modalPres(m)}
  if(m.k==='report'&&isAppt(IT(m.id))){h=feedbackModal(m,X)}
  else if(m.k==='report'){
   const i=IT(m.id),v=VERB[i.cat];
@@ -891,7 +922,7 @@ function modal(){
  if(m.k==='ficha'){
   const e=ENT[m.id],f=FICHA[m.id],salud=!isCare()||P[S.user].salud;
   const contacts=[m.id==='luis'?'lucero':'luis','diego','adriana'];
-  h=`<div class="sh"><div style="display:flex;gap:12px;align-items:center"><span class="av pic lg">${entPic(m.id)}</span><div><div class="eb dk">Ficha rápida</div><h2 style="font-size:22px">${e.full}</h2></div></div>${X}</div><div class="sb">
+  h=`<div class="sh"><div style="display:flex;gap:12px;align-items:center"><span class="av pic lg">${entPic(m.id)}</span><div><div class="eb dk">Ficha de emergencia</div><h2 style="font-size:22px">${e.full}</h2></div></div>${X}</div><div class="sb">
   <div class="banner warn">${ic('info','s')}<div>Datos de ejemplo. Para emergencias: muéstrala en la clínica o compártela.</div></div>
   <div class="ficha"><div><small>Documento</small><b>${f.doc}</b></div><div><small>EPS</small><b>${f.eps}</b></div>
   ${salud?`<div><small>Tipo de sangre</small><b>${f.sangre}</b></div><div><small>Alergias</small><b>${f.alergias}</b></div><div style="grid-column:1/-1"><small>Médico tratante</small><b>${f.medico}</b></div>`:`<div style="grid-column:1/-1"><small>Salud</small><b>Sin permiso para ver datos de salud</b></div>`}</div>
@@ -938,7 +969,7 @@ function modal(){
   ${photoOf(e.id)?`<button class="lnk" style="align-self:flex-start;color:var(--bad)" data-a="rmphoto" data-id="${e.id}">Quitar foto</button>`:''}</div></div>
   ${e.type==='carro'?fld('marca','Marca','Renault')+fld('modelo','Modelo','Logan')+fld('anio','Año','2016')+fld('placa','Placa','ABC 123','Carro: 3 letras y 3 números. Moto: 3 letras, 2 números y 1 letra.')
    :e.type==='casa'?fld('nombre','Nombre','Casa familiar')+fld('dir','Dirección','Calle 00 # 00-00')+fld('ciudad','Ciudad','Cali')
-   :fld('full','Nombre completo','Luis')+fld('short','Cómo le dicen','Luis')}
+   :fld('full','Nombre completo','Luis')+fld('short','Cómo le dicen','Luis')+fld('doc','Documento','CC 00.000.0000')+fld('nace','Fecha de nacimiento','12 de marzo de 1950')+fld('cel','Celular','300 000 0000')+fld('mail','Correo','nombre@correo.com')+fld('dir','Dirección','Calle 00 # 00-00, Cali')+fld('eps','EPS','')}
   <button class="btn pri big full" data-a="saveent">Guardar cambios</button></div>`}
  if(m.k==='delent'){const e=ENT[m.id],open=S.items.filter(i=>i.ent===m.id&&i.open).length,nd=S.docs.filter(d=>d.ent===m.id).length;
   h=`<div class="sh"><h2>Eliminar ${esc(e.full)}</h2>${X}</div><div class="sb">
@@ -1026,16 +1057,16 @@ document.addEventListener('click',e=>{
  const m=S.modal;
  switch(a){
  case 'kebab':{const r=t.getBoundingClientRect();S.menu=S.menu&&S.menu.id===t.dataset.id&&S.menu.k===t.dataset.k?null:{k:t.dataset.k,id:t.dataset.id,r:r.right,b:r.bottom,t:r.top};render();break}
- case 'm-edit-ent':{const e=ENT[t.dataset.id];S.menu=null;S.modal={k:'editent',id:e.id,f:e.type==='carro'?{marca:e.marca,modelo:e.modelo,anio:e.anio,placa:e.placa}:e.type==='casa'?{nombre:e.nombre||e.full,dir:e.dir,ciudad:e.ciudad}:{full:e.full,short:e.name}};render();break}
+ case 'm-edit-ent':{const e=ENT[t.dataset.id];S.menu=null;S.modal={k:'editent',id:e.id,f:e.type==='carro'?{marca:e.marca,modelo:e.modelo,anio:e.anio,placa:e.placa}:e.type==='casa'?{nombre:e.nombre||e.full,dir:e.dir,ciudad:e.ciudad}:Object.assign({full:e.full,short:e.name},e.perfil||{})};render();break}
  case 'saveent':{const e=ENT[m.id],f={};document.querySelectorAll('[id^=f_]').forEach(x=>f[x.id.slice(2)]=x.value.trim());m.f=f;const er={};
   if(e.type==='carro'){f.placa=f.placa.toUpperCase().replace(/\s+/g,' ');if(!f.marca)er.marca='Escribe la marca.';if(!f.modelo)er.modelo='Escribe el modelo.';if(!/^(19[5-9]\d|20[0-2]\d)$/.test(f.anio))er.anio='Escribe un año válido, por ejemplo 2016.';if(!/^[A-Z]{3} ?(\d{3}|\d{2}[A-Z])$/.test(f.placa))er.placa='La placa no es válida. Ejemplo: KTZ 418.'}
   else if(e.type==='casa'){if(!f.nombre)er.nombre='Escribe un nombre.';if(!f.ciudad)er.ciudad='Escribe la ciudad.'}
-  else{if(!f.full)er.full='Escribe el nombre completo.';if(!f.short)er.short='Escribe cómo le dicen.'}
+  else{if(!f.full)er.full='Escribe el nombre completo.';if(!f.short)er.short='Escribe cómo le dicen.';if(f.mail&&!/^\S+@\S+\.\S+$/.test(f.mail))er.mail='El correo no es válido.';if(f.cel&&f.cel.replace(/\D/g,'').length!==10)er.cel='El celular debe tener 10 dígitos.'}
   if(Object.keys(er).length){m.err=er;render();break}
   const before=e.full;
   if(e.type==='carro'){if(/^[A-Z]{3}\d/.test(f.placa))f.placa=f.placa.slice(0,3)+' '+f.placa.slice(3);Object.assign(e,f);e.full=`${f.marca} ${f.modelo} · ${f.placa}`}
   else if(e.type==='casa'){Object.assign(e,f);e.full=`${f.nombre} · ${f.ciudad}`}
-  else{e.full=f.full;e.name=f.short;e.ini=f.full.split(/\s+/).map(w=>w[0]).join('').slice(0,2).toUpperCase();if(P[e.id]){P[e.id].name=f.full;P[e.id].short=f.short;P[e.id].ini=e.ini}}
+  else{e.full=f.full;e.name=f.short;e.perfil={doc:f.doc,nace:f.nace,cel:f.cel,mail:f.mail,dir:f.dir,eps:f.eps};e.ini=f.full.split(/\s+/).map(w=>w[0]).join('').slice(0,2).toUpperCase();if(P[e.id]){P[e.id].name=f.full;P[e.id].short=f.short;P[e.id].ini=e.ini}}
   S.feed.unshift({at:'Ahora',who:S.user,x:`editó ${before} → ${e.full}`});S.modal=null;render();toast('Cambios guardados');break}
  case 'm-del-ent':S.menu=null;S.modal={k:'delent',id:t.dataset.id};render();break;
  case 'dodelent':{const e=ENT[m.id];S.docs=S.docs.filter(d=>d.ent!==m.id);S.items=S.items.filter(i=>i.ent!==m.id);delete ENT[m.id];S.feed.unshift({at:'Ahora',who:S.user,x:`eliminó ${e.full}`});S.modal=null;S.stack=[];S.view=S.view==='ent'?'fam':S.view;render();toast(e.full+' eliminado');break}
@@ -1063,6 +1094,9 @@ document.addEventListener('click',e=>{
  case 'docback':S.docCat=null;render();break;
  case 'doc':S.modal={k:'doc',id:t.dataset.id};render();break;
  case 'opendoc':{const d=S.docs.find(x=>x.id===m.id);d.log=d.log||[];d.log.push([me().short,nowS()]);m.opened=true;render();break}
+ case 'presenta':S.modal={k:'presenta',id:t.dataset.id};render();break;
+ case 'share':m.share=true;render();break;
+ case 'noshare':m.share=false;render();break;
  case 'ficha':S.modal={k:'ficha',id:t.dataset.id};render();break;
  case 'docjump':S.docF=t.dataset.ent;S.docCat=null;S.stack=[];nav('docs',null,false);break;
  case 'avisos':S.modal={k:'avisos'};render();break;
