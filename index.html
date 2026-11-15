@@ -380,6 +380,16 @@ label.btn{cursor:pointer;position:relative}
 .presrows small{display:block;font-size:13px;color:var(--fg-3);font-weight:700;letter-spacing:.06em;text-transform:uppercase}
 .presrows b{font-size:24px;color:var(--fg-1);word-break:break-word}
 @media(max-width:959px){.hub.pres{flex-direction:column;align-items:flex-start}.hub.pres .hubpic{width:136px;height:136px}.presgrid{grid-template-columns:1fr 1fr}}
+
+.hstats{display:flex;gap:0;margin-top:14px;max-width:520px}
+.hstats>div{flex:1;padding:0 18px;border-left:1px solid var(--navy-500)}
+.hstats>div:first-child{padding-left:0;border-left:0}
+.hstats b{display:block;font-size:34px;font-weight:300;letter-spacing:-.02em;color:var(--on-1);line-height:1.1;font-variant-numeric:tabular-nums}
+.hstats b.hb{color:#f0a697}
+.hstats small{font-size:13px;color:var(--on-2)}
+.hbar{height:6px;border-radius:999px;background:var(--navy-600);margin:16px 0 18px;max-width:520px;overflow:hidden}
+.hbar i{display:block;height:100%;background:var(--gold-500);border-radius:999px}
+@media(max-width:959px){.hstats b{font-size:28px}.hstats>div{padding:0 12px}}
 </style>
 </head>
 <body>
@@ -630,8 +640,10 @@ function vHomeRemote(){
   const txt=l.length?`<span style="color:var(--bad)">${esc(l[0].title)}: atrasado</span>`:nx?`<span style="color:${statColor[stat(nx)]}">${esc(nx.title)} · ${fday(nx.due).toLowerCase()}</span>`:`<span style="color:var(--ok)">Al día</span>`;
   return `<button class="ent ${l.length?'al':''}" data-a="ent" data-id="${e.id}">${entTile(e.id,'sm')}<b>${e.name}</b>${txt}</button>`}).join('');
  return `<section class="hero" style="padding-bottom:28px"><div class="top"><span class="eb">Casa de la familia · en Cali son las 12:47 p. m.</span>${heroTools()}</div>
- <div class="ringw" style="margin-top:16px"><div class="ring" style="background:conic-gradient(var(--gold-500) 0 ${pct}%, var(--navy-500) ${pct}% 100%)"><div><b>${ok}/${total}</b><small>al día</small></div></div>
- <div><h1 style="margin:0 0 6px">${late.length?`Hola, ${u.short}. Casi todo va al día`:`Tranquilo, ${u.short}. Todo va al día`}</h1><div style="color:var(--on-2)">${late.length?`${late.length} ${late.length>1?'cosas atrasadas':'cosa atrasada'} en casa`:'Nada atrasado en casa'}</div></div></div>${facesRow(true)}</section>
+ <h1 style="margin:14px 0 4px">${late.length?`Hola, ${u.short}. Casi todo va al día`:`Tranquilo, ${u.short}. Todo va al día`}</h1>
+ <div class="hstats"><div><b>${ok}</b><small>al día</small></div><div><b class="${late.length?'hb':''}">${late.length}</b><small>${late.length===1?'atrasada':'atrasadas'}</small></div><div><b>${open.filter(i=>stat(i)==='warn').length}</b><small>esta semana</small></div></div>
+ <div class="hbar" role="img" aria-label="${ok} de ${total} al día"><i style="width:${pct}%"></i></div>
+ ${facesRow(true)}</section>
  <div class="wrap">
  <div style="display:flex;gap:10px;margin-top:18px;flex-wrap:wrap"><button class="btn gh sm" data-a="ficha" data-id="luis">${ic('card','s')}Ficha de emergencia de Luis</button><button class="btn gh sm" data-a="ficha" data-id="lucero">${ic('card','s')}Ficha de emergencia de Lucero</button></div>
  <div class="cols" style="margin-top:6px"><div>
