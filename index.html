@@ -390,6 +390,8 @@ label.btn{cursor:pointer;position:relative}
 .hbar{height:6px;border-radius:999px;background:var(--navy-600);margin:16px 0 18px;max-width:520px;overflow:hidden}
 .hbar i{display:block;height:100%;background:var(--gold-500);border-radius:999px}
 @media(max-width:959px){.hstats b{font-size:28px}.hstats>div{padding:0 12px}}
+
+@media(max-width:959px){.faces{gap:8px}.face{width:64px}.face .fpic{width:58px;height:58px}.face b{font-size:13px}}
 </style>
 </head>
 <body>
@@ -409,6 +411,7 @@ function baseEnt(){return{
  luis:{id:'luis',name:'Luis',full:'Luis',type:'persona',ini:'LP',bg:'#d6e5f6',fg:'#2a63a8',perfil:{doc:'CC 00.000.4521',nace:'12 de marzo de 1950',cel:'300 000 0001',mail:'luis.ejemplo@correo.com',dir:'Calle Ejemplo # 00-00, Cali',eps:'EPS Ejemplo (ficticia)'}},
  lucero:{id:'lucero',name:'Lucero',full:'Lucero',type:'persona',ini:'LS',bg:'#fbe3c8',fg:'#b4570f',perfil:{doc:'CC 00.000.7380',nace:'4 de agosto de 1954',cel:'300 000 0002',mail:'lucero.ejemplo@correo.com',dir:'Calle Ejemplo # 00-00, Cali',eps:'EPS Ejemplo (ficticia)'}},
  casa:{id:'casa',name:'Casa',full:'Casa familiar · Cali',type:'casa',nombre:'Casa familiar',dir:'Calle 00 # 00-00 (ficticia)',ciudad:'Cali',bg:'#d3f1e5',fg:'#17785a'},
+ aaron:{id:'aaron',name:'Aaron',full:'Aaron',type:'mascota',especie:'Perro',raza:'Criollo (ejemplo)',nace:'Marzo de 2019 (ejemplo)',vet:'Veterinaria Patitas (ficticia)',bg:'#dcefe9',fg:'#1f6f5c'},
  carro:{id:'carro',name:'Carro',full:'Renault Logan · KTZ 418',type:'carro',marca:'Renault',modelo:'Logan',anio:'2016',placa:'KTZ 418',bg:'#f8efcc',fg:'#8a6d0f'}
 }}
 let P=baseP(),ENT=baseEnt();
@@ -417,7 +420,7 @@ const KIND={casa:'Vive en la casa',afuera:'Acompaña desde afuera',cuidador:'Cui
 const SCALE={normal:.88,grande:1,muy:1.12};
 const SCALE_L={normal:'Normal',grande:'Grande',muy:'Muy grande'};
 const actLabel=i=>isAppt(i)?'¿Cómo le fue?':VERB[i.cat][0];
-const VERB={pago:['Ya lo pagué','Toma una foto del recibo pagado','Si pagaste por internet, sube el pantallazo.'],medicamento:['Ya los compré','Toma una foto de la factura de la droguería','La compra no dice si se están tomando: eso es otra cosa.'],cita:['Ya fui','Toma una foto de la constancia o de la orden que te dieron','Si no te dieron papel, puedes contarlo con un audio.'],examen:['Ya fui','Toma una foto de la constancia','Si no te dieron papel, cuéntalo con un audio.'],vehiculo:['Ya la hice','Toma una foto del certificado nuevo','El certificado debe mostrar la nueva fecha.'],otro:['Ya lo hice','Toma una foto que lo muestre','']};
+const VERB={pago:['Ya lo pagué','Toma una foto del recibo pagado','Si pagaste por internet, sube el pantallazo.'],medicamento:['Ya los compré','Toma una foto de la factura de la droguería','La compra no dice si se están tomando: eso es otra cosa.'],cita:['Ya fui','Toma una foto de la constancia o de la orden que te dieron','Si no te dieron papel, puedes contarlo con un audio.'],examen:['Ya fui','Toma una foto de la constancia','Si no te dieron papel, cuéntalo con un audio.'],mascota:['Ya está hecho','Toma una foto (de Aaron o del recibo)','Una foto de Aaron recién bañado también sirve.'],vehiculo:['Ya la hice','Toma una foto del certificado nuevo','El certificado debe mostrar la nueva fecha.'],otro:['Ya lo hice','Toma una foto que lo muestre','']};
 const CATS=[['Identidad','id',true,'Cédulas, licencia, pasaporte'],['Propiedad','house',true,'Escrituras, certificados'],['Salud','heart',true,'Carnés, fórmulas, órdenes'],['Seguros','shield',false,'SOAT, pólizas'],['Vehículo','car',false,'Tarjeta, certificados'],['Recibos','file',false,'Soportes de pagos y gestiones']];
 const FICHA={
  luis:{doc:'CC •••• 4521',eps:'EPS Ejemplo (ficticia)',sangre:'O+ (ejemplo)',alergias:'Ninguna conocida (ejemplo)',medico:'Dra. Ejemplo · cardiología',nace:'Ejemplo: 1950'},
@@ -428,7 +431,7 @@ function seed(){P=baseP();ENT=baseEnt();return{
  user:'luis',view:'home',arg:null,stack:[],modal:null,toast:null,calM:10,docF:'todos',docCat:null,
  font:{luis:'grande',lucero:'grande',diego:'normal',adriana:'normal'},
  notif:{app:true,mail:true,wa:false,hora:'7:00 a. m.'},
- places:{p1:{name:'Clínica del Valle (ficticia)',dir:'Av. Ejemplo # 10-20',tel:'602 000 0001'},p2:{name:'EPS Ejemplo · sede Norte',dir:'Calle Ejemplo # 40-15',tel:'602 000 0002'},p3:{name:'Consultorio dental Norte (ficticio)',dir:'Carrera Ejemplo # 5-30',tel:'602 000 0003'},p4:{name:'Laboratorio Central (ficticio)',dir:'Calle Ejemplo # 22-08',tel:'602 000 0004'}},
+ places:{p1:{name:'Clínica del Valle (ficticia)',dir:'Av. Ejemplo # 10-20',tel:'602 000 0001'},p2:{name:'EPS Ejemplo · sede Norte',dir:'Calle Ejemplo # 40-15',tel:'602 000 0002'},p3:{name:'Consultorio dental Norte (ficticio)',dir:'Carrera Ejemplo # 5-30',tel:'602 000 0003'},p4:{name:'Laboratorio Central (ficticio)',dir:'Calle Ejemplo # 22-08',tel:'602 000 0004'},p5:{name:'Veterinaria Patitas (ficticia)',dir:'Carrera Ejemplo # 8-12',tel:'602 000 0005'}},
  items:[
   {id:'gas',ent:'casa',title:'Pagar el gas',sub:'Factura de octubre',cat:'pago',resp:'luis',due:D(11,12),amount:'$ 86.400',rec:'Cada mes',open:true,hist:[['1 nov','Sistema','Se creó para este mes']]},
   {id:'rtm',ent:'carro',title:'Revisión técnico-mecánica',sub:'Certificado anual',cat:'vehiculo',resp:'luis',due:D(11,10),rec:'Cada año',open:true,hist:[['10 oct','Sistema','Se creó al acercarse el vencimiento del certificado']]},
@@ -442,6 +445,10 @@ function seed(){P=baseP();ENT=baseEnt();return{
   {id:'odonto',ent:'lucero',title:'Cita de odontología',sub:'Control',cat:'cita',resp:'lucero',due:D(12,3),time:'2:00 p. m.',place:'p3',acomp:'luis',open:true,sens:true,hist:[['14 nov','Lucero','Anotó la cita']]},
   {id:'predial',ent:'casa',title:'Impuesto predial',sub:'Año 2026',cat:'pago',resp:'diego',due:D(12,15),amount:'$ 1.120.000',rec:'Cada año',open:true,hist:[['1 nov','Sistema','Se creó para este año']]},
   {id:'licencia',ent:'luis',title:'Renovar licencia de conducción',sub:'Vence el 20 de enero de 2027',cat:'otro',resp:'luis',due:new Date(2027,0,20),open:true,hist:[['15 nov','Sistema','Se creó desde el documento: la licencia vence en enero']]},
+  {id:'banoaaron',ent:'aaron',title:'Baño y peluquería de Aaron',sub:'Cada mes',cat:'mascota',resp:'luis',due:D(11,19),rec:'Cada mes',open:true,hist:[['19 oct','Sistema','Se creó para este mes']]},
+  {id:'vacaaron',ent:'aaron',title:'Vacuna antirrábica de Aaron',sub:'Refuerzo anual',cat:'cita',resp:'luis',due:D(12,10),time:'10:00 a. m.',place:'p5',open:true,rec:'Cada año',hist:[['10 nov','Sistema','Se creó desde el carné de vacunas: refuerzo anual']]},
+  {id:'comidaaaron',ent:'aaron',title:'Comprar concentrado de Aaron',sub:'Bulto de 8 kg',cat:'mascota',resp:'lucero',due:D(11,22),rec:'Cada mes',open:true,hist:[['22 oct','Lucero','Lo anotó']]},
+  {id:'despaaron',ent:'aaron',title:'Desparasitación de Aaron',sub:'Cada 3 meses',cat:'mascota',resp:'luis',due:D(11,8),rec:'Cada 3 meses',open:false,closed:{by:'luis',at:'8 nov · 4:15 p. m.',kind:'foto',file:'desparasitante.jpg',note:'Le di la pastilla con la comida'},hist:[['8 ago','Sistema','Se creó'],['8 nov','Luis','Lo cerró con foto']]},
   {id:'agua',ent:'casa',title:'Pagar el agua',sub:'Factura de octubre',cat:'pago',resp:'luis',due:D(11,5),amount:'$ 97.300',rec:'Cada mes',open:false,closed:{by:'luis',at:'3 nov · 10:12 a. m.',kind:'foto',file:'recibo_agua_oct.jpg',note:''},hist:[['1 oct','Sistema','Se creó para este mes'],['3 nov','Luis','Lo cerró con foto del recibo']]},
   {id:'labs',ent:'luis',title:'Exámenes de sangre',sub:'Laboratorio',cat:'examen',resp:'luis',due:D(11,14),time:'6:30 a. m.',place:'p4',ayunas:true,open:false,sens:true,closed:{by:'luis',at:'14 nov · 8:40 a. m.',kind:'voz',file:null,note:'No me dieron papel. Los resultados llegan al correo en 3 días'},hist:[['5 nov','Luis','Anotó los exámenes'],['14 nov','Luis','Lo cerró con un audio: no le dieron papel']]}
  ],
@@ -459,10 +466,12 @@ function seed(){P=baseP();ENT=baseEnt();return{
   {id:'d1',ent:'carro',cat:'Seguros',name:'SOAT 2025-2026',fmt:'PDF',until:D(11,28),link:'soat'},
   {id:'d15',ent:'casa',cat:'Seguros',name:'Póliza de hogar',fmt:'PDF',until:new Date(2027,5,30)},
   {id:'d2',ent:'carro',cat:'Vehículo',name:'Certificado técnico-mecánica 2025',fmt:'PDF',until:D(11,10),link:'rtm'},
+  {id:'d16',ent:'aaron',cat:'Salud',name:'Carné de vacunas de Aaron',fmt:'JPG'},
   {id:'d3',ent:'carro',cat:'Vehículo',name:'Tarjeta de propiedad',fmt:'JPG'},
   {id:'d4',ent:'casa',cat:'Recibos',name:'Recibo del agua · octubre',fmt:'JPG',by:'luis'}
  ],
  feed:[
+  {at:'8 nov',who:'luis',x:'desparasitó a Aaron y subió la foto',id:'despaaron',kind:'foto'},
   {at:'Ayer · 4:20 p. m.',who:'lucero',x:'anotó odontología el 3 de diciembre',id:'odonto'},
   {at:'Ayer · 8:40 a. m.',who:'luis',x:'cerró “Exámenes de sangre” con un audio',id:'labs',kind:'voz'},
   {at:'Hace 2 días',who:'adriana',x:'se encargó de pagar la luz',id:'luz'},
@@ -502,6 +511,7 @@ card:'<rect x="3" y="4" width="18" height="16" rx="2"/><path d="M7 9h10M7 13h6"/
 flask:'<path d="M9 3h6M10 3v6l-5 9a2 2 0 0 0 1.7 3h10.6a2 2 0 0 0 1.7-3l-5-9V3"/><path d="M7.5 15h9"/>',
 pill:'<path d="M10.5 20.5a5 5 0 0 1-7-7l7-7a5 5 0 0 1 7 7z"/><path d="m8.5 8.5 7 7"/>',
 pin:'<path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0z"/><circle cx="12" cy="10" r="3"/>',
+paw:'<circle cx="6" cy="11" r="2"/><circle cx="10" cy="6.5" r="2"/><circle cx="14" cy="6.5" r="2"/><circle cx="18" cy="11" r="2"/><path d="M8 17.5c0-2.5 1.8-4.5 4-4.5s4 2 4 4.5c0 1.4-1 2.5-2.3 2.5-.6 0-1.1-.3-1.7-.3s-1.1.3-1.7.3C9 20 8 18.9 8 17.5z"/>',
 kebab:'<circle cx="12" cy="5" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="12" cy="19" r="1.6"/>',
 edit:'<path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/>',
 trash:'<path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6"/>',
@@ -520,6 +530,7 @@ const fdate=d=>`${DIA[d.getDay()]} ${d.getDate()} de ${MES[d.getMonth()]}${d.get
 const fshort=d=>`${d.getDate()} ${MES[d.getMonth()].slice(0,3)}${d.getFullYear()!==2026?' '+d.getFullYear():''}`;
 function stat(i){if(!i.open)return 'ok';const n=days(i.due);if(n<0)return 'bad';if(n<=7)return 'warn';return 'neu'}
 const isAppt=i=>i.cat==='cita'||i.cat==='examen';
+const tLabel=t=>({persona:'Persona',casa:'Casa',carro:'Vehículo',mascota:'Mascota'})[t];
 const PL=i=>i.place&&S.places[i.place];
 function statTxt(i){if(!i.open)return 'Hecho';if(isAppt(i)){const n=days(i.due);if(n<0)return `Fue hace ${-n} ${-n===1?'día':'días'} · ¿cómo le fue?`;if(n===0)return `Hoy${i.time?' '+i.time:''}`;if(n===1)return `Mañana${i.time?' '+i.time:''}`;return `Faltan ${n} días`}const n=days(i.due);if(n<0)return `Atrasado ${-n} ${-n===1?'día':'días'}`;return fday(i.due)}
 const statColor={bad:'var(--bad)',warn:'var(--warn)',neu:'var(--fg-3)',ok:'var(--ok)'};
@@ -530,12 +541,12 @@ function portrait(key,bg){const L=LOOK[key]||{skin:'#d9b08f',hair:'#5a4636',styl
  const gl=L.glasses?`<g fill="none" stroke="#1d2a40" stroke-width="1.3"><circle cx="27.5" cy="29.5" r="3.4"/><circle cx="36.5" cy="29.5" r="3.4"/><path d="M30.9 29.5h2.2"/></g>`:'';
  const bd=L.beard?`<path d="M24 32c1 6 4 8 8 8s7-2 8-8c-2 2-5 3-8 3s-6-1-8-3z" fill="${L.hair}" opacity=".85"/>`:'';
  return `<svg viewBox="0 0 64 64" aria-hidden="true" style="display:block;width:100%;height:100%"><rect width="64" height="64" fill="${bg}"/>${back}<path d="M9 64c2-12 11-18 23-18s21 6 23 18z" fill="${L.shirt}"/><rect x="28" y="38" width="8" height="9" rx="3" fill="${L.skin}"/><circle cx="32" cy="28.5" r="11" fill="${L.skin}"/>${hair}${gl}${bd}</svg>`}
-function scene(type,bg){return type==='casa'?`<svg viewBox="0 0 64 64" aria-hidden="true" style="display:block;width:100%;height:100%"><rect width="64" height="64" fill="${bg}"/><rect y="48" width="64" height="16" fill="#a9d9c2"/><path d="M14 30 32 15l18 15v20H14z" fill="#fbf7ee"/><path d="M10 31 32 12l22 19-3 3-19-16-19 16z" fill="#17785a"/><rect x="28" y="36" width="8" height="14" rx="1" fill="#8a6d0f"/><rect x="18" y="34" width="7" height="6" fill="#d6e5f6"/><rect x="39" y="34" width="7" height="6" fill="#d6e5f6"/></svg>`
+function scene(type,bg){if(type==='mascota')return `<svg viewBox="0 0 64 64" aria-hidden="true" style="display:block;width:100%;height:100%"><rect width="64" height="64" fill="${bg}"/><rect y="50" width="64" height="14" fill="#b9dccf"/><path d="M18 52c0-10 6-16 14-16s14 6 14 16z" fill="#b07a45"/><ellipse cx="32" cy="30" rx="11" ry="10" fill="#c48a52"/><path d="M21 24c-4 2-5 9-2 12 2-2 4-6 4-10z" fill="#7a4f2a"/><path d="M43 24c4 2 5 9 2 12-2-2-4-6-4-10z" fill="#7a4f2a"/><ellipse cx="32" cy="35" rx="5.5" ry="4" fill="#e8c49c"/><circle cx="28" cy="28" r="1.6" fill="#0d1b33"/><circle cx="36" cy="28" r="1.6" fill="#0d1b33"/><ellipse cx="32" cy="33" rx="2" ry="1.4" fill="#0d1b33"/><path d="M26 44h12" stroke="#c9a227" stroke-width="2.5"/></svg>`;return type==='casa'?`<svg viewBox="0 0 64 64" aria-hidden="true" style="display:block;width:100%;height:100%"><rect width="64" height="64" fill="${bg}"/><rect y="48" width="64" height="16" fill="#a9d9c2"/><path d="M14 30 32 15l18 15v20H14z" fill="#fbf7ee"/><path d="M10 31 32 12l22 19-3 3-19-16-19 16z" fill="#17785a"/><rect x="28" y="36" width="8" height="14" rx="1" fill="#8a6d0f"/><rect x="18" y="34" width="7" height="6" fill="#d6e5f6"/><rect x="39" y="34" width="7" height="6" fill="#d6e5f6"/></svg>`
  :`<svg viewBox="0 0 64 64" aria-hidden="true" style="display:block;width:100%;height:100%"><rect width="64" height="64" fill="${bg}"/><rect y="44" width="64" height="20" fill="#e5d7a6"/><path d="M8 42v-6c0-3 2-5 5-5h5l6-7h16l7 7h5c3 0 4 2 4 5v6z" fill="#c4cddb"/><path d="M25 25h14l5 6H20z" fill="#d6e5f6"/><circle cx="19" cy="43" r="5.5" fill="#0d1b33"/><circle cx="45" cy="43" r="5.5" fill="#0d1b33"/><circle cx="19" cy="43" r="2" fill="#c4cddb"/><circle cx="45" cy="43" r="2" fill="#c4cddb"/><rect x="26" y="34" width="12" height="4" rx="1" fill="#fff" stroke="#8a6d0f" stroke-width=".8"/></svg>`}
 const imgTag=u=>`<img src="${u}" alt="" style="width:100%;height:100%;object-fit:cover;display:block">`;
 function photoOf(id){return (ENT[id]&&ENT[id].photo)||(P[id]&&P[id].photo)||null}
 function entPic(e){if(photoOf(e))return imgTag(photoOf(e));const E_=ENT[e];return E_.type==='persona'?portrait(e,E_.bg):scene(E_.type,E_.bg)}
-function entInner(e,cls=''){const E_=ENT[e];return E_.type==='persona'?E_.ini:ic(E_.type==='casa'?'house':'car',cls)}
+function entInner(e,cls=''){const E_=ENT[e];return E_.type==='persona'?E_.ini:ic(E_.type==='casa'?'house':E_.type==='mascota'?'paw':'car',cls)}
 function entTile(e,cls=''){const E_=ENT[e];return `<span class="tile pic ${cls} ${E_.type==='persona'?'round':''}">${entPic(e)}</span>`}
 function av(id,cls=''){const p=P[id];if(p.status==='pendiente')return `<span class="av ${cls} pend">${p.ini}</span>`;return `<span class="av pic ${cls}" title="${esc(p.name)}">${photoOf(id)?imgTag(photoOf(id)):portrait(id,p.kind==='afuera'?'#e4e9f1':p.bg)}</span>`}
 function counts(eid){const its=S.items.filter(i=>i.ent===eid&&i.open&&seesItem(i));return {late:its.filter(i=>stat(i)==='bad').length,week:its.filter(i=>stat(i)==='warn').length,open:its.length}}
@@ -747,6 +758,7 @@ const PROPS=[
  ['DEC-033','Anotar por tipo: cita, examen, remedios, pago, renovar documento u otra cosa; cada tipo pide sus datos (citas y exámenes: fecha, hora, lugar, orden).'],
  ['DEC-034','Citas y exámenes: cuenta regresiva diaria en la app; avisos 7, 3, 1 día y el mismo día; se cierran con “¿Cómo le fue?”.'],
  ['DEC-035','Tarjeta de presentación por persona (documento, nacimiento, celular, correo, dirección, EPS) con “Mostrar mis datos” a pantalla completa; documento enmascarado fuera de ese modo; la ficha de emergencia queda aparte. El carro muestra placa, SOAT y técnico-mecánica.'],
+ ['DEC-036','Mascotas como integrantes: Aaron (perro) con su página, foto, baño, vacunas, veterinario, desparasitación y comida; veterinario y vacunas funcionan como citas.'],
  ['DEC-031','Fotos en lugar de iniciales y fila de caritas con contador de pendientes en el inicio. Retratos ilustrados de ejemplo hasta subir fotos reales, que se guardan privadas.']
 ];
 function vEnt(id){
@@ -759,11 +771,11 @@ function vEnt(id){
  const hist=S.feed.filter(x=>IT(x.id)&&IT(x.id).ent===id).slice(0,5);
  const sec=(t,arr,dot,lim)=>arr.length?`<div class="shd"><span class="dot" style="background:${dot}"></span><h2>${t}</h2><span class="c">${arr.length}</span></div><div class="stack">${arr.slice(0,lim||99).map(i=>taskRow(i)).join('')}</div>`:'';
  const pf=e.perfil||{};const mask=s=>s?s.replace(/^(\D*)[\d.]+(\d{4})$/,'$1•••• $2'):'';
- const details=e.type==='carro'?[['Marca',e.marca],['Modelo',e.modelo],['Año',e.anio],['Placa',e.placa]]:e.type==='casa'?[['Dirección',e.dir],['Ciudad',e.ciudad]]:[['Documento',mask(pf.doc)],['Nacimiento',pf.nace],['Celular',pf.cel],['Correo',pf.mail],['Dirección',pf.dir],['EPS',pf.eps]];
+ const details=e.type==='carro'?[['Marca',e.marca],['Modelo',e.modelo],['Año',e.anio],['Placa',e.placa]]:e.type==='mascota'?[['Especie',e.especie],['Raza',e.raza],['Nació',e.nace],['Veterinaria',e.vet]]:e.type==='casa'?[['Dirección',e.dir],['Ciudad',e.ciudad]]:[['Documento',mask(pf.doc)],['Nacimiento',pf.nace],['Celular',pf.cel],['Correo',pf.mail],['Dirección',pf.dir],['EPS',pf.eps]];
  return `<div class="wrap"><button class="back" data-a="back">${ic('back','s')}Volver</button>
  <div class="hub card hi ${e.type==='persona'?'pres':''}">
   ${canEdit()?`<label class="hubpic edit ${e.type==='persona'?'':'sq'}" title="Cambiar foto">${entPic(id)}<span class="camb">${ic('cam','s')}</span><input type="file" accept="image/*" data-a="photoin" data-id="${id}" ${FIN}></label>`:`<span class="hubpic ${e.type==='persona'?'':'sq'}">${entPic(id)}</span>`}
-  <div class="hubtx"><div class="eb dk">${e.type==='persona'?'Persona':e.type==='casa'?'Casa':'Vehículo'}</div><h1>${esc(e.full)}</h1>
+  <div class="hubtx"><div class="eb dk">${tLabel(e.type)}${e.type==='mascota'?' · '+esc(e.especie||''):''}</div><h1>${esc(e.full)}</h1>
   <div class="${e.type==='persona'?'presgrid':'hubfacts'}">${details.filter(d=>d[1]).map(d=>`<span><small>${d[0]}</small><b>${esc(d[1])}</b></span>`).join('')}</div>
   <div class="hubact">${e.type==='persona'?`<button class="btn pri" data-a="presenta" data-id="${id}">${ic('id','s')}${S.user===id?'Mostrar mis datos':'Mostrar datos de '+esc(e.name)}</button>`:e.type==='carro'?`<button class="btn pri" data-a="presenta" data-id="${id}">${ic('car','s')}Mostrar documentos del carro</button>`:''}${f?`<button class="btn gh sm" data-a="ficha" data-id="${id}">${ic('heart','s')}Ficha de emergencia</button>`:''}${kebab('ent',id,e.full)}</div></div>
  </div>
@@ -802,7 +814,7 @@ function vSet(){
  </div>`).join('')}
  ${adm?`<div class="setrow"><button class="btn pri" data-a="invite">${ic('plus')}Invitar a alguien</button><span class="muted">Por ejemplo, un cuidador o cuidadora.</span></div>`:''}</div>
  <div class="h2s">Personas, casas y vehículos</div>
- <div class="setsec">${Object.values(ENT).map(e=>`<div class="setrow">${entTile(e.id,'sm')}<div class="tx"><div class="t">${esc(e.full)}</div><div class="s">${e.type==='persona'?'Persona':e.type==='casa'?'Casa · '+esc(e.dir||''):'Vehículo · placa '+esc(e.placa||'')}</div></div>${kebab('ent',e.id,e.full)}</div>`).join('')}
+ <div class="setsec">${Object.values(ENT).map(e=>`<div class="setrow">${entTile(e.id,'sm')}<div class="tx"><div class="t">${esc(e.full)}</div><div class="s">${e.type==='mascota'?'Mascota · '+esc(e.especie||''):e.type==='persona'?'Persona':e.type==='casa'?'Casa · '+esc(e.dir||''):'Vehículo · placa '+esc(e.placa||'')}</div></div>${kebab('ent',e.id,e.full)}</div>`).join('')}
  ${adm?`<div class="setrow"><button class="btn sec sm" data-a="addent">${ic('plus','s')}Agregar persona, casa o vehículo</button></div>`:''}</div>
  <p class="muted">Tema oscuro: no se incluye (DEC-027).</p></div>`;
 }
@@ -811,7 +823,7 @@ function vSet(){
 const FIN='style="position:absolute;width:1px;height:1px;opacity:0;overflow:hidden"';
 function pickers(ctx,has){return `<div class="opts"><label class="btn ${has?'gh':'dark'}">${ic('cam')}${has?'Otra foto':'Tomar foto'}<input type="file" accept="image/*" capture="environment" data-a="filein" data-ctx="${ctx}" data-kind="foto" ${FIN}></label><label class="btn gh">${ic('up')}Subir archivo<input type="file" accept="image/*,application/pdf" data-a="filein" data-ctx="${ctx}" data-kind="archivo" ${FIN}></label></div>`}
 function filePreview(f,dark){if(!f)return '';if(f.type.startsWith('image/'))return `<img src="${f.url}" alt="${esc(f.name)}" style="max-width:100%;max-height:260px;border-radius:14px;display:block;position:relative">`;return `<div style="display:flex;gap:12px;align-items:center;position:relative;color:${dark?'var(--on-1)':'var(--fg-1)'}"><span class="docic">PDF</span><b style="word-break:break-all">${esc(f.name)}</b></div>`}
-const TIPOS=[['cita','Cita médica','heart'],['examen','Examen o laboratorio','flask'],['medicamento','Remedios','pill'],['pago','Pago','card'],['documento','Renovar documento','id'],['otro','Otra cosa','plus']];
+const TIPOS=[['cita','Cita médica','heart'],['examen','Examen o laboratorio','flask'],['medicamento','Remedios','pill'],['pago','Pago','card'],['documento','Renovar documento','id'],['mascota','Mascota','paw'],['otro','Otra cosa','plus']];
 function chipsF(m,f,opts){return `<div class="chips">${opts.map(o=>`<button class="chip ${m.f[f]===o[0]?'on':''}" data-a="af" data-f="${f}" data-v="${o[0]}">${o[2]?`<span class="dt" style="background:${o[2]}"></span>`:''}${o[1]}</button>`).join('')}</div>`}
 function inF(m,id,lab,ph,type,er){return `<div class="fld"><label for="a_${id}">${lab}</label><input class="inp ${er[id]?'err':''}" id="a_${id}" type="${type||'text'}" value="${esc(m.f[id]||'')}" placeholder="${ph||''}">${er[id]?`<div class="er">${er[id]}</div>`:''}</div>`}
 function addModal(m,X){
@@ -830,6 +842,7 @@ function addModal(m,X){
  if(t==='medicamento')body=`<div>${lbl('¿Para quién?')}${chipsF(m,'para',personas)}${er.para?'<div class="er">Elige para quién.</div>':''}</div>${inF(m,'fecha','Próxima compra','','date',er)}<div>${lbl('¿Cada cuánto?')}${chipsF(m,'rec',[['Cada mes','Cada mes'],['Cada 15 días','Cada 15 días'],['Una vez','Una vez']])}</div><div>${lbl('Fórmula (opcional)')}${pickers('add',!!m.file)}${m.file?`<div style="background:var(--navy-50);border-radius:14px;padding:10px;margin-top:8px">${filePreview(m.file)}</div>`:''}</div>`;
  if(t==='pago')body=`<div>${lbl('¿De qué?')}${chipsF(m,'para',todas.filter(x=>ENT[x[0]].type!=='persona').concat(todas.filter(x=>ENT[x[0]].type==='persona')))}${er.para?'<div class="er">Elige de qué es.</div>':''}</div>${inF(m,'esp','¿Qué se paga?','Ej.: internet, administración, gas','text',er)}${inF(m,'valor','Valor (opcional)','Ej.: 86400','text',er)}${inF(m,'fecha','Fecha límite','','date',er)}<div>${lbl('¿Se repite?')}${chipsF(m,'rec',[['Cada mes','Cada mes'],['Cada año','Cada año'],['Una vez','Una vez']])}</div>`;
  if(t==='documento')body=`<div>${lbl('¿De quién?')}${chipsF(m,'para',todas.filter(x=>ENT[x[0]].type!=='casa'))}${er.para?'<div class="er">Elige de quién.</div>':''}</div>${inF(m,'esp','¿Qué documento?','Ej.: licencia de conducción, pasaporte','text',er)}${inF(m,'fecha','¿Cuándo vence?','','date',er)}<p class="help" style="margin:0">Se recuerda desde un mes antes.</p>`;
+ if(t==='mascota')body=`<div>${lbl('¿Cuál mascota?')}${chipsF(m,'para',Object.values(ENT).filter(e=>e.type==='mascota').map(e=>[e.id,e.name,e.fg]))}${er.para?'<div class="er">Elige la mascota.</div>':''}</div><div>${lbl('¿Qué es?')}${chipsF(m,'esp',[['Veterinario','Veterinario'],['Vacuna','Vacuna'],['Baño','Baño y peluquería'],['Desparasitación','Desparasitación'],['Comida','Comprar comida']])}${er.esp?'<div class="er">Elige qué es.</div>':''}</div>${fecha()}${['Veterinario','Vacuna'].includes(m.f.esp)?lugar:''}<div>${lbl('¿Se repite?')}${chipsF(m,'rec',[['Una vez','Una vez'],['Cada mes','Cada mes'],['Cada 3 meses','Cada 3 meses'],['Cada año','Cada año']])}</div>${adj}`;
  if(t==='otro')body=`${inF(m,'esp','¿Qué hay que hacer?','Ej.: llevar el televisor a arreglar','text',er)}<div>${lbl('¿Para quién o para qué?')}${chipsF(m,'para',todas)}${er.para?'<div class="er">Elige uno.</div>':''}</div>${fecha()}${inF(m,'lugar','Lugar (opcional)','','text',er)}`;
  return `<div class="sh"><div><button class="lnk" data-a="tipo" data-v="">${ic('back','s')} Cambiar tipo</button><h2 style="margin-top:6px">${T[1]}</h2></div>${X}</div><div class="sb">${body}<p class="help" style="margin:0">Lo ve toda la familia y cualquiera lo puede gestionar.</p><button class="btn pri big full" data-a="saveadd">Guardar</button></div>`;
 }
@@ -968,18 +981,19 @@ function modal(){
  if(m.k==='addent'){
   const er=m.err||{};
   h=`<div class="sh"><h2>Agregar a la familia</h2>${X}</div><div class="sb">
-  <div><span class="lbl">¿Qué es?</span><div class="chips">${[['persona','Persona'],['casa','Casa'],['carro','Vehículo']].map(t=>`<button class="chip ${m.type===t[0]?'on':''}" data-a="setf" data-f="type" data-v="${t[0]}">${t[1]}</button>`).join('')}</div>${er.type?'<div class="er">Elige el tipo.</div>':''}</div>
+  <div><span class="lbl">¿Qué es?</span><div class="chips">${[['persona','Persona'],['mascota','Mascota'],['casa','Casa'],['carro','Vehículo']].map(t=>`<button class="chip ${m.type===t[0]?'on':''}" data-a="setf" data-f="type" data-v="${t[0]}">${t[1]}</button>`).join('')}</div>${er.type?'<div class="er">Elige el tipo.</div>':''}</div>
   <div class="fld"><label for="ename">Nombre</label><input class="inp ${er.n?'err':''}" id="ename" value="${esc(m.n||'')}" placeholder="Ej.: Finca en Dagua">${er.n?'<div class="er">Escribe el nombre.</div>':''}</div>
   <button class="btn pri big full" data-a="doaddent">Agregar</button></div>`;
  }
  if(m.k==='editent'){const e=ENT[m.id],er=m.err||{},f=m.f;
   const fld=(id,lab,ph,help)=>`<div class="fld"><label for="f_${id}">${lab}</label><input class="inp ${er[id]?'err':''}" id="f_${id}" value="${esc(f[id]||'')}" placeholder="${ph||''}">${er[id]?`<div class="er">${er[id]}</div>`:help?`<div class="help">${help}</div>`:''}</div>`;
-  h=`<div class="sh"><h2>Editar ${e.type==='persona'?'persona':e.type==='casa'?'casa':'vehículo'}</h2>${X}</div><div class="sb">
+  h=`<div class="sh"><h2>Editar ${e.type==='persona'?'persona':e.type==='casa'?'casa':e.type==='mascota'?'mascota':'vehículo'}</h2>${X}</div><div class="sb">
   <div style="display:flex;gap:16px;align-items:center;flex-wrap:wrap"><span class="hubpic ${e.type==='persona'?'':'sq'}" style="width:96px;height:96px">${entPic(e.id)}</span>
   <div style="display:flex;flex-direction:column;gap:8px;flex:1;min-width:180px"><span class="lbl" style="margin:0">Foto</span>
   <div class="opts"><label class="btn dark sm">${ic('cam','s')}Tomar<input type="file" accept="image/*" capture="environment" data-a="photoin" data-id="${e.id}" ${FIN}></label><label class="btn gh sm">${ic('up','s')}Elegir<input type="file" accept="image/*" data-a="photoin" data-id="${e.id}" ${FIN}></label></div>
   ${photoOf(e.id)?`<button class="lnk" style="align-self:flex-start;color:var(--bad)" data-a="rmphoto" data-id="${e.id}">Quitar foto</button>`:''}</div></div>
   ${e.type==='carro'?fld('marca','Marca','Renault')+fld('modelo','Modelo','Logan')+fld('anio','Año','2016')+fld('placa','Placa','ABC 123','Carro: 3 letras y 3 números. Moto: 3 letras, 2 números y 1 letra.')
+   :e.type==='mascota'?fld('full','Nombre','Aaron')+fld('especie','Especie','Perro')+fld('raza','Raza','Criollo')+fld('nace','Nació','Marzo de 2019')+fld('vet','Veterinaria','')
    :e.type==='casa'?fld('nombre','Nombre','Casa familiar')+fld('dir','Dirección','Calle 00 # 00-00')+fld('ciudad','Ciudad','Cali')
    :fld('full','Nombre completo','Luis')+fld('short','Cómo le dicen','Luis')+fld('doc','Documento','CC 00.000.0000')+fld('nace','Fecha de nacimiento','12 de marzo de 1950')+fld('cel','Celular','300 000 0000')+fld('mail','Correo','nombre@correo.com')+fld('dir','Dirección','Calle 00 # 00-00, Cali')+fld('eps','EPS','')}
   <button class="btn pri big full" data-a="saveent">Guardar cambios</button></div>`}
@@ -1069,14 +1083,16 @@ document.addEventListener('click',e=>{
  const m=S.modal;
  switch(a){
  case 'kebab':{const r=t.getBoundingClientRect();S.menu=S.menu&&S.menu.id===t.dataset.id&&S.menu.k===t.dataset.k?null:{k:t.dataset.k,id:t.dataset.id,r:r.right,b:r.bottom,t:r.top};render();break}
- case 'm-edit-ent':{const e=ENT[t.dataset.id];S.menu=null;S.modal={k:'editent',id:e.id,f:e.type==='carro'?{marca:e.marca,modelo:e.modelo,anio:e.anio,placa:e.placa}:e.type==='casa'?{nombre:e.nombre||e.full,dir:e.dir,ciudad:e.ciudad}:Object.assign({full:e.full,short:e.name},e.perfil||{})};render();break}
+ case 'm-edit-ent':{const e=ENT[t.dataset.id];S.menu=null;S.modal={k:'editent',id:e.id,f:e.type==='carro'?{marca:e.marca,modelo:e.modelo,anio:e.anio,placa:e.placa}:e.type==='mascota'?{full:e.full,especie:e.especie,raza:e.raza,nace:e.nace,vet:e.vet}:e.type==='casa'?{nombre:e.nombre||e.full,dir:e.dir,ciudad:e.ciudad}:Object.assign({full:e.full,short:e.name},e.perfil||{})};render();break}
  case 'saveent':{const e=ENT[m.id],f={};document.querySelectorAll('[id^=f_]').forEach(x=>f[x.id.slice(2)]=x.value.trim());m.f=f;const er={};
   if(e.type==='carro'){f.placa=f.placa.toUpperCase().replace(/\s+/g,' ');if(!f.marca)er.marca='Escribe la marca.';if(!f.modelo)er.modelo='Escribe el modelo.';if(!/^(19[5-9]\d|20[0-2]\d)$/.test(f.anio))er.anio='Escribe un año válido, por ejemplo 2016.';if(!/^[A-Z]{3} ?(\d{3}|\d{2}[A-Z])$/.test(f.placa))er.placa='La placa no es válida. Ejemplo: KTZ 418.'}
+  else if(e.type==='mascota'){if(!f.full)er.full='Escribe el nombre.'}
   else if(e.type==='casa'){if(!f.nombre)er.nombre='Escribe un nombre.';if(!f.ciudad)er.ciudad='Escribe la ciudad.'}
   else{if(!f.full)er.full='Escribe el nombre completo.';if(!f.short)er.short='Escribe cómo le dicen.';if(f.mail&&!/^\S+@\S+\.\S+$/.test(f.mail))er.mail='El correo no es válido.';if(f.cel&&f.cel.replace(/\D/g,'').length!==10)er.cel='El celular debe tener 10 dígitos.'}
   if(Object.keys(er).length){m.err=er;render();break}
   const before=e.full;
   if(e.type==='carro'){if(/^[A-Z]{3}\d/.test(f.placa))f.placa=f.placa.slice(0,3)+' '+f.placa.slice(3);Object.assign(e,f);e.full=`${f.marca} ${f.modelo} · ${f.placa}`}
+  else if(e.type==='mascota'){Object.assign(e,f);e.name=f.full}
   else if(e.type==='casa'){Object.assign(e,f);e.full=`${f.nombre} · ${f.ciudad}`}
   else{e.full=f.full;e.name=f.short;e.perfil={doc:f.doc,nace:f.nace,cel:f.cel,mail:f.mail,dir:f.dir,eps:f.eps};e.ini=f.full.split(/\s+/).map(w=>w[0]).join('').slice(0,2).toUpperCase();if(P[e.id]){P[e.id].name=f.full;P[e.id].short=f.short;P[e.id].ini=e.ini}}
   S.feed.unshift({at:'Ahora',who:S.user,x:`editó ${before} → ${e.full}`});S.modal=null;render();toast('Cambios guardados');break}
@@ -1134,15 +1150,18 @@ document.addEventListener('click',e=>{
  case 'af':collectA(m);m.f[t.dataset.f]=t.dataset.v;if(m.err)m.err[t.dataset.f]=0;render();break;
  case 'saveadd':{collectA(m);const f=m.f,tp=m.tipo,er={};
   if(!f.para)er.para=1;
-  if(['cita','examen','pago','documento','otro'].includes(tp)&&!f.esp)er.esp=tp==='otro'?'Escribe qué hay que hacer.':'Completa este dato.';
+  if(['cita','examen','pago','documento','otro','mascota'].includes(tp)&&!f.esp)er.esp=tp==='otro'?'Escribe qué hay que hacer.':'Completa este dato.';
   if(!f.fecha)er.fecha='Indica la fecha.';
-  if((tp==='cita'||tp==='examen')){if(!f.hora)er.hora='Indica la hora.';if(!f.place)er.place='Elige el lugar.';if(f.place==='nuevo'&&!f.pname)er.pname='Escribe el nombre del lugar.'}
+  const vet=tp==='mascota'&&['Veterinario','Vacuna'].includes(f.esp);
+  if((tp==='cita'||tp==='examen'||vet)){if(!f.hora)er.hora='Indica la hora.';if(!f.place)er.place='Elige el lugar.';if(f.place==='nuevo'&&!f.pname)er.pname='Escribe el nombre del lugar.'}
   if(Object.keys(er).length){m.err=er;render();break}
   let place=f.place;if(place==='nuevo'){place='p'+Date.now();S.places[place]={name:f.pname,dir:f.pdir||'',tel:''}}
   const due=fromIso(f.fecha);const time=f.hora?fmtTime(f.hora):undefined;const id='n'+Date.now();
   const ent=f.para,isP=ENT[ent].type==='persona';const resp=isP&&P[ent]?ent:'luis';
-  const titles={cita:'Cita de '+(f.esp||'').toLowerCase(),examen:f.esp,medicamento:'Remedios de '+ENT[ent].name,pago:'Pagar '+(f.esp||'').toLowerCase(),documento:'Renovar '+(f.esp||'').toLowerCase(),otro:f.esp};
-  const it={id,ent,title:titles[tp].charAt(0).toUpperCase()+titles[tp].slice(1),sub:{cita:'Cita médica',examen:'Examen',medicamento:'Compra',pago:'Pago',documento:'Vence el '+fdate(due),otro:f.lugar||'Anotado por '+me().short}[tp],cat:tp==='documento'?'otro':tp,resp,due,time,open:true,by:S.user,hist:[['Hoy',me().short,'Lo anotó'+(m.file?' y adjuntó un archivo':'')]]};
+  const mtit={Veterinario:'Veterinario de ',Vacuna:'Vacuna de ',Baño:'Baño de ',Desparasitación:'Desparasitación de ',Comida:'Comprar comida de '};
+  const titles={mascota:(mtit[f.esp]||'')+ENT[ent].name,cita:'Cita de '+(f.esp||'').toLowerCase(),examen:f.esp,medicamento:'Remedios de '+ENT[ent].name,pago:'Pagar '+(f.esp||'').toLowerCase(),documento:'Renovar '+(f.esp||'').toLowerCase(),otro:f.esp};
+  const it={id,ent,title:titles[tp].charAt(0).toUpperCase()+titles[tp].slice(1),sub:{mascota:f.esp==='Baño'?'Baño y peluquería':f.esp,cita:'Cita médica',examen:'Examen',medicamento:'Compra',pago:'Pago',documento:'Vence el '+fdate(due),otro:f.lugar||'Anotado por '+me().short}[tp],cat:tp==='documento'?'otro':vet?'cita':tp,resp,due,time,open:true,by:S.user,hist:[['Hoy',me().short,'Lo anotó'+(m.file?' y adjuntó un archivo':'')]]};
+  if(tp==='mascota'){if(vet)it.place=place;it.rec=f.rec&&f.rec!=='Una vez'?f.rec:undefined}
   if(tp==='cita'||tp==='examen'){it.place=place;it.acomp=f.acomp||undefined;it.prep=f.prep||undefined;it.ayunas=!!f.ayunas;it.sens=true}
   if(tp==='medicamento'){it.sens=true;it.rec=f.rec==='Una vez'?undefined:f.rec}
   if(tp==='pago'){it.rec=f.rec==='Una vez'?undefined:f.rec;if(f.valor)it.amount='$ '+Number(String(f.valor).replace(/\D/g,'')).toLocaleString('es-CO')}
