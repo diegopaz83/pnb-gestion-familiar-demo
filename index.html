@@ -456,6 +456,8 @@ label.btn{cursor:pointer;position:relative}
 .rec.live{background:var(--bad-50);border-color:var(--bad-bg);color:var(--bad-t)}
 .wave.live{opacity:1!important;background:repeating-linear-gradient(90deg,var(--bad) 0 3px,transparent 3px 7px);animation:pulse 1s ease-in-out infinite}
 @keyframes pulse{50%{opacity:.4}}
+
+.aprow>div{flex:1 1 160px;min-width:0}
 </style>
 </head>
 <body>
@@ -740,7 +742,7 @@ function vItem(id){
  <div class="card"><div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center"><span class="pill ${st}">${statTxt(i)}</span>${i.sens?'<span class="pill gold">Salud</span>':''}${i.reopened&&i.open?'<span class="pill warn">Pidieron revisar</span>':''}</div>
  <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:16px">
  <div><div class="muted">Fecha</div><div style="font-weight:700;color:var(--fg-1)">${fdate(i.due)}${i.time?', '+i.time:''}</div></div>
- <div><div class="muted">${isAppt(i)?(i.open?'Va':'Fue'):i.open?'Lo hace':'Lo hizo'}</div><div style="font-weight:700;color:var(--fg-1);display:flex;gap:8px;align-items:center">${av(i.open?i.resp:c.by,'sm')}${P[i.open?i.resp:c.by].short}</div></div></div>
+ <div><div class="muted">${isAppt(i)?(i.open?'Va':c&&c.kind==='nofui'?'No asistió':'Asistió'):i.open?'Lo hace':'Lo hizo'}</div><div style="font-weight:700;color:var(--fg-1);display:flex;gap:8px;align-items:center">${isAppt(i)?`${entTile(i.ent,'sm')}${esc(ENT[i.ent].name)}`:`${av(i.open?i.resp:(c.did||c.by),'sm')}${P[i.open?i.resp:(c.did||c.by)].short}`}</div>${isAppt(i)&&c&&c.acomp?`<div class="muted" style="margin-top:2px">Acompañó: ${P[c.acomp].short}</div>`:''}</div></div>
  ${isAppt(i)?`<div class="apbox">${PL(i)?`<div class="aprow">${ic('pin')}<div style="flex:1"><b>${esc(PL(i).name)}</b><div class="muted">${esc(PL(i).dir||'')}</div></div><button class="btn gh sm" data-a="toast" data-m="Abriría el mapa (simulado)">Cómo llegar</button><button class="btn gh sm" data-a="toast" data-m="Llamada simulada a ${esc(PL(i).tel||'')}">${ic('phone','s')}</button></div>`:''}
  ${i.acomp?`<div class="aprow">${av(i.acomp,'sm')}<div>Acompaña: <b>${P[i.acomp].short}</b></div></div>`:''}
  ${i.ayunas?`<div class="aprow">${ic('alert')}<div><b>En ayunas</b></div></div>`:''}
@@ -754,8 +756,8 @@ function vItem(id){
  </div>
  ${c?`<div class="card"><h2 style="font-size:20px">${isAppt(i)?'Cómo le fue':'Cómo se cerró'}</h2>
   <div style="display:flex;gap:14px;align-items:center;margin-top:14px">${c.kind==='nota'||c.kind==='nofui'?`<span class="docic" style="background:var(--info-50);color:var(--info)">${ic('msg')}</span>`:c.kind==='voz'?`<span class="docic" style="background:var(--gold-50);color:var(--gold-700)">${ic('mic')}</span>`:`<span class="docic">${(c.file||'').split('.').pop().toUpperCase()}</span>`}
-  <div><div style="font-weight:700;color:var(--fg-1)">${c.kind==='voz'?'Audio de '+P[c.by].short:c.kind==='nota'?'Nota de '+P[c.by].short:c.kind==='nofui'?'No asistió':esc(c.file)}</div>${c.url&&(c.mime||'').startsWith('image/')?`<img src="${c.url}" alt="" style="max-width:220px;max-height:160px;border-radius:12px;margin-top:8px;display:block">`:''}<div class="muted">${P[c.by].short} · ${c.at}</div>${c.audio?`<audio controls src="${c.audio.url}" style="width:100%;max-width:320px;margin-top:8px"></audio><div class="muted" style="font-size:13px">Audio de ${fmtDur(c.audio.dur)} · se borra a los 90 días</div>`:''}${c.how?`<span class="pill ${c.how==='Bien'?'ok':c.how==='Regular'?'warn':'info'}" style="margin-top:6px">${esc(c.how)}</span>`:''}${c.note?`<div style="margin-top:4px">“${esc(c.note)}”</div>`:''}</div></div>
-  ${c.kind==='voz'?`<div class="banner warn" style="margin-top:12px">${ic('info','s')}<div>Se cerró sin papel. Queda la palabra de ${P[c.by].short}.</div></div>`:`<div class="muted" style="margin-top:10px">Guardado en Papeles · Recibos</div>`}
+  <div><div style="font-weight:700;color:var(--fg-1)">${c.kind==='voz'?'Audio de '+P[c.by].short:c.kind==='nota'?'Nota de '+P[c.by].short:c.kind==='nofui'?'No asistió':esc(c.file)}</div>${c.url&&(c.mime||'').startsWith('image/')?`<img src="${c.url}" alt="" style="max-width:220px;max-height:160px;border-radius:12px;margin-top:8px;display:block">`:''}<div class="muted">Lo registró ${P[c.by].short} · ${c.at}</div>${c.audio?`<audio controls src="${c.audio.url}" style="width:100%;max-width:320px;margin-top:8px"></audio><div class="muted" style="font-size:13px">Audio de ${fmtDur(c.audio.dur)} · se borra a los 90 días</div>`:''}${c.how?`<span class="pill ${c.how==='Bien'?'ok':c.how==='Regular'?'warn':'info'}" style="margin-top:6px">${esc(c.how)}</span>`:''}${c.note?`<div style="margin-top:4px">“${esc(c.note)}”</div>`:''}</div></div>
+  ${c.kind==='voz'?`<div class="banner warn" style="margin-top:12px">${ic('info','s')}<div>Se cerró sin papel. Queda la palabra de ${P[c.by].short}.</div></div>`:c.file?`<div class="muted" style="margin-top:10px">Guardado en Papeles · ${isAppt(i)?'Salud':'Recibos'}</div>`:''}
   ${remote()?`<div style="margin-top:14px"><button class="btn gh sm" data-a="reopen" data-id="${i.id}">Pedir que se revise</button></div>`:''}</div>`:''}
  </div>
  <div class="card"><h2 style="font-size:20px">Historia</h2><div class="feed" style="margin-top:14px">${i.hist.slice().reverse().map((h,k,a)=>`<div class="fi"><div class="rail"><i class="${k===0?'k':''}"></i>${k<a.length-1?'<span></span>':''}</div><div class="bd"><div class="fx">${esc(h[2])}</div><div class="fw">${h[0]} · ${h[1]}</div></div></div>`).join('')}</div></div>
@@ -921,7 +923,9 @@ function feedbackModal(m,X){
   <button class="btn gh big full" data-a="fbres" data-v="cambio">${ic('cal')}La cambiaron de fecha</button>
   <button class="btn gh big full" data-a="fbres" data-v="nofui">${ic('x')}No asistió</button></div></div>`;
  const er=m.err;
- if(m.res==='fui')return head+`<div class="sb"><h2>¿Cómo le fue?</h2>
+ if(m.res==='fui')return head+`<div class="sb"><h2>${E_.name} asistió</h2><p class="help" style="margin:-8px 0 0">${S.user===i.ent?'Cuéntalo tú.':'Lo registras tú, '+me().short+', en nombre de '+E_.name+'.'}</p>
+  <div><span class="lbl">¿Quién acompañó a ${E_.name}?</span><div class="chips">${[['','Nadie']].concat(Object.values(P).filter(p=>p.status==='activo'&&p.id!==i.ent).map(p=>[p.id,p.short])).map(o=>`<button class="chip ${(m.acomp??(i.acomp||''))===o[0]?'on':''}" data-a="fbacomp" data-v="${o[0]}">${o[1]}</button>`).join('')}</div></div>
+  <span class="lbl" style="margin-bottom:-6px">¿Cómo le fue?</span>
   <div class="chips">${['Bien','Regular','Me pidieron algo más'].map(x=>`<button class="chip ${m.how===x?'on':''}" data-a="fbhow" data-v="${x}">${x}</button>`).join('')}</div>
   <div class="fld"><label for="fbnote">Cuéntalo en pocas palabras</label><textarea class="inp" id="fbnote" placeholder="Ej.: todo bien, cambió la dosis, control en 3 meses">${esc(m.note||'')}</textarea></div>
   ${recUI(m,'O deja un audio')}
@@ -1252,13 +1256,14 @@ document.addEventListener('click',e=>{
   S.items.push(it);addFeed(`anotó “${it.title}”${tp==='cita'||tp==='examen'?' para el '+due.getDate()+' de '+MES[due.getMonth()]:''}`,id);S.modal=null;render();toast('Anotado. Ya lo ve toda la familia');break}
  case 'setf':if(m.k==='adddoc'){m.n=val('dname');m.v=val('dvence')}if(m.k==='invite'){m.n=val('iname');m.c=val('icontact')}if(m.k==='addent')m.n=val('ename');if(m.k==='edititem'){m.t=val('et');m.d=val('ed');m.h=val('eh')}if(m.k==='editdoc'){m.n=val('dn');m.v=val('dv')}if(m.k==='delitem'&&m.r==='Otro')m.o=val('dr');m[t.dataset.f]=t.dataset.v;if(m.err)m.err[t.dataset.f]=0;render();break;
  case 'fbres':m.res=t.dataset.v;m.err=null;render();break;
+ case 'fbacomp':m.note=val('fbnote');m.acomp=t.dataset.v;render();break;
  case 'fbhow':m.note=val('fbnote');m.how=t.dataset.v;m.err=null;render();break;
  case 'fbwhy':m.d=val('fbd');m.why=t.dataset.v;m.err=null;render();break;
  case 'fbsave':{if(m.recording){m.err='Detén la grabación primero.';render();break}m.note=val('fbnote');const i=IT(m.id);if(!m.how){m.err='Elige cómo le fue.';render();break}if(!m.note&&!m.rec&&!m.file){m.err='Cuéntalo con una nota, un audio o una foto. Así queda la constancia.';render();break}
-  i.open=false;i.closed={by:S.user,at:nowS(),audio:m.audio||null,kind:m.file?'foto':m.rec?'voz':'nota',file:m.file?m.file.name:null,url:m.file?m.file.url:null,mime:m.file?m.file.type:null,note:m.note,how:m.how};i.reopened=null;
-  i.hist.push(['Hoy',me().short,`Contó cómo le fue: ${m.how.toLowerCase()}${m.note?' · '+m.note:''}`]);
+  i.open=false;i.closed={by:S.user,at:nowS(),acomp:(m.acomp??(i.acomp||''))||null,audio:m.audio||null,kind:m.file?'foto':m.rec?'voz':'nota',file:m.file?m.file.name:null,url:m.file?m.file.url:null,mime:m.file?m.file.type:null,note:m.note,how:m.how};i.reopened=null;
+  i.hist.push(['Hoy',me().short,`${S.user===i.ent?'Contó cómo le fue':'Contó cómo le fue a '+ENT[i.ent].name}: ${m.how.toLowerCase()}${m.note?' · '+m.note:''}`]);
   if(m.file)S.docs.push({id:'d'+Date.now(),ent:i.ent,cat:'Salud',name:`${i.title} · ${fshort(i.due)}`,fmt:m.file.type.includes('pdf')?'PDF':'JPG',by:S.user,url:m.file.url,mime:m.file.type,log:[]});
-  addFeed(`contó cómo fue “${i.title.toLowerCase()}” de ${ENT[i.ent].name}: ${m.how.toLowerCase()}`,i.id,m.file?'foto':m.rec?'voz':null);m.done=true;render();break}
+  addFeed(`${S.user===i.ent?'contó cómo le fue en':'contó cómo le fue a '+ENT[i.ent].name+' en'} “${i.title.toLowerCase()}”: ${m.how.toLowerCase()}`,i.id,m.file?'foto':m.rec?'voz':null);m.done=true;render();break}
  case 'fbcambio':{m.d=val('fbd');m.h=val('fbh');if(!m.d){m.err='Indica la nueva fecha.';render();break}const i=IT(m.id);const old=fshort(i.due);i.due=fromIso(m.d);if(m.h)i.time=fmtTime(m.h);i.hist.push(['Hoy',me().short,`Cambió la fecha: ${old} → ${fshort(i.due)}`]);addFeed(`movió “${i.title.toLowerCase()}” al ${i.due.getDate()} de ${MES[i.due.getMonth()]}`,i.id);m.done=true;render();break}
  case 'fbnofui':{m.d=val('fbd');if(!m.why){m.err='Elige qué pasó.';render();break}const i=IT(m.id);
   if(m.d){const old=fshort(i.due);i.due=fromIso(m.d);i.hist.push(['Hoy',me().short,`No asistió (${m.why.toLowerCase()}). Se reprogramó: ${old} → ${fshort(i.due)}`]);addFeed(`reprogramó “${i.title.toLowerCase()}”`,i.id);S.modal=null;render();toast('Reprogramada. Los recordatorios siguen');break}
