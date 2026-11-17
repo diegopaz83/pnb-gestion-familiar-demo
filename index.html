@@ -614,6 +614,11 @@ main{container:main/inline-size}
 .task.hecha,.grp .task.hecha{background:#f0f9f4;border-color:#d9f0e4}
 .grp .task.hecha+.task.hecha{border-top-color:#d9f0e4}
 .task.hecha .chk{background:#dcf3e8!important;border-color:#dcf3e8!important}
+
+/* v3.26 lo atrasado en rojo suave */
+.task.tarde,.grp .task.tarde{background:#fdf3f1;border-color:#f6dcd6}
+.grp .task.tarde+.task.tarde{border-top-color:#f6dcd6}
+.card.main-task.tarde{background:#fdf3f1;border:1px solid #f6dcd6}
 </style>
 </head>
 <body>
@@ -808,7 +813,7 @@ function taskRow(i,{showWho=true}={}){
  const st=stat(i),deleg=i.open&&P[i.resp].kind==='afuera'&&!remote();
  const can=canReport(i);
  const whoLine=isAppt(i)&&i.open?`<div class="s">${PL(i)?esc(PL(i).name):''}${i.time&&days(i.due)>1?' · '+fday(i.due).toLowerCase()+' '+i.time:''}${i.acomp?' · acompaña '+P[i.acomp].short:''}</div>`:i.resp!==S.user?`<div class="s">${i.open?'Lo hace '+P[i.resp].short:'Lo hizo '+P[i.closed.by].short}</div>`:(i.prep?`<div class="s">${esc(i.prep)}</div>`:'');
- return `<div class="task click ${deleg?'deleg':''} ${i.open?'':'hecha'}" data-a="open" data-id="${i.id}" role="button" tabindex="0">
+ return `<div class="task click ${deleg?'deleg':''} ${i.open?(st==='bad'?'tarde':''):'hecha'}" data-a="open" data-id="${i.id}" role="button" tabindex="0">
  ${entTile(i.ent,'sm')}
  <div class="tx"><div class="t">${esc(i.title)}</div><div class="m" style="color:${statColor[st]}">${statTxt(i)}${i.time&&i.open&&!isAppt(i)?' · '+i.time:''}${i.reopened&&i.open?' · revisar':''}</div>${showWho?whoLine:''}</div>
  ${can?`<button class="chk" data-a="report" data-id="${i.id}" aria-label="${actLabel(i)}">${ic('check','l')}</button>`:(!i.open?`<span class="chk" style="background:var(--ok-bg);border-color:var(--ok-bg);color:var(--ok)">${ic('check','l')}</span>`:'')}
@@ -837,7 +842,7 @@ function vHomeLocal(){
  const upA=i=>isAppt(i)&&days(i.due)>=0;
  const rest=[...late,...week].filter(i=>i!==first&&!upA(i));
  const head=first?(isAppt(first)&&days(first.due)<0?`${u.short}, falta contar cómo fue: ${first.title.toLowerCase()}`:`${u.short}, ${stat(first)==='bad'?'hoy toca':'lo próximo es'}: ${first.title.toLowerCase()}`):`Todo al día, ${u.short}`;
- const mainCard=first?`<div class="card hi main-task">
+ const mainCard=first?`<div class="card hi main-task ${stat(first)==='bad'?'tarde':''}">
   <div class="row">${entTile(first.ent)}<div><span class="pill ${stat(first)}">${statTxt(first)}${first.time&&!isAppt(first)?' · '+first.time:''}</span><h3 style="margin-top:6px">${esc(first.title)}</h3><div class="muted" style="font-size:16px">${isAppt(first)&&PL(first)?esc(PL(first).name):esc(first.sub)}${first.amount?' · '+first.amount:''}${first.resp!==S.user?' · lo tiene '+P[first.resp].short:''}</div></div></div>
   ${first.reopened?`<div class="banner warn">${ic('alert','s')}<div><b>${P[first.reopened.by].short} pidió revisar:</b> ${esc(first.reopened.reason)}</div></div>`:''}
   ${canReport(first)?`<button class="btn pri big full" data-a="report" data-id="${first.id}">${isAppt(first)?ic('msg'):ic('cam')}${actLabel(first)}</button>`:''}
