@@ -588,6 +588,15 @@ main{container:main/inline-size}
 .sop .lnk,.prev .lnk{flex:none;align-self:center}
 .prevs{display:flex;flex-direction:column;gap:8px;margin-top:14px}
 .prev .docic{flex:none}
+
+/* v3.21 archivos: nombre legible y miniatura */
+.cierre{display:flex;gap:14px;align-items:flex-start;margin-top:14px}
+.cierre .cbd{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
+.cierre .cbd b{color:var(--fg-1);font-size:17px;overflow-wrap:anywhere}
+.mini{flex:none;width:72px;height:72px;border-radius:14px;overflow:hidden;display:block;background:var(--navy-100)}
+.mini img{width:100%;height:100%;object-fit:cover;display:block}
+.sop .mini{width:56px;height:56px;border-radius:12px}
+.card b,.sop b,.prev b,.fact b{overflow-wrap:anywhere}
 </style>
 </head>
 <body>
@@ -864,10 +873,15 @@ function vHomeRemote(){
  </div><div><div class="shd"><h2>Lo último en casa</h2></div><div class="card">${feedHtml(6)}</div></div></div></div>`;
 }
 const EJ='Archivo de ejemplo. En la app real aquí se abre la foto o el documento.';
+function nombreArch(f,kind){const base=f.name.replace(/\.[^.]+$/,'');const ext=(f.name.match(/\.[^.]+$/)||[''])[0].toLowerCase();
+ const raro=/^(\d{6,}|img[_-]?\d|pxl[_-]?\d|dsc|image|photo|whatsapp image|screenshot|captura)/i.test(base)||base.length>40;
+ if(kind==='foto'||(f.type.startsWith('image/')&&raro)){const n=new Date();return `Foto del ${n.getDate()} ${['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'][n.getMonth()]}, ${nowS().split(' · ').pop()}`}
+ return raro?`Documento del ${new Date().getDate()} ${['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'][new Date().getMonth()]}${ext}`:f.name}
 function verArch(name,url){return url?`<a class="lnk" href="${url}" target="_blank">Ver</a>`:`<button class="lnk" data-a="toast" data-m="${EJ}">Ver</button>`}
 function soportes(i){
  const ap=i.apuntes||[],adj=i.attach&&!isAppt(i);
- const rows=(adj?`<div class="sop">${ic('file')}<div><span class="k">${i.cat==='medicamento'?'Fórmula':'Adjunto'}</span><b>${esc(i.attach.name)}</b></div>${verArch(i.attach.name,i.attach.url)}</div>`:'')+
+ const aimg=adj&&i.attach.url&&/\.(jpe?g|png|webp|heic)$|^Foto/i.test(i.attach.name);
+ const rows=(adj?`<div class="sop">${aimg?`<a class="mini" href="${i.attach.url}" target="_blank" aria-label="Ver"><img src="${i.attach.url}" alt=""></a>`:ic('file')}<div><span class="k">${i.cat==='medicamento'?'Fórmula':'Adjunto'}</span><b>${esc(i.attach.name)}</b></div>${aimg?'':verArch(i.attach.name,i.attach.url)}</div>`:'')+
   ap.map(a=>`<div class="sop">${a.file?ic('file'):ic('msg')}<div>${a.note?`<p>${esc(a.note)}</p>`:''}${a.file?(a.file.url&&(a.file.type||'').startsWith('image/')?`<img src="${a.file.url}" alt="${esc(a.file.name)}">`:`<b>${esc(a.file.name)}</b>`):''}<span class="k">${P[a.by].short} · ${a.at}</span></div>${a.file&&!(a.file.url&&(a.file.type||'').startsWith('image/'))?verArch(a.file.name,a.file.url):''}</div>`).join('');
  const can=i.open&&seesItem(i);
  if(!rows&&!can)return '';
@@ -900,8 +914,8 @@ function vItem(id){
  ${i.open&&!can&&remote()&&i.resp!==S.user?`<div style="display:flex;gap:10px;margin-top:18px;flex-wrap:wrap"><button class="btn sec sm" data-a="take" data-id="${i.id}">Lo gestiono yo</button>${P[i.resp].kind!=='afuera'?`<button class="btn gh sm" data-a="write" data-id="${i.id}">${ic('msg','s')}Escribirle a ${P[i.resp].short}</button>`:''}</div>`:''}
  </div>
  ${c?`<div class="card"><h2 style="font-size:20px">${isAppt(i)?'Cómo le fue':'Cómo se cerró'}</h2>
-  <div style="display:flex;gap:14px;align-items:center;margin-top:14px">${c.kind==='nota'||c.kind==='nofui'?`<span class="docic" style="background:var(--info-50);color:var(--info)">${ic('msg')}</span>`:c.kind==='voz'?`<span class="docic" style="background:var(--gold-50);color:var(--gold-700)">${ic('mic')}</span>`:`<span class="docic">${(c.file||'').split('.').pop().toUpperCase()}</span>`}
-  <div><div style="font-weight:700;color:var(--fg-1)">${c.kind==='voz'?'Audio de '+P[c.by].short:c.kind==='nota'?'Nota de '+P[c.by].short:c.kind==='nofui'?'No asistió':esc(c.file)}</div>${c.url&&(c.mime||'').startsWith('image/')?`<img src="${c.url}" alt="" style="max-width:220px;max-height:160px;border-radius:12px;margin-top:8px;display:block">`:''}<div class="muted">Lo registró ${P[c.by].short} · ${c.at}</div>${c.audio?`<audio controls src="${c.audio.url}" style="width:100%;max-width:320px;margin-top:8px"></audio><div class="muted" style="font-size:13px">Audio de ${fmtDur(c.audio.dur)} · se borra a los 90 días</div>`:''}${c.how?`<span class="pill ${c.how==='Bien'?'ok':c.how==='Regular'?'warn':'info'}" style="margin-top:6px">${esc(c.how)}</span>`:''}${c.note?`<div style="margin-top:4px">“${esc(c.note)}”</div>`:''}</div></div>
+  ${(()=>{const img=c.url&&(c.mime||'').startsWith('image/');return `<div class="cierre">${img?`<a class="mini" href="${c.url}" target="_blank" aria-label="Ver la foto"><img src="${c.url}" alt=""></a>`:c.kind==='nota'||c.kind==='nofui'?`<span class="docic" style="background:var(--info-50);color:var(--info)">${ic('msg')}</span>`:c.kind==='voz'?`<span class="docic" style="background:var(--gold-50);color:var(--gold-700)">${ic('mic')}</span>`:`<span class="docic">${(c.file||'').split('.').pop().toUpperCase().slice(0,4)}</span>`}
+  <div class="cbd"><b>${c.kind==='voz'?'Audio de '+P[c.by].short:c.kind==='nota'?'Nota de '+P[c.by].short:c.kind==='nofui'?'No asistió':img?'Foto':esc(c.file)}</b><div class="muted">Lo registró ${P[c.by].short} · ${c.at}</div>`})()}${c.audio?`<audio controls src="${c.audio.url}" style="width:100%;max-width:320px;margin-top:8px"></audio><div class="muted" style="font-size:13px">Audio de ${fmtDur(c.audio.dur)} · se borra a los 90 días</div>`:''}${c.how?`<span class="pill ${c.how==='Bien'?'ok':c.how==='Regular'?'warn':'info'}" style="margin-top:6px">${esc(c.how)}</span>`:''}${c.note?`<div style="margin-top:4px">“${esc(c.note)}”</div>`:''}</div></div>
   ${c.kind==='voz'?`<div class="banner warn" style="margin-top:12px">${ic('info','s')}<div>Se cerró sin papel. Queda la palabra de ${P[c.by].short}.</div></div>`:c.file?`<div class="muted" style="margin-top:10px">Guardado en Papeles · ${isAppt(i)?'Salud':'Recibos'}</div>`:''}
   ${remote()?`<div style="margin-top:14px"><button class="btn gh sm" data-a="reopen" data-id="${i.id}">Pedir que se revise</button></div>`:''}</div>`:''}
  ${anteriores(i)}
@@ -1333,7 +1347,7 @@ document.addEventListener('change',e=>{const t=e.target,a=t.dataset.a;
   if(m.k==='apunte'){m.note=val('apnote');m.err=null}
   if(m.k==='report'&&isAppt(IT(m.id))){m.note=val('fbnote');m.err=null}
   if(m.k==='adddoc'){m.n=val('dname')||f.name.replace(/\.[^.]+$/,'');m.v=val('dvence');if(m.err)m.err.f=0}
-  m.file={name:f.name,type:f.type,url:URL.createObjectURL(f)};render();return}
+  m.file={name:nombreArch(f,t.dataset.kind),type:f.type,url:URL.createObjectURL(f)};render();return}
  if(a==='who'){S.user=t.value;S.view='home';S.stack=[];S.modal=null;S.docCat=null;S.docF='todos';render();scrollTo(0,0);toast('Ahora ves como '+me().name)}
  if(a==='fontsel'){S.font[S.user]=t.value;render()}
  if(a==='hora'){S.notif.hora=t.value;toast('Resumen diario a las '+t.value)}
