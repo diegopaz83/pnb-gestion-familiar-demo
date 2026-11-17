@@ -603,7 +603,8 @@ main{container:main/inline-size}
 <div id="app"></div>
 <script>
 /* ============ Datos ficticios (nombres de la familia reales) ============ */
-const TODAY=new Date(2026,10,15);
+const TODAY=(()=>{const n=new Date();return new Date(n.getFullYear(),n.getMonth(),n.getDate())})();
+const BASE=new Date(2026,10,15),SHIFT=Math.round((TODAY-BASE)/864e5);
 const MES=['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
 const DIA=['domingo','lunes','martes','miércoles','jueves','viernes','sábado'];
 function baseP(){return{
@@ -631,9 +632,9 @@ const FICHA={
  luis:{doc:'CC •••• 4521',eps:'EPS Ejemplo (ficticia)',sangre:'O+ (ejemplo)',alergias:'Ninguna conocida (ejemplo)',medico:'Dra. Ejemplo · cardiología',nace:'Ejemplo: 1950'},
  lucero:{doc:'CC •••• 7380',eps:'EPS Ejemplo (ficticia)',sangre:'A+ (ejemplo)',alergias:'Penicilina (ejemplo)',medico:'Dr. Ejemplo · medicina general',nace:'Ejemplo: 1954'}
 };
-function D(m,d){return new Date(2026,m-1,d)}
+function D(m,d){return new Date(2026,m-1,d+SHIFT)}
 function seed(){P=baseP();ENT=baseEnt();return{
- user:'luis',view:'landing',arg:null,stack:[],modal:null,toast:null,calM:10,docF:'todos',docCat:null,
+ user:'luis',view:'landing',arg:null,stack:[],modal:null,toast:null,calM:TODAY.getFullYear()*12+TODAY.getMonth(),docF:'todos',docCat:null,
  font:{luis:'grande',lucero:'grande',diego:'normal',adriana:'normal'},
  notif:{app:true,mail:true,wa:false,hora:'7:00 a. m.'},
  places:{p1:{name:'Clínica del Valle (ficticia)',dir:'Av. Ejemplo # 10-20',tel:'602 000 0001'},p2:{name:'EPS Ejemplo · sede Norte',dir:'Calle Ejemplo # 40-15',tel:'602 000 0002'},p3:{name:'Consultorio dental Norte (ficticio)',dir:'Carrera Ejemplo # 5-30',tel:'602 000 0003'},p4:{name:'Laboratorio Central (ficticio)',dir:'Calle Ejemplo # 22-08',tel:'602 000 0004'},p5:{name:'Veterinaria Patitas (ficticia)',dir:'Carrera Ejemplo # 8-12',tel:'602 000 0005'}},
@@ -796,7 +797,7 @@ function taskRow(i,{showWho=true}={}){
  ${can?`<button class="chk" data-a="report" data-id="${i.id}" aria-label="${actLabel(i)}">${ic('check','l')}</button>`:(!i.open?`<span class="chk" style="background:var(--ok-bg);border-color:var(--ok-bg);color:var(--ok)">${ic('check','l')}</span>`:'')}
  </div>`}
 function weekStrip(list){
- const out=[];for(let k=0;k<7;k++){const d=new Date(2026,10,15+k);const its=list.filter(i=>i.open&&i.due.toDateString()===d.toDateString());
+ const out=[];for(let k=0;k<7;k++){const d=new Date(TODAY.getFullYear(),TODAY.getMonth(),TODAY.getDate()+k);const its=list.filter(i=>i.open&&i.due.toDateString()===d.toDateString());
   const late=k===0&&list.some(i=>stat(i)==='bad');
   const col=late?'#e4806f':its.length?'#f1c18f':'transparent';
   out.push(`<button class="wd ${k===0?'on':''}" data-a="nav" data-v="cal"><span>${['DOM','LUN','MAR','MIÉ','JUE','VIE','SÁB'][d.getDay()]}</span><b>${d.getDate()}</b><i style="background:${col}"></i></button>`)}
@@ -903,7 +904,7 @@ function vItem(id){
  ${isAppt(i)&&i.acomp&&i.open?`<div class="fact">${av(i.acomp,'sm')}<div><span class="k">Acompaña</span><b>${P[i.acomp].short}</b></div></div>`:''}
  ${isAppt(i)&&PL(i)?`<div class="fact place">${ic('pin')}<div><b>${esc(PL(i).name)}</b>${PL(i).dir?`<span class="k">${esc(PL(i).dir)}</span>`:''}<div class="pact"><button class="btn gh sm" data-a="toast" data-m="Abriría el mapa (simulado)">${ic('pin','s')}Cómo llegar</button><button class="btn gh sm" data-a="toast" data-m="Llamada simulada a ${esc(PL(i).tel||'')}">${ic('phone','s')}Llamar</button></div></div></div>`:''}
  ${isAppt(i)&&i.ayunas?`<div class="fact warn">${ic('alert')}<div><b>En ayunas</b></div></div>`:''}
- ${isAppt(i)&&i.attach?`<div class="fact">${ic('file')}<div><span class="k">Orden adjunta</span><b>${esc(i.attach.name)}</b>${i.attach.url?`<a class="lnk" href="${i.attach.url}" target="_blank">Ver</a>`:''}</div></div>`:''}
+ ${isAppt(i)&&i.attach?(()=>{const im=i.attach.url&&(/^Foto/.test(i.attach.name)||/\.(jpe?g|png|webp|heic)$/i.test(i.attach.name));return `<div class="fact">${im?`<a class="mini" href="${i.attach.url}" target="_blank" aria-label="Ver la orden"><img src="${i.attach.url}" alt=""></a>`:ic('file')}<div><span class="k">Orden adjunta</span><b>${esc(i.attach.name)}</b>${im?'':verArch(i.attach.name,i.attach.url)}</div></div>`})():''}
  </div>
  ${isAppt(i)&&i.open?`<p class="remind">${ic('bell','s')}Se recuerda todos los días en la app, y con aviso 7, 3 y 1 día antes.</p>`:''}
  ${isAppt(i)&&i.open&&days(i.due)>0&&canEdit()?`<button class="btn gh sm" style="margin-top:12px" data-a="report" data-id="${i.id}" data-res="cambio">Cambió la fecha</button>`:''}
@@ -924,15 +925,15 @@ function vItem(id){
  </div></div>`;
 }
 function vCal(){
- const m=S.calM,y=2026;
+ const y=Math.floor(S.calM/12),m=S.calM%12;
  const list=S.items.filter(i=>seesItem(i)&&i.due.getMonth()===m&&i.due.getFullYear()===y).sort((a,b)=>a.due-b.due);
  const first=new Date(y,m,1),start=(first.getDay()+6)%7,dim=new Date(y,m+1,0).getDate();
  let cells=['Lun','Mar','Mié','Jue','Vie','Sáb','Dom'].map(d=>`<div class="dw">${d}</div>`).join('');
  const tot=Math.ceil((start+dim)/7)*7;
  for(let k=0;k<tot;k++){const dn=k-start+1,inm=dn>=1&&dn<=dim;const its=inm?list.filter(i=>i.due.getDate()===dn):[];
-  cells+=`<div class="dc ${inm?'':'out'} ${inm&&m===10&&dn===15?'today':''}">${inm?`<span class="n">${dn}</span>`:''}${its.map(i=>`<button class="ce ${i.open?'':'closed'}" style="background:${ENT[i.ent].bg};color:${ENT[i.ent].fg}" data-a="open" data-id="${i.id}">${esc(i.title)}</button>`).join('')}</div>`}
+  cells+=`<div class="dc ${inm?'':'out'} ${inm&&y===TODAY.getFullYear()&&m===TODAY.getMonth()&&dn===TODAY.getDate()?'today':''}">${inm?`<span class="n">${dn}</span>`:''}${its.map(i=>`<button class="ce ${i.open?'':'closed'}" style="background:${ENT[i.ent].bg};color:${ENT[i.ent].fg}" data-a="open" data-id="${i.id}">${esc(i.title)}</button>`).join('')}</div>`}
  const byDay={};list.forEach(i=>{const k=i.due.getDate();(byDay[k]=byDay[k]||[]).push(i)});
- const agenda=Object.keys(byDay).map(k=>`<div class="dayh">${fdate(new Date(y,m,+k))}${m===10&&+k===15?' · hoy':''}</div><div class="stack">${byDay[k].map(i=>taskRow(i)).join('')}</div>`).join('');
+ const agenda=Object.keys(byDay).map(k=>`<div class="dayh">${fdate(new Date(y,m,+k))}${y===TODAY.getFullYear()&&m===TODAY.getMonth()&&+k===TODAY.getDate()?' · hoy':''}</div><div class="stack">${byDay[k].map(i=>taskRow(i)).join('')}</div>`).join('');
  const legend=`<div class="chips" style="margin-top:14px">${Object.values(ENT).filter(e=>seesEnt(e.id)).map(e=>`<span class="chip" style="cursor:default"><span class="dt" style="background:${e.fg}"></span>${e.name}</span>`).join('')}</div>`;
  return `<div class="wrap"><div class="ph"><div><div class="eb dk">Calendario de la familia</div><h1>${MES[m][0].toUpperCase()+MES[m].slice(1)} ${y}</h1><p>Todo lo de la familia, la casa y el carro.</p></div>
  <div class="mnav"><button class="ib" data-a="calm" data-d="-1" ${m<=9?'disabled':''} aria-label="Mes anterior">${ic('back','s')}</button><button class="ib" data-a="calm" data-d="1" ${m>=11?'disabled':''} aria-label="Mes siguiente">${ic('chev','s')}</button></div></div>
@@ -1400,7 +1401,7 @@ document.addEventListener('click',e=>{
  case 'signout':S.view='landing';S.stack=[];S.modal=null;S.menu=null;render();scrollTo(0,0);break;
  case 'enter':{const id=t.dataset.id;if(id==='cuida'&&!P.cuida){P.cuida={...CUIDA};S.font.cuida='normal'}S.user=id;S.view='home';S.stack=[];S.modal=null;S.docCat=null;S.docF='todos';render();scrollTo(0,0);toast('Entraste como '+me().name);break}
  case 'toast':toast(t.dataset.m);break;
- case 'calm':S.calM=Math.max(9,Math.min(11,S.calM+ +t.dataset.d));render();break;
+ case 'calm':{const h=TODAY.getFullYear()*12+TODAY.getMonth();S.calM=Math.max(h-2,Math.min(h+3,S.calM+ +t.dataset.d))};render();break;
  case 'docf':S.docF=t.dataset.f;render();break;
  case 'cat':S.docCat=t.dataset.c;render();scrollTo(0,0);break;
  case 'docback':S.docCat=null;render();break;
