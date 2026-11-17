@@ -619,6 +619,26 @@ main{container:main/inline-size}
 .task.tarde,.grp .task.tarde{background:#fdf3f1;border-color:#f6dcd6}
 .grp .task.tarde+.task.tarde{border-top-color:#f6dcd6}
 .card.main-task.tarde{background:#fdf3f1;border:1px solid #f6dcd6}
+
+/* v3.27 Lo último: actividad legible */
+.acts2{display:flex;flex-direction:column}
+.acg{font-size:13px;font-weight:700;color:var(--fg-3);padding:14px 2px 6px}
+.acg:first-child{padding-top:0}
+.ac{display:flex;gap:12px;align-items:center;padding:10px;margin:0 -10px;border-radius:16px;text-align:left}
+.ac.click{cursor:pointer}
+.ac.click:hover{background:var(--navy-50)}
+.ac>.av{flex:none;width:40px;height:40px}
+.actx{flex:1;min-width:0}
+.actx p{margin:0;font-size:16px;line-height:1.4;color:var(--fg-2);overflow-wrap:anywhere}
+.actx p b{color:var(--fg-1)}
+.actx p em{font-style:normal;font-weight:700;color:var(--fg-1)}
+.acm{display:flex;flex-wrap:wrap;gap:4px 10px;align-items:center;margin-top:4px;font-size:13px;color:var(--fg-3)}
+.ack{display:inline-flex;align-items:center;gap:4px;border-radius:999px;padding:2px 8px;font-weight:600}
+.ack.fo{background:var(--ok-50);color:var(--ok)}
+.ack.au{background:var(--gold-50);color:var(--gold-700)}
+.ack.fi{background:var(--navy-100);color:var(--navy-500)}
+.acm .lnk{font-size:13px;padding:0}
+.acgo{flex:none;color:var(--line-strong)}
 </style>
 </head>
 <body>
@@ -699,11 +719,11 @@ function seed(){P=baseP();ENT=baseEnt();return{
   {id:'d4',ent:'casa',cat:'Recibos',name:'Recibo del agua · octubre',fmt:'JPG',by:'luis'}
  ],
  feed:[
-  {at:'8 nov',who:'luis',x:'desparasitó a Aaron y subió la foto',id:'despaaron',kind:'foto'},
-  {at:'Ayer · 4:20 p. m.',who:'lucero',x:'anotó odontología el 3 de diciembre',id:'odonto'},
+  {at:'Ayer · 4:20 p. m.',who:'lucero',x:'anotó “Cita de odontología” para el 3 de diciembre',id:'odonto'},
   {at:'Ayer · 8:40 a. m.',who:'luis',x:'cerró “Exámenes de sangre” con un audio',id:'labs',kind:'voz'},
-  {at:'Hace 2 días',who:'adriana',x:'se encargó de pagar la luz',id:'luz'},
-  {at:'3 nov',who:'luis',x:'pagó el agua y subió la foto',id:'agua',kind:'foto'}
+  {at:'Hace 2 días',who:'adriana',x:'se encargó de “Pagar la luz”',id:'luz'},
+  {at:'Hace 9 días',who:'luis',x:'cerró “Desparasitación de Aaron”',id:'despaaron',kind:'foto'},
+  {at:'Hace 14 días',who:'luis',x:'cerró “Pagar el agua”',id:'agua',kind:'foto'}
  ]
 }}
 let S=seed();
@@ -871,9 +891,17 @@ function hechoSec(){const h=hechos();if(!h.length)return '';const n=S.moreDone?h
  return `<div class="shd"><span class="dot" style="background:var(--ok)"></span><h2>Ya se hizo</h2><span class="c">${h.length}</span></div><p class="shsub">Últimos 14 días, con lo que dejaron como constancia.</p><div class="grp">${h.slice(0,n).map(hechoRow).join('')}</div>${h.length>4?`<button class="lnk vermas" data-a="moredone">${S.moreDone?'Ver menos':'Ver los '+h.length}</button>`:''}`}
 function feedHtml(n){
  const f=S.feed.filter(e=>!IT(e.id)||seesItem(IT(e.id))).slice(0,n);
- if(!f.length)return '<p class="muted">Todavía no hay movimientos.</p>';
- return `<div class="feed">${f.map((e,k)=>{const it=IT(e.id);const canRe=remote()&&it&&!it.open&&e.kind;return `<div class="fi"><div class="rail"><i class="${k===0?'k':''}"></i>${k<f.length-1?'<span></span>':''}</div><div class="bd"><div class="fx"><b>${P[e.who].short}</b> ${esc(e.x)}</div><div class="fw">${e.at}${e.kind==='foto'?' · con foto':e.kind==='voz'?' · con audio, sin papel':e.kind==='archivo'?' · con archivo':''}</div>
- ${it?`<div class="acts"><button class="lnk" data-a="open" data-id="${it.id}">Ver</button>${canRe?`<button class="lnk" data-a="reopen" data-id="${it.id}">Pedir revisar</button>`:''}</div>`:''}</div></div>`}).join('')}</div>`}
+ if(!f.length)return '<p class="muted" style="margin:0">Todavía no hay movimientos.</p>';
+ const grupo=e=>{const g=e.at.split(' · ')[0];return g==='Ahora'?'Hoy':g};
+ const KIND={foto:['cam','Con foto','fo'],voz:['mic','Audio, sin papel','au'],archivo:['file','Con archivo','fi']};
+ let last='',out='';
+ f.forEach(e=>{const it=IT(e.id),g=grupo(e);if(g!==last){out+=`<div class="acg">${esc(g)}</div>`;last=g}
+  const c=it&&it.closed,img=c&&c.url&&(c.mime||'').startsWith('image/'),K=KIND[e.kind];
+  const hora=e.at.includes(' · ')?e.at.split(' · ').slice(1).join(' · '):(e.at==='Ahora'?'Ahora':'');
+  const canRe=remote()&&it&&!it.open&&e.kind;
+  const txt=esc(e.x).replace(/“([^”]+)”/g,'<em>$1</em>');
+  out+=`<div class="ac ${it?'click':''}" ${it?`data-a="open" data-id="${it.id}" role="button" tabindex="0"`:''}>${av(e.who,'sm')}<div class="actx"><p><b>${P[e.who].short}</b> ${txt}</p><div class="acm">${hora?`<span>${esc(hora)}</span>`:''}${K?`<span class="ack ${K[2]}">${ic(K[0],'s')}${K[1]}</span>`:''}${canRe?`<button class="lnk" data-a="reopen" data-id="${it.id}">Pedir revisar</button>`:''}</div></div>${img?`<span class="mini sm"><img src="${c.url}" alt=""></span>`:it?`<span class="acgo">${ic('chev','s')}</span>`:''}</div>`});
+ return `<div class="acts2">${out}</div>`}
 function vHomeRemote(){
  const u=me();
  const open=S.items.filter(i=>i.open);
@@ -1473,7 +1501,7 @@ document.addEventListener('click',e=>{
   i.open=false;i.closed={ts:Date.now(),by:S.user,at:nowS(),kind:m.kind,audio:m.audio||null,file:m.file?m.file.name:null,url:m.file?m.file.url:null,mime:m.file?m.file.type:null,note:m.note};
   i.reopened=null;
   i.hist.push(['Hoy',me().short,`Lo cerró con ${m.kind==='foto'?'foto':m.kind==='archivo'?'archivo':'audio (sin papel)'}`]);
-  addFeed(`${i.cat==='pago'?'pagó':'cerró'} “${i.title.toLowerCase()}”`,i.id,m.kind);
+  addFeed(`cerró “${i.title}”`,i.id,m.kind);
   m.done=true;m.offline=!!t.dataset.off;render();break}
  case 'sync':S.modal=null;render();toast('Enviado. La familia ya lo puede ver');break;
  case 'add':S.modal={k:'add',f:{para:t.dataset.ent||null,rec:null},tipo:null};render();break;
@@ -1507,16 +1535,16 @@ document.addEventListener('click',e=>{
  case 'fbsave':{if(m.recording){m.err='Detén la grabación primero.';render();break}m.note=val('fbnote');const i=IT(m.id);if(!m.how){m.err='Elige cómo le fue.';render();break}if(!m.note&&!m.rec&&!m.file){m.err='Cuéntalo con una nota, un audio o una foto. Así queda la constancia.';render();break}
   i.open=false;i.closed={ts:Date.now(),by:S.user,at:nowS(),acomp:(m.acomp??(i.acomp||''))||null,audio:m.audio||null,kind:m.file?'foto':m.rec?'voz':'nota',file:m.file?m.file.name:null,url:m.file?m.file.url:null,mime:m.file?m.file.type:null,note:m.note,how:m.how};i.reopened=null;
   i.hist.push(['Hoy',me().short,`${S.user===i.ent?'Contó cómo le fue':'Contó cómo le fue a '+ENT[i.ent].name}: ${m.how.toLowerCase()}${m.note?' · '+m.note:''}`]);
-  addFeed(`${S.user===i.ent?'contó cómo le fue en':'contó cómo le fue a '+ENT[i.ent].name+' en'} “${i.title.toLowerCase()}”: ${m.how.toLowerCase()}`,i.id,m.file?'foto':m.rec?'voz':null);m.done=true;render();break}
- case 'fbcambio':{m.d=val('fbd');m.h=val('fbh');if(!m.d){m.err='Indica la nueva fecha.';render();break}const i=IT(m.id);const old=fshort(i.due);i.due=fromIso(m.d);if(m.h)i.time=fmtTime(m.h);i.hist.push(['Hoy',me().short,`Cambió la fecha: ${old} → ${fshort(i.due)}`]);addFeed(`movió “${i.title.toLowerCase()}” al ${i.due.getDate()} de ${MES[i.due.getMonth()]}`,i.id);m.done=true;render();break}
+  addFeed(`${S.user===i.ent?'contó cómo le fue en':'contó cómo le fue a '+ENT[i.ent].name+' en'} “${i.title}”: ${m.how.toLowerCase()}`,i.id,m.file?'foto':m.rec?'voz':null);m.done=true;render();break}
+ case 'fbcambio':{m.d=val('fbd');m.h=val('fbh');if(!m.d){m.err='Indica la nueva fecha.';render();break}const i=IT(m.id);const old=fshort(i.due);i.due=fromIso(m.d);if(m.h)i.time=fmtTime(m.h);i.hist.push(['Hoy',me().short,`Cambió la fecha: ${old} → ${fshort(i.due)}`]);addFeed(`movió “${i.title}” al ${i.due.getDate()} de ${MES[i.due.getMonth()]}`,i.id);m.done=true;render();break}
  case 'fbnofui':{m.d=val('fbd');if(!m.why){m.err='Elige qué pasó.';render();break}const i=IT(m.id);
-  if(m.d){const old=fshort(i.due);i.due=fromIso(m.d);i.hist.push(['Hoy',me().short,`No asistió (${m.why.toLowerCase()}). Se reprogramó: ${old} → ${fshort(i.due)}`]);addFeed(`reprogramó “${i.title.toLowerCase()}”`,i.id);S.modal=null;render();toast('Reprogramada. Los recordatorios siguen');break}
-  i.open=false;i.closed={ts:Date.now(),by:S.user,at:nowS(),kind:'nofui',note:m.why};i.hist.push(['Hoy',me().short,'No asistió: '+m.why.toLowerCase()]);addFeed(`marcó que no asistió a “${i.title.toLowerCase()}”`,i.id);S.modal=null;render();toast('Registrado como “no asistió”');break}
+  if(m.d){const old=fshort(i.due);i.due=fromIso(m.d);i.hist.push(['Hoy',me().short,`No asistió (${m.why.toLowerCase()}). Se reprogramó: ${old} → ${fshort(i.due)}`]);addFeed(`reprogramó “${i.title}”`,i.id);S.modal=null;render();toast('Reprogramada. Los recordatorios siguen');break}
+  i.open=false;i.closed={ts:Date.now(),by:S.user,at:nowS(),kind:'nofui',note:m.why};i.hist.push(['Hoy',me().short,'No asistió: '+m.why.toLowerCase()]);addFeed(`marcó que no asistió a “${i.title}”`,i.id);S.modal=null;render();toast('Registrado como “no asistió”');break}
  case 'reopen':S.modal={k:'reopen',id:t.dataset.id};render();break;
- case 'doreopen':{m.why=val('why');if(!m.why){m.err=1;render();break}const i=IT(m.id);const who=i.closed.by;i.open=true;i.resp=who;i.reopened={by:S.user,reason:m.why};i.hist.push(['Hoy',me().short,'Pidió revisar: '+m.why]);addFeed(`pidió revisar “${i.title.toLowerCase()}”`,i.id);S.modal=null;render();toast(`${P[who].short} lo verá como pendiente con tu mensaje`);break}
+ case 'doreopen':{m.why=val('why');if(!m.why){m.err=1;render();break}const i=IT(m.id);const who=i.closed.by;i.open=true;i.resp=who;i.reopened={by:S.user,reason:m.why};i.hist.push(['Hoy',me().short,'Pidió revisar: '+m.why]);addFeed(`pidió revisar “${i.title}”`,i.id);S.modal=null;render();toast(`${P[who].short} lo verá como pendiente con tu mensaje`);break}
  case 'write':S.modal={k:'write',id:t.dataset.id};render();break;
  case 'sendmsg':{const i=IT(m.id);i.hist.push(['Hoy',me().short,'Le escribió a '+P[i.resp].short]);S.modal=null;render();toast('Mensaje enviado a '+P[i.resp].short+' (simulado)');break}
- case 'take':{const i=IT(t.dataset.id);i.resp=S.user;i.hist.push(['Hoy',me().short,'Lo tomó para hacerlo desde afuera']);addFeed(`se encargó de “${i.title.toLowerCase()}”`,i.id);render();toast('Ahora lo tienes tú');break}
+ case 'take':{const i=IT(t.dataset.id);i.resp=S.user;i.hist.push(['Hoy',me().short,'Lo tomó para hacerlo desde afuera']);addFeed(`se encargó de “${i.title}”`,i.id);render();toast('Ahora lo tienes tú');break}
  case 'adddoc':S.modal={k:'adddoc',ent:S.docF!=='todos'?S.docF:null,cat:S.docCat};render();break;
  case 'hasv':if(m.k==='adddoc'){m.n=val('dname');if(m.hasV)m.v=val('dvence')}if(m.k==='editdoc'){m.n=val('dn');if(m.hasV)m.v=val('dv')}m.hasV=!!t.dataset.v;if(m.err)m.err.v=0;render();break;
  case 'dockind':m.n=val('dname');m.v=val('dvence');m.has=true;if(m.err)m.err.f=0;render();break;
