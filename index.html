@@ -524,6 +524,49 @@ main{container:main/inline-size}
 }
 @media(min-width:600px) and (max-width:959px){.tabbar{left:50%;right:auto;width:520px;transform:translateX(-50%)}}
 @media(min-width:960px) and (max-width:1199px){.side{width:212px}}
+
+/* v3.18 portada con entradas por rol */
+.ld{min-height:100vh;background:var(--cream)}
+.ldin{max-width:1040px;margin:0 auto;padding:0 20px}
+.ldh{background:var(--navy-800);color:var(--on-2);padding:28px 0 34px;border-radius:0 0 32px 32px}
+.ldb{display:flex;gap:12px;align-items:baseline;flex-wrap:wrap}
+.ldb span{color:var(--gold-500);font-weight:700;font-size:15px}
+.ldb i{font-style:normal;font-size:14px;color:var(--on-3)}
+.ldh h1{color:var(--on-1);font-size:clamp(38px,9vw,64px);line-height:1.02;font-weight:800;letter-spacing:-.035em;margin:10px 0 12px}
+.ldh p{font-size:18px;line-height:1.45;max-width:34em;margin:0}
+.ldfs{display:flex;gap:8px;margin-top:24px;flex-wrap:wrap}
+.ldf{display:flex;flex-direction:column;align-items:center;gap:6px;width:60px}
+.ldf .fpic{width:56px;height:56px;border-radius:50%;overflow:hidden;display:block;border:2px solid rgba(255,255,255,.14)}
+.ldf .fpic.sq{border-radius:16px}
+.ldf .fpic svg,.ldf .fpic img{width:100%;height:100%;display:block;object-fit:cover}
+.ldf b{font-size:13px;color:var(--on-1);font-weight:600}
+.ldbody{padding-top:32px;padding-bottom:60px}
+.ldbody h2{font-size:28px;font-weight:800;letter-spacing:-.02em}
+.ldsub{margin:6px 0 0;color:var(--fg-3);font-size:17px;max-width:36em}
+.ldg{margin-top:26px;padding-top:20px;border-top:1px solid var(--line)}
+.ldgh h3{font-size:19px;font-weight:800}
+.ldgh p{margin:2px 0 0;color:var(--fg-3);font-size:15px}
+.ldcs{display:grid;gap:12px;margin-top:14px}
+.ldc{display:flex;gap:14px;align-items:flex-start;text-align:left;width:100%;background:var(--white);border:2px solid transparent;border-radius:22px;padding:16px;box-shadow:var(--sh-sm);color:var(--fg-2);transition:border-color .14s var(--ease),box-shadow .14s var(--ease)}
+.ldc:hover,.ldc:focus-visible{border-color:var(--gold-500);box-shadow:var(--sh-md)}
+.ldc .av{width:64px;height:64px;flex:none}
+.ldt{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
+.ldt b{font-size:20px;color:var(--fg-1);font-weight:800;line-height:1.2}
+.ldt small{font-size:14px;font-weight:700;color:var(--gold-700)}
+.ldt span{font-size:16px;line-height:1.4;margin-top:4px}
+.ldt em{font-style:normal;font-size:14px;color:var(--fg-3);margin-top:4px}
+.ldgo{align-self:center;flex:none;width:44px;height:44px;border-radius:50%;background:var(--navy-800);color:var(--gold-500);display:grid;place-items:center}
+.ldfoot{margin:28px 0 0;color:var(--fg-3);font-size:14px;max-width:44em}
+@media(min-width:760px){
+ .ldin{padding:0 36px}
+ .ldh{padding:44px 0 48px;border-radius:0 0 40px 40px}
+ .ldbody{padding-top:44px}
+ .ldfs{gap:14px}
+ .ldg{display:grid;grid-template-columns:220px minmax(0,1fr);gap:28px;align-items:start}
+ .ldcs{margin-top:0}
+}
+@media(min-width:1040px){.ldcs{grid-template-columns:1fr 1fr}.ldg:last-of-type .ldcs{grid-template-columns:1fr 1fr}}
+@media(max-width:360px){.ldc{padding:14px;gap:12px}.ldc .av{width:52px;height:52px}.ldgo{width:38px;height:38px}}
 </style>
 </head>
 <body>
@@ -560,7 +603,7 @@ const FICHA={
 };
 function D(m,d){return new Date(2026,m-1,d)}
 function seed(){P=baseP();ENT=baseEnt();return{
- user:'luis',view:'home',arg:null,stack:[],modal:null,toast:null,calM:10,docF:'todos',docCat:null,
+ user:'luis',view:'landing',arg:null,stack:[],modal:null,toast:null,calM:10,docF:'todos',docCat:null,
  font:{luis:'grande',lucero:'grande',diego:'normal',adriana:'normal'},
  notif:{app:true,mail:true,wa:false,hora:'7:00 a. m.'},
  places:{p1:{name:'Clínica del Valle (ficticia)',dir:'Av. Ejemplo # 10-20',tel:'602 000 0001'},p2:{name:'EPS Ejemplo · sede Norte',dir:'Calle Ejemplo # 40-15',tel:'602 000 0002'},p3:{name:'Consultorio dental Norte (ficticio)',dir:'Carrera Ejemplo # 5-30',tel:'602 000 0003'},p4:{name:'Laboratorio Central (ficticio)',dir:'Calle Ejemplo # 22-08',tel:'602 000 0004'},p5:{name:'Veterinaria Patitas (ficticia)',dir:'Carrera Ejemplo # 8-12',tel:'602 000 0005'}},
@@ -1183,9 +1226,38 @@ function modal(){
  return `<div class="scrim\" data-a="scrim"><div class="sheet" role="dialog" aria-modal="true" style="zoom:${z}">${h}</div></div>`;
 }
 
+/* ============ portada ============ */
+const ENTRADAS=[
+ ['Viven en la casa','Usan la app todos los días desde el celular.',[
+  ['luis','Lleva el día a día: ve lo que toca hoy y lo cierra con una foto o un audio.','Abre en “Hoy”'],
+  ['lucero','Anota sus citas, cuenta cómo le fue y guarda sus papeles.','Abre en “Hoy”']]],
+ ['Acompañan desde afuera','Administran la familia y ven cómo va todo a distancia.',[
+  ['diego','Revisa qué está atrasado, se encarga de pagos y puede pedir que algo se revise.','Abre en “Desde afuera”'],
+  ['adriana','Acompaña a distancia y administra miembros, roles y permisos.','Abre en “Desde afuera”']]],
+ ['Cuida a alguien','Rol previsto para una cuidadora o cuidador. Hoy la familia no tiene.',[
+  ['cuida','Solo ve a Luis y a Lucero. No ve cédulas, escrituras, la casa ni el carro.','Persona de ejemplo']]]
+];
+const CUIDA={id:'cuida',name:'Cuidadora de ejemplo',short:'Cuidadora',ini:'CE',kind:'cuidador',role:'cuidador',where:'Cali',bg:'#d3f1e5',fg:'#17785a',status:'activo',scope:['luis','lucero'],salud:true};
+function vLanding(){
+ const face=id=>id==='cuida'?`<span class="av pic">${portrait('cuida',CUIDA.bg)}</span>`:av(id);
+ const cuida=Object.values(ENT).map(e=>`<span class="ldf"><span class="fpic ${e.type==='persona'?'':'sq'}">${entPic(e.id)}</span><b>${esc(e.name.split(' ')[0])}</b></span>`).join('');
+ return `<div class="ld">
+ <header class="ldh"><div class="ldin">
+  <div class="ldb"><span>PNB Digital</span></div>
+  <h1>Gestión familiar</h1>
+  <p>Citas, pagos, papeles y cuidados de la familia, cada uno con responsable, fecha y evidencia de que se hizo.</p>
+  <div class="ldfs" aria-label="Lo que cuida la familia">${cuida}</div>
+ </div></header>
+ <div class="ldin ldbody">
+  <h2>¿Quién entra?</h2>
+  <p class="ldsub">Cada persona ve la app distinta según su rol. Elige una para probarla.</p>
+  ${ENTRADAS.map(g=>`<section class="ldg"><div class="ldgh"><h3>${g[0]}</h3><p>${g[1]}</p></div><div class="ldcs">${g[2].map(x=>{const p=x[0]==='cuida'?CUIDA:P[x[0]];return `<button class="ldc" data-a="enter" data-id="${x[0]}">${face(x[0])}<span class="ldt"><b>${esc(p.name)}</b><small>${ROLE[p.role]}</small><span>${x[1]}</span><em>${x[2]}</em></span><span class="ldgo" aria-hidden="true">${ic('chev')}</span></button>`}).join('')}</div></section>`).join('')}
+  <p class="ldfoot">Nada de lo que hagas aquí se guarda: al reiniciar vuelve al estado inicial. Arriba, en “Portada”, regresas a esta página.</p>
+ </div></div>`}
 /* ============ render ============ */
 function render(){
  const v=S.view;
+ if(v==='landing'){document.getElementById('app').innerHTML=`<div class="pbar"><b>PROTOTIPO</b><span>Demo · datos ficticios</span></div>${vLanding()}`;return}
  let c='';
  if(v==='home')c=remote()?vHomeRemote():vHomeLocal();
  else if(v==='item')c=vItem(S.arg);else if(v==='cal')c=vCal();else if(v==='docs')c=vDocs();else if(v==='fam')c=vFamily();else if(v==='ent')c=vEnt(S.arg);else if(v==='set')c=vSet();
@@ -1196,7 +1268,7 @@ function render(){
  <div class="pbar"><b>PROTOTIPO</b><span>Demo · datos ficticios</span><span class="sp"></span>
  <label>Ver como <select data-a="who">${Object.values(P).filter(p=>p.status==='activo').map(p=>`<option value="${p.id}" ${S.user===p.id?'selected':''}>${p.short}</option>`).join('')}</select></label>
  <label>Letra <select data-a="fontsel">${['normal','grande','muy'].map(k=>`<option value="${k}" ${S.font[S.user]===k?'selected':''}>${SCALE_L[k]}</option>`).join('')}</select></label>
- <button data-a="reset">Reiniciar</button></div>
+ <button data-a="portada">Portada</button><button data-a="reset">Reiniciar</button></div>
  <div class="app"><aside class="side"><div class="brand"><span>PNB Digital</span><b>Gestión familiar</b></div><nav>${navs.map(n=>`<button class="${act===n[0]?'on':''}" data-a="nav" data-v="${n[0]}">${ic(n[1])}${n[2]}</button>`).join('')}<button class="${act==='set'?'on':''}" data-a="nav" data-v="set">${ic('gear')}Ajustes</button></nav>
  <button class="btn pri add" data-a="add">${ic('plus')}Anotar algo</button>
  <div class="me">${av(S.user,'sm')}<div>${me().name}<small>${ROLE[me().role]} · ${KIND[me().kind]}</small></div></div></aside>
@@ -1267,7 +1339,9 @@ document.addEventListener('click',e=>{
  case 'open':nav('item',t.dataset.id);break;
  case 'ent':nav('ent',t.dataset.id);break;
  case 'back':back();break;
- case 'reset':S=seed();render();toast('Prototipo reiniciado');break;
+ case 'reset':S=seed();render();scrollTo(0,0);break;
+ case 'portada':S.view='landing';S.stack=[];S.modal=null;render();scrollTo(0,0);break;
+ case 'enter':{const id=t.dataset.id;if(id==='cuida'&&!P.cuida){P.cuida={...CUIDA};S.font.cuida='normal'}S.user=id;S.view='home';S.stack=[];S.modal=null;S.docCat=null;S.docF='todos';render();scrollTo(0,0);toast('Entraste como '+me().name);break}
  case 'toast':toast(t.dataset.m);break;
  case 'calm':S.calM=Math.max(9,Math.min(11,S.calM+ +t.dataset.d));render();break;
  case 'docf':S.docF=t.dataset.f;render();break;
