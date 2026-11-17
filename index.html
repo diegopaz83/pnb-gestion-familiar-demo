@@ -609,6 +609,11 @@ main{container:main/inline-size}
 .evi.fi{background:var(--navy-100);color:var(--navy-500)}
 .vermas{display:block;margin:10px auto 0}
 .guarda{display:flex;flex-wrap:wrap;gap:6px 14px;align-items:center;margin-top:10px}
+
+/* v3.24 lo hecho en verde suave */
+.task.hecha,.grp .task.hecha{background:#f0f9f4;border-color:#d9f0e4}
+.grp .task.hecha+.task.hecha{border-top-color:#d9f0e4}
+.task.hecha .chk{background:#dcf3e8!important;border-color:#dcf3e8!important}
 </style>
 </head>
 <body>
@@ -803,7 +808,7 @@ function taskRow(i,{showWho=true}={}){
  const st=stat(i),deleg=i.open&&P[i.resp].kind==='afuera'&&!remote();
  const can=canReport(i);
  const whoLine=isAppt(i)&&i.open?`<div class="s">${PL(i)?esc(PL(i).name):''}${i.time&&days(i.due)>1?' · '+fday(i.due).toLowerCase()+' '+i.time:''}${i.acomp?' · acompaña '+P[i.acomp].short:''}</div>`:i.resp!==S.user?`<div class="s">${i.open?'Lo hace '+P[i.resp].short:'Lo hizo '+P[i.closed.by].short}</div>`:(i.prep?`<div class="s">${esc(i.prep)}</div>`:'');
- return `<div class="task click ${deleg?'deleg':''}" data-a="open" data-id="${i.id}" role="button" tabindex="0">
+ return `<div class="task click ${deleg?'deleg':''} ${i.open?'':'hecha'}" data-a="open" data-id="${i.id}" role="button" tabindex="0">
  ${entTile(i.ent,'sm')}
  <div class="tx"><div class="t">${esc(i.title)}</div><div class="m" style="color:${statColor[st]}">${statTxt(i)}${i.time&&i.open&&!isAppt(i)?' · '+i.time:''}${i.reopened&&i.open?' · revisar':''}</div>${showWho?whoLine:''}</div>
  ${can?`<button class="chk" data-a="report" data-id="${i.id}" aria-label="${actLabel(i)}">${ic('check','l')}</button>`:(!i.open?`<span class="chk" style="background:var(--ok-bg);border-color:var(--ok-bg);color:var(--ok)">${ic('check','l')}</span>`:'')}
@@ -856,7 +861,7 @@ function hechos(){const lim=+TODAY-14*864e5;return S.items.filter(i=>!i.open&&i.
 function hechoRow(i){const c=i.closed,img=c.url&&(c.mime||'').startsWith('image/');
  const ev=img?`<span class="mini sm"><img src="${c.url}" alt=""></span>`:c.kind==='voz'?`<span class="evi au">${ic('mic','s')}</span>`:c.kind==='nota'||c.kind==='nofui'?`<span class="evi no">${ic('msg','s')}</span>`:c.file?`<span class="evi fi">${ic('file','s')}</span>`:'';
  const qui=c.kind==='nofui'?'No asistió':isAppt(i)?`${ENT[i.ent].name} asistió`:`Lo hizo ${P[c.did||c.by].short}`;
- return `<div class="task click hecho" data-a="open" data-id="${i.id}" role="button" tabindex="0">${entTile(i.ent,'sm')}<div class="tx"><div class="t">${esc(i.title)}</div><div class="s">${qui} · ${esc(c.at.replace(/ · .*$/,''))}${c.how?' · '+esc(c.how.toLowerCase()):''}</div>${c.note?`<div class="s nota">“${esc(c.note)}”</div>`:''}</div>${ev}</div>`}
+ return `<div class="task click hecho hecha" data-a="open" data-id="${i.id}" role="button" tabindex="0">${entTile(i.ent,'sm')}<div class="tx"><div class="t">${esc(i.title)}</div><div class="s">${qui} · ${esc(c.at.replace(/ · .*$/,''))}${c.how?' · '+esc(c.how.toLowerCase()):''}</div>${c.note?`<div class="s nota">“${esc(c.note)}”</div>`:''}</div>${ev}</div>`}
 function hechoSec(){const h=hechos();if(!h.length)return '';const n=S.moreDone?h.length:4;
  return `<div class="shd"><span class="dot" style="background:var(--ok)"></span><h2>Ya se hizo</h2><span class="c">${h.length}</span></div><p class="shsub">Últimos 14 días, con lo que dejaron como constancia.</p><div class="grp">${h.slice(0,n).map(hechoRow).join('')}</div>${h.length>4?`<button class="lnk vermas" data-a="moredone">${S.moreDone?'Ver menos':'Ver los '+h.length}</button>`:''}`}
 function feedHtml(n){
