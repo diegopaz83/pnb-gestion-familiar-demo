@@ -567,6 +567,13 @@ main{container:main/inline-size}
 }
 @media(min-width:1040px){.ldcs{grid-template-columns:1fr 1fr}.ldg:last-of-type .ldcs{grid-template-columns:1fr 1fr}}
 @media(max-width:360px){.ldc{padding:14px;gap:12px}.ldc .av{width:52px;height:52px}.ldgo{width:38px;height:38px}}
+
+/* v3.19 sin controles de prototipo dentro de la app; cerrar sesión */
+.side .me{margin-top:auto}
+.side .sout{display:flex;align-items:center;gap:10px;background:none;border:0;color:var(--on-2);font-weight:600;font-size:15px;padding:10px 14px;border-radius:12px;text-align:left}
+.side .sout:hover{background:var(--navy-700);color:var(--on-1)}
+.ldfoot .lnk{display:inline;padding:0}
+@media(min-width:960px){.side{padding-bottom:52px}}
 </style>
 </head>
 <body>
@@ -669,6 +676,7 @@ mic:'<path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"/><path d="M1
 x:'<path d="M18 6 6 18M6 6l12 12"/>',
 back:'<path d="m15 18-6-6 6-6"/>',
 chev:'<path d="m9 18 6-6-6-6"/>',
+out:'<path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="m16 17 5-5-5-5"/><path d="M21 12H9"/>',
 alert:'<path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/><path d="M12 9v4M12 17h.01"/>',
 house:'<path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V21h14V9.5"/><path d="M10 21v-6h4v6"/>',
 car:'<path d="M5 17h14v-4.5L17 7H7l-2 5.5z"/><circle cx="7.5" cy="17.5" r="1.5"/><circle cx="16.5" cy="17.5" r="1.5"/><path d="M5 12.5h14"/>',
@@ -992,6 +1000,7 @@ function vSet(){
  <div class="h2s">Personas, casas y vehículos</div>
  <div class="setsec">${Object.values(ENT).map(e=>`<div class="setrow">${entTile(e.id,'sm')}<div class="tx"><div class="t">${esc(e.full)}</div><div class="s">${e.type==='mascota'?'Mascota · '+esc(e.especie||''):e.type==='persona'?'Persona':e.type==='casa'?'Casa · '+esc(e.dir||''):'Vehículo · placa '+esc(e.placa||'')}</div></div>${kebab('ent',e.id,e.full)}</div>`).join('')}
  ${adm?`<div class="setrow"><button class="btn sec sm" data-a="addent">${ic('plus','s')}Agregar persona, casa o vehículo</button></div>`:''}</div>
+ <div class="setsec"><div class="setrow" style="border:0"><div class="tx"><div class="t">Cerrar sesión</div><div class="s">Vuelves a la portada para entrar como otra persona.</div></div><button class="btn gh sm" data-a="signout">${ic('out','s')}Cerrar sesión</button></div></div>
  <p class="muted">Tema oscuro: no se incluye (DEC-027).</p></div>`;
 }
 
@@ -1252,7 +1261,7 @@ function vLanding(){
   <h2>¿Quién entra?</h2>
   <p class="ldsub">Cada persona ve la app distinta según su rol. Elige una para probarla.</p>
   ${ENTRADAS.map(g=>`<section class="ldg"><div class="ldgh"><h3>${g[0]}</h3><p>${g[1]}</p></div><div class="ldcs">${g[2].map(x=>{const p=x[0]==='cuida'?CUIDA:P[x[0]];return `<button class="ldc" data-a="enter" data-id="${x[0]}">${face(x[0])}<span class="ldt"><b>${esc(p.name)}</b><small>${ROLE[p.role]}</small><span>${x[1]}</span><em>${x[2]}</em></span><span class="ldgo" aria-hidden="true">${ic('chev')}</span></button>`}).join('')}</div></section>`).join('')}
-  <p class="ldfoot">Nada de lo que hagas aquí se guarda: al reiniciar vuelve al estado inicial. Arriba, en “Portada”, regresas a esta página.</p>
+  <p class="ldfoot">Lo que hagas dentro se conserva mientras tengas abierta esta página. Para volver aquí, usa “Cerrar sesión” en Ajustes. <button class="lnk" data-a="reset">Reiniciar los datos de ejemplo</button></p>
  </div></div>`}
 /* ============ render ============ */
 function render(){
@@ -1265,13 +1274,10 @@ function render(){
  const navs=[['home','home',remote()?'Desde afuera':'Hoy'],['cal','cal','Calendario'],['docs','file','Papeles'],['fam','fam','Familia']];
  const z=SCALE[S.font[S.user]||'grande'];
  document.getElementById('app').innerHTML=`
- <div class="pbar"><b>PROTOTIPO</b><span>Demo · datos ficticios</span><span class="sp"></span>
- <label>Ver como <select data-a="who">${Object.values(P).filter(p=>p.status==='activo').map(p=>`<option value="${p.id}" ${S.user===p.id?'selected':''}>${p.short}</option>`).join('')}</select></label>
- <label>Letra <select data-a="fontsel">${['normal','grande','muy'].map(k=>`<option value="${k}" ${S.font[S.user]===k?'selected':''}>${SCALE_L[k]}</option>`).join('')}</select></label>
- <button data-a="portada">Portada</button><button data-a="reset">Reiniciar</button></div>
+ <div class="pbar"><b>PROTOTIPO</b><span>Demo · datos ficticios</span></div>
  <div class="app"><aside class="side"><div class="brand"><span>PNB Digital</span><b>Gestión familiar</b></div><nav>${navs.map(n=>`<button class="${act===n[0]?'on':''}" data-a="nav" data-v="${n[0]}">${ic(n[1])}${n[2]}</button>`).join('')}<button class="${act==='set'?'on':''}" data-a="nav" data-v="set">${ic('gear')}Ajustes</button></nav>
  <button class="btn pri add" data-a="add">${ic('plus')}Anotar algo</button>
- <div class="me">${av(S.user,'sm')}<div>${me().name}<small>${ROLE[me().role]} · ${KIND[me().kind]}</small></div></div></aside>
+ <div class="me">${av(S.user,'sm')}<div>${me().name}<small>${ROLE[me().role]} · ${KIND[me().kind]}</small></div></div><button class="sout" data-a="signout">${ic('out','s')}Cerrar sesión</button></aside>
  <main style="zoom:${z}">${c}</main></div>
  <nav class="tabbar" style="zoom:${Math.min(z,1)}">${navs.slice(0,2).map(n=>`<button class="${act===n[0]?'on':''}" data-a="nav" data-v="${n[0]}">${ic(n[1])}${n[0]==='home'?(remote()?'Inicio':'Hoy'):n[2]}</button>`).join('')}<button class="plus" data-a="add" aria-label="Anotar algo">${ic('plus')}</button>${navs.slice(2).map(n=>`<button class="${act===n[0]?'on':''}" data-a="nav" data-v="${n[0]}">${ic(n[1])}${n[2]}</button>`).join('')}</nav>
  ${modal()}
@@ -1339,8 +1345,8 @@ document.addEventListener('click',e=>{
  case 'open':nav('item',t.dataset.id);break;
  case 'ent':nav('ent',t.dataset.id);break;
  case 'back':back();break;
- case 'reset':S=seed();render();scrollTo(0,0);break;
- case 'portada':S.view='landing';S.stack=[];S.modal=null;render();scrollTo(0,0);break;
+ case 'reset':S=seed();render();scrollTo(0,0);toast('Datos de ejemplo reiniciados');break;
+ case 'signout':S.view='landing';S.stack=[];S.modal=null;S.menu=null;render();scrollTo(0,0);break;
  case 'enter':{const id=t.dataset.id;if(id==='cuida'&&!P.cuida){P.cuida={...CUIDA};S.font.cuida='normal'}S.user=id;S.view='home';S.stack=[];S.modal=null;S.docCat=null;S.docF='todos';render();scrollTo(0,0);toast('Entraste como '+me().name);break}
  case 'toast':toast(t.dataset.m);break;
  case 'calm':S.calM=Math.max(9,Math.min(11,S.calM+ +t.dataset.d));render();break;
