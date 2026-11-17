@@ -458,6 +458,54 @@ label.btn{cursor:pointer;position:relative}
 @keyframes pulse{50%{opacity:.4}}
 
 .aprow>div{flex:1 1 160px;min-width:0}
+
+/* v3.16 pasada visual: inicio, detalle, anotar */
+.grp{background:var(--white);border-radius:22px;box-shadow:var(--sh-sm);overflow:hidden}
+.grp .task{border-radius:0;box-shadow:none;border:0;border-top:1px solid var(--line);padding:14px 16px}
+.grp .task:first-child{border-top:0}
+.grp.quiet{background:var(--cream-2);box-shadow:none;padding:6px 16px 12px}
+.dl{display:flex;gap:12px;align-items:center;padding:10px 0;border-top:1px solid rgba(13,27,51,.08)}
+.dl:first-child{border-top:0}
+.dl .tx{min-width:0;display:flex;flex-direction:column}
+.dl b{font-size:16px;color:var(--fg-1);font-weight:700}
+.dl span{font-size:14px;color:var(--fg-3)}
+.dlnote{margin:6px 0 0;font-size:14px;color:var(--fg-3)}
+.eb.day{text-transform:none;letter-spacing:0;font-size:15px;font-weight:600}
+.eb.day::first-letter{text-transform:uppercase}
+.itop{display:flex;justify-content:space-between;align-items:center;padding-top:12px}
+.itop .back{padding-top:0}
+.ihead{display:flex;gap:16px;align-items:center;padding-top:14px}
+.ihead h1{font-size:28px;line-height:1.15;overflow-wrap:anywhere}
+.ihead p{margin:4px 0 0;color:var(--fg-3);font-size:16px}
+.facts{margin-top:14px}
+.fact{display:flex;gap:14px;align-items:flex-start;padding:14px 0;border-top:1px solid var(--line)}
+.fact>.ic,.fact>svg{flex:none;width:24px;height:24px;margin:2px 8px 0;color:var(--gold-700)}
+.fact>div{min-width:0;flex:1;display:flex;flex-direction:column}
+.fact b{color:var(--fg-1);font-size:17px;font-weight:700}
+.fact .k{color:var(--fg-3);font-size:14px}
+.fact.when b{font-size:19px}
+.fact.when b::first-letter{text-transform:uppercase}
+.fact.when .hr{font-size:26px;font-weight:300;color:var(--fg-1);line-height:1.2}
+.fact.warn>svg,.fact.warn>.ic{color:var(--warn)}
+.pact{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.remind{display:flex;gap:8px;align-items:flex-start;margin:0;padding-top:12px;border-top:1px solid var(--line);font-size:14px;color:var(--fg-3)}
+.remind svg{flex:none;margin-top:2px}
+.tipos{grid-template-columns:1fr!important;gap:0;background:var(--white);border:1px solid var(--line);border-radius:20px;overflow:hidden}
+.tipo{flex-direction:row;align-items:center;gap:14px;border:0;border-top:1px solid var(--line);border-radius:0;padding:12px 14px}
+.tipo:first-child{border-top:0}
+.tipo:hover{background:var(--navy-50)}
+.tipo .tt{flex:1;min-width:0;display:flex;flex-direction:column}
+.tipo b{font-size:17px}
+.tipo small{font-size:14px;color:var(--fg-3)}
+.tipo>svg{color:var(--fg-3);flex:none}
+.tipo .fic{width:44px;height:44px;border-radius:14px;flex:none}
+.tipo .fic.sal{background:var(--info-50);color:var(--info)}
+.tipo .fic.doc{background:var(--navy-100);color:var(--navy-500)}
+.tipo .fic.mas{background:var(--ok-bg);color:var(--ok)}
+.tipo .fic.otr{background:var(--cream-2);color:var(--fg-2)}
+@media(min-width:720px){.tipos{grid-template-columns:1fr 1fr!important}.tipo:nth-child(2){border-top:0}.tipo:nth-child(odd){border-right:1px solid var(--line)}}
+.tabbar button{padding:0;overflow:visible;letter-spacing:-.01em}
+@media(max-width:420px){.tabbar button{font-size:12px}}
 </style>
 </head>
 <body>
@@ -686,13 +734,13 @@ function vHomeLocal(){
   <button class="lnk" style="align-self:center" data-a="open" data-id="${first.id}">Ver detalles</button></div>`
   :`<div class="empty"><div class="big">${ic('check','l')}</div><h3>No hay nada pendiente esta semana</h3><p>Cuando haya algo por hacer, aparecerá aquí con tiempo.</p></div>`;
  const famHtml=Object.values(ENT).filter(e=>seesEnt(e.id)).map(e=>{const al=S.items.some(i=>i.ent===e.id&&seesItem(i)&&stat(i)==='bad');return `<button class="famb" data-a="ent" data-id="${e.id}"><span class="av" style="background:${e.bg};color:${e.fg}">${entInner(e.id)}</span>${al?'<span class="badge"></span>':''}${e.name}</button>`}).join('');
- return `<section class="hero"><div class="top"><span class="eb">${fdate(TODAY)}</span>${heroTools()}</div><h1>${esc(head)}</h1>${facesRow(false)}</section>
+ return `<section class="hero"><div class="top"><span class="eb day">${fdate(TODAY)}</span>${heroTools()}</div><h1>${esc(head)}</h1>${facesRow(false)}</section>
  <div class="wrap lift"><div class="cols"><div>
  ${mainCard}
  ${countdown()}
- ${rest.length?`<div class="shd"><span class="dot" style="background:var(--warn)"></span><h2>Esta semana</h2><span class="c">${rest.length}</span></div><div class="stack">${rest.map(i=>taskRow(i)).join('')}</div>`:''}
- ${deleg.length?`<div class="shd"><h2>Lo hacen Diego y Adriana</h2></div><div class="stack">${deleg.map(i=>`<div class="task deleg">${entTile(i.ent,'sm')}<div class="tx"><div class="t" style="font-size:17px">${esc(i.title)} · ${fday(i.due).toLowerCase()}</div><div class="s">Lo hace ${P[i.resp].short} desde afuera. No tienes que hacer nada.</div></div></div>`).join('')}</div>`:''}
- ${later.filter(i=>!(upA(i)&&days(i.due)<=14)).length?`<div class="shd"><h2>Más adelante</h2><span class="c">${later.filter(i=>!(upA(i)&&days(i.due)<=14)).length}</span></div><div class="stack">${later.filter(i=>!(upA(i)&&days(i.due)<=14)).map(i=>taskRow(i)).join('')}</div>`:''}
+ ${rest.length?`<div class="shd"><span class="dot" style="background:var(--warn)"></span><h2>Esta semana</h2><span class="c">${rest.length}</span></div><div class="grp">${rest.map(i=>taskRow(i)).join('')}</div>`:''}
+ ${deleg.length?`<div class="shd"><h2>Lo hacen Diego y Adriana</h2></div><div class="grp quiet">${deleg.map(i=>`<div class="dl">${av(i.resp,'sm')}<div class="tx"><b>${esc(i.title)}</b><span>${P[i.resp].short}, ${fday(i.due).toLowerCase()}</span></div></div>`).join('')}<p class="dlnote">No tienes que hacer nada con estos.</p></div>`:''}
+ ${later.filter(i=>!(upA(i)&&days(i.due)<=14)).length?`<div class="shd"><h2>Más adelante</h2><span class="c">${later.filter(i=>!(upA(i)&&days(i.due)<=14)).length}</span></div><div class="grp">${later.filter(i=>!(upA(i)&&days(i.due)<=14)).map(i=>taskRow(i)).join('')}</div>`:''}
  </div><div>
  ${care?'':`<div class="shd desk-only" style="margin-top:0"><h2>Lo último</h2></div><div class="shd mob-only"><h2>Lo último</h2></div><div class="card">${feedHtml(4)}</div>`}
  </div></div></div>`;
@@ -736,19 +784,20 @@ function vItem(id){
  const i=IT(id);if(!i)return '';
  if(!seesItem(i))return `<div class="wrap"><button class="back" data-a="back">${ic('back','s')}Volver</button><div class="empty" style="margin-top:16px"><div class="big" style="background:var(--navy-100);color:var(--navy-500)">${ic('lock','l')}</div><h3>No tienes acceso</h3><p>Esto no está en tu alcance. Pídeselo a Diego o Adriana.</p></div></div>`;
  const e=ENT[i.ent],st=stat(i),c=i.closed,can=canReport(i);
- return `<div class="wrap"><button class="back" data-a="back">${ic('back','s')}Volver</button>
- <div class="ph" style="padding-top:12px"><div style="display:flex;gap:16px;align-items:center">${entTile(i.ent)}<div><div class="eb dk">${e.name}${i.rec?' · '+i.rec.toLowerCase():''}</div><h1>${esc(i.title)}</h1><p>${esc(i.sub)}${i.amount?' · '+i.amount:''}</p></div></div>${kebab('item',i.id,i.title)}</div>
+ return `<div class="wrap"><div class="itop"><button class="back" data-a="back">${ic('back','s')}Volver</button>${kebab('item',i.id,i.title)}</div>
+ <div class="ihead">${entTile(i.ent)}<div><h1>${esc(i.title)}</h1><p>${e.name}${i.sub?', '+esc(i.sub).toLowerCase():''}${i.amount?', '+i.amount:''}${i.rec?', '+i.rec.toLowerCase():''}</p></div></div>
  <div class="cols" style="margin-top:20px"><div class="stack">
  <div class="card"><div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center"><span class="pill ${st}">${statTxt(i)}</span>${i.sens?'<span class="pill gold">Salud</span>':''}${i.reopened&&i.open?'<span class="pill warn">Pidieron revisar</span>':''}</div>
- <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:16px">
- <div><div class="muted">Fecha</div><div style="font-weight:700;color:var(--fg-1)">${fdate(i.due)}${i.time?', '+i.time:''}</div></div>
- <div><div class="muted">${isAppt(i)?(i.open?'Va':c&&c.kind==='nofui'?'No asistió':'Asistió'):i.open?'Lo hace':'Lo hizo'}</div><div style="font-weight:700;color:var(--fg-1);display:flex;gap:8px;align-items:center">${isAppt(i)?`${entTile(i.ent,'sm')}${esc(ENT[i.ent].name)}`:`${av(i.open?i.resp:(c.did||c.by),'sm')}${P[i.open?i.resp:(c.did||c.by)].short}`}</div>${isAppt(i)&&c&&c.acomp?`<div class="muted" style="margin-top:2px">Acompañó: ${P[c.acomp].short}</div>`:''}</div></div>
- ${isAppt(i)?`<div class="apbox">${PL(i)?`<div class="aprow">${ic('pin')}<div style="flex:1"><b>${esc(PL(i).name)}</b><div class="muted">${esc(PL(i).dir||'')}</div></div><button class="btn gh sm" data-a="toast" data-m="Abriría el mapa (simulado)">Cómo llegar</button><button class="btn gh sm" data-a="toast" data-m="Llamada simulada a ${esc(PL(i).tel||'')}">${ic('phone','s')}</button></div>`:''}
- ${i.acomp?`<div class="aprow">${av(i.acomp,'sm')}<div>Acompaña: <b>${P[i.acomp].short}</b></div></div>`:''}
- ${i.ayunas?`<div class="aprow">${ic('alert')}<div><b>En ayunas</b></div></div>`:''}
- ${i.attach?`<div class="aprow">${ic('file')}<div style="flex:1">Orden adjunta: <b>${esc(i.attach.name)}</b></div>${i.attach.url?`<a class="lnk" href="${i.attach.url}" target="_blank">Ver</a>`:''}</div>`:''}
- ${i.open?`<div class="aprow">${ic('bell')}<div class="muted">En la app se recuerda todos los días. Avisos: 7, 3 y 1 día antes y el mismo día.</div></div>`:''}
- ${i.open&&days(i.due)>0&&canEdit()?`<button class="btn gh sm" style="align-self:flex-start" data-a="report" data-id="${i.id}" data-res="cambio">Cambió la fecha</button>`:''}</div>`:''}
+ <div class="facts">
+ <div class="fact when">${ic('cal')}<div><b>${fdate(i.due)}</b>${i.time?`<span class="hr">${i.time}</span>`:''}</div></div>
+ <div class="fact">${isAppt(i)?`${entTile(i.ent,'sm')}`:`${av(i.open?i.resp:(c.did||c.by),'sm')}`}<div><span class="k">${isAppt(i)?(i.open?'Va':c&&c.kind==='nofui'?'No asistió':'Asistió'):i.open?'Lo hace':'Lo hizo'}</span><b>${isAppt(i)?esc(ENT[i.ent].name):P[i.open?i.resp:(c.did||c.by)].short}</b>${isAppt(i)&&c&&c.acomp?`<span class="k">Acompañó ${P[c.acomp].short}</span>`:''}</div></div>
+ ${isAppt(i)&&i.acomp&&i.open?`<div class="fact">${av(i.acomp,'sm')}<div><span class="k">Acompaña</span><b>${P[i.acomp].short}</b></div></div>`:''}
+ ${isAppt(i)&&PL(i)?`<div class="fact place">${ic('pin')}<div><b>${esc(PL(i).name)}</b>${PL(i).dir?`<span class="k">${esc(PL(i).dir)}</span>`:''}<div class="pact"><button class="btn gh sm" data-a="toast" data-m="Abriría el mapa (simulado)">${ic('pin','s')}Cómo llegar</button><button class="btn gh sm" data-a="toast" data-m="Llamada simulada a ${esc(PL(i).tel||'')}">${ic('phone','s')}Llamar</button></div></div></div>`:''}
+ ${isAppt(i)&&i.ayunas?`<div class="fact warn">${ic('alert')}<div><b>En ayunas</b></div></div>`:''}
+ ${isAppt(i)&&i.attach?`<div class="fact">${ic('file')}<div><span class="k">Orden adjunta</span><b>${esc(i.attach.name)}</b>${i.attach.url?`<a class="lnk" href="${i.attach.url}" target="_blank">Ver</a>`:''}</div></div>`:''}
+ </div>
+ ${isAppt(i)&&i.open?`<p class="remind">${ic('bell','s')}Se recuerda todos los días en la app, y con aviso 7, 3 y 1 día antes.</p>`:''}
+ ${isAppt(i)&&i.open&&days(i.due)>0&&canEdit()?`<button class="btn gh sm" style="margin-top:12px" data-a="report" data-id="${i.id}" data-res="cambio">Cambió la fecha</button>`:''}
  ${i.prep?`<div class="banner info" style="margin-top:14px">${ic('info','s')}<div>${esc(i.prep)}</div></div>`:''}
  ${i.reopened&&i.open?`<div class="banner warn" style="margin-top:14px">${ic('alert','s')}<div><b>${P[i.reopened.by].short} pidió revisar:</b> ${esc(i.reopened.reason)}</div></div>`:''}
  ${can?`<button class="btn pri big full" style="margin-top:18px" data-a="report" data-id="${i.id}">${isAppt(i)?ic('msg'):ic('cam')}${actLabel(i)}</button>`:''}
@@ -889,11 +938,11 @@ function vSet(){
 const FIN='style="position:absolute;width:1px;height:1px;opacity:0;overflow:hidden"';
 function pickers(ctx,has){return `<div class="opts"><label class="btn ${has?'gh':'dark'}">${ic('cam')}${has?'Otra foto':'Tomar foto'}<input type="file" accept="image/*" capture="environment" data-a="filein" data-ctx="${ctx}" data-kind="foto" ${FIN}></label><label class="btn gh">${ic('up')}Subir archivo<input type="file" accept="image/*,application/pdf" data-a="filein" data-ctx="${ctx}" data-kind="archivo" ${FIN}></label></div>`}
 function filePreview(f,dark){if(!f)return '';if(f.type.startsWith('image/'))return `<img src="${f.url}" alt="${esc(f.name)}" style="max-width:100%;max-height:260px;border-radius:14px;display:block;position:relative">`;return `<div style="display:flex;gap:12px;align-items:center;position:relative;color:${dark?'var(--on-1)':'var(--fg-1)'}"><span class="docic">PDF</span><b style="word-break:break-all">${esc(f.name)}</b></div>`}
-const TIPOS=[['cita','Cita médica','heart'],['examen','Examen o laboratorio','flask'],['medicamento','Remedios','pill'],['pago','Pago','card'],['documento','Renovar documento','id'],['mascota','Mascota','paw'],['otro','Otra cosa','plus']];
+const TIPOS=[['cita','Cita médica','heart','Con lugar, hora y quién acompaña','sal'],['examen','Examen o laboratorio','flask','Sangre, ecografía, rayos X','sal'],['medicamento','Remedios','pill','Una compra que se repite','sal'],['pago','Pago','card','Servicios, impuestos, cuotas','pag'],['documento','Renovar documento','id','Licencia, SOAT, pasaporte','doc'],['mascota','Mascota','paw','Veterinario, vacunas, baño','mas'],['otro','Otra cosa','plus','Cualquier otro pendiente','otr']];
 function chipsF(m,f,opts){return `<div class="chips">${opts.map(o=>`<button class="chip ${m.f[f]===o[0]?'on':''}" data-a="af" data-f="${f}" data-v="${o[0]}">${o[2]?`<span class="dt" style="background:${o[2]}"></span>`:''}${o[1]}</button>`).join('')}</div>`}
 function inF(m,id,lab,ph,type,er){return `<div class="fld"><label for="a_${id}">${lab}</label><input class="inp ${er[id]?'err':''}" id="a_${id}" type="${type||'text'}" value="${esc(m.f[id]||'')}" placeholder="${ph||''}">${er[id]?`<div class="er">${er[id]}</div>`:''}</div>`}
 function addModal(m,X){
- if(!m.tipo){return `<div class="sh"><h2>¿Qué quieres anotar?</h2>${X}</div><div class="sb"><div class="tipos">${TIPOS.map(t=>`<button class="tipo" data-a="tipo" data-v="${t[0]}"><span class="fic">${ic(t[2])}</span><b>${t[1]}</b></button>`).join('')}</div></div>`}
+ if(!m.tipo){return `<div class="sh"><h2>¿Qué quieres anotar?</h2>${X}</div><div class="sb"><div class="tipos">${TIPOS.map(t=>`<button class="tipo" data-a="tipo" data-v="${t[0]}"><span class="fic ${t[4]}">${ic(t[2])}</span><span class="tt"><b>${t[1]}</b><small>${t[3]}</small></span>${ic('chev','s')}</button>`).join('')}</div></div>`}
  const er=m.err||{},t=m.tipo,T=TIPOS.find(x=>x[0]===t);
  const personas=Object.values(ENT).filter(e=>e.type==='persona'&&seesEnt(e.id)).map(e=>[e.id,e.name,e.fg]);
  const todas=Object.values(ENT).filter(e=>seesEnt(e.id)).map(e=>[e.id,e.name,e.fg]);
