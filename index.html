@@ -953,7 +953,9 @@ function vItem(id){
 }
 function vCal(){
  const y=Math.floor(S.calM/12),m=S.calM%12;
- const list=S.items.filter(i=>seesItem(i)&&i.due.getMonth()===m&&i.due.getFullYear()===y).sort((a,b)=>a.due-b.due);
+ if(S.calF&&!seesEnt(S.calF))S.calF=null;
+ const all=S.items.filter(i=>seesItem(i)&&i.due.getMonth()===m&&i.due.getFullYear()===y).sort((a,b)=>a.due-b.due);
+ const list=S.calF?all.filter(i=>i.ent===S.calF):all;
  const first=new Date(y,m,1),start=(first.getDay()+6)%7,dim=new Date(y,m+1,0).getDate();
  let cells=['Lun','Mar','Mié','Jue','Vie','Sáb','Dom'].map(d=>`<div class="dw">${d}</div>`).join('');
  const tot=Math.ceil((start+dim)/7)*7;
@@ -961,10 +963,10 @@ function vCal(){
   cells+=`<div class="dc ${inm?'':'out'} ${inm&&y===TODAY.getFullYear()&&m===TODAY.getMonth()&&dn===TODAY.getDate()?'today':''}">${inm?`<span class="n">${dn}</span>`:''}${its.map(i=>`<button class="ce ${i.open?'':'closed'}" style="background:${ENT[i.ent].bg};color:${ENT[i.ent].fg}" data-a="open" data-id="${i.id}">${esc(i.title)}</button>`).join('')}</div>`}
  const byDay={};list.forEach(i=>{const k=i.due.getDate();(byDay[k]=byDay[k]||[]).push(i)});
  const agenda=Object.keys(byDay).map(k=>`<div class="dayh">${fdate(new Date(y,m,+k))}${y===TODAY.getFullYear()&&m===TODAY.getMonth()&&+k===TODAY.getDate()?' · hoy':''}</div><div class="stack">${byDay[k].map(i=>taskRow(i)).join('')}</div>`).join('');
- const legend=`<div class="chips" style="margin-top:14px">${Object.values(ENT).filter(e=>seesEnt(e.id)).map(e=>`<span class="chip" style="cursor:default"><span class="dt" style="background:${e.fg}"></span>${e.name}</span>`).join('')}</div>`;
+ const legend=`<div class="chips" role="group" aria-label="Ver solo" style="margin-top:14px"><button class="chip ${S.calF?'':'on'}" data-a="calf" data-v="" aria-pressed="${!S.calF}">Todos</button>${Object.values(ENT).filter(e=>seesEnt(e.id)).map(e=>`<button class="chip ${S.calF===e.id?'on':''}" data-a="calf" data-v="${e.id}" aria-pressed="${S.calF===e.id}"><span class="dt" style="background:${e.fg}"></span>${e.name}</button>`).join('')}</div>`;
  return `<div class="wrap"><div class="ph"><div><div class="eb dk">Calendario de la familia</div><h1>${MES[m][0].toUpperCase()+MES[m].slice(1)} ${y}</h1><p>Todo lo de la familia, la casa y el carro.</p></div>
  <div class="mnav"><button class="ib" data-a="calm" data-d="-1" ${m<=9?'disabled':''} aria-label="Mes anterior">${ic('back','s')}</button><button class="ib" data-a="calm" data-d="1" ${m>=11?'disabled':''} aria-label="Mes siguiente">${ic('chev','s')}</button></div></div>
- <div style="margin-top:18px">${list.length?`<div class="cal">${cells}</div>${legend}<div class="agenda">${agenda}</div>`:`<div class="empty"><div class="big">${ic('cal','l')}</div><h3>Nada anotado en ${MES[m]}</h3><p>Usa el botón + para anotar una cita, un pago o algo por hacer.</p><button class="btn pri" style="margin-top:16px" data-a="add">${ic('plus')}Anotar algo</button></div>`}</div></div>`;
+ <div style="margin-top:18px">${all.length?`${legend}<div class="cal" style="margin-top:14px">${cells}</div>${list.length?`<div class="agenda">${agenda}</div>`:`<p class="muted" style="margin:18px 4px">${esc(ENT[S.calF].name)} no tiene nada en ${MES[m]}.</p>`}`:`<div class="empty"><div class="big">${ic('cal','l')}</div><h3>Nada anotado en ${MES[m]}</h3><p>Usa el botón + para anotar una cita, un pago o algo por hacer.</p><button class="btn pri" style="margin-top:16px" data-a="add">${ic('plus')}Anotar algo</button></div>`}</div></div>`;
 }
 function vig(d){if(!d.until)return '';const n=days(d.until);return n<0?`<span class="pill bad">Venció ${fshort(d.until)}</span>`:n<=90?`<span class="pill warn">Vence en ${n} días</span>`:`<span class="pill neu">Hasta ${fshort(d.until)}</span>`}
 const catSens=c=>(CATS.find(x=>x[0]===c)||[])[2];
@@ -1452,6 +1454,7 @@ document.addEventListener('click',e=>{
  case 'close':case 'scrim':if(REC){try{REC.mr.stop()}catch(e){}}S.modal=null;render();break;
  case 'report':S.modal={k:'report',id:t.dataset.id,res:t.dataset.res||null};render();break;
  case 'apunte':S.modal={k:'apunte',id:t.dataset.id};render();break;
+ case 'calf':S.calF=t.dataset.v||null;render();break;
  case 'moredone':S.moreDone=!S.moreDone;render();break;
  case 'apapel':S.modal={k:'apapel',id:t.dataset.id,cat:null};render();break;
  case 'apapelsave':{if(!m.cat){m.err=1;render();break}const i=IT(m.id),c=i.closed;S.docs.push({id:'d'+Date.now(),ent:i.ent,cat:m.cat,name:`${i.title} · ${fshort(i.due)}`,fmt:(c.mime||'').includes('pdf')?'PDF':'JPG',by:S.user,url:c.url,mime:c.mime,log:[]});c.papel=m.cat;i.hist.push(['Hoy',me().short,'Lo guardó en Papeles, en '+m.cat]);S.modal=null;render();toast('Guardado en Papeles, en '+m.cat);break}
