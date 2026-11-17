@@ -506,6 +506,24 @@ label.btn{cursor:pointer;position:relative}
 @media(min-width:720px){.tipos{grid-template-columns:1fr 1fr!important}.tipo:nth-child(2){border-top:0}.tipo:nth-child(odd){border-right:1px solid var(--line)}}
 .tabbar button{padding:0;overflow:visible;letter-spacing:-.01em}
 @media(max-width:420px){.tabbar button{font-size:12px}}
+
+/* v3.17 responsive por ancho real del contenido (funciona con cualquier tamaño de letra) */
+main{container:main/inline-size}
+.cds{grid-template-columns:repeat(auto-fit,minmax(min(100%,290px),1fr))!important}
+@media(min-width:960px){.cols{grid-template-columns:1fr}}
+@container main (min-width:600px){
+ .wrap{max-width:720px;margin-inline:auto;padding-inline:20px}
+ .hero{padding-inline:max(20px,calc((100% - 720px)/2 + 20px))}
+ .grp .task{padding:14px 20px}
+}
+@container main (min-width:900px){
+ .wrap{max-width:1180px;margin-inline:0;padding-inline:36px}
+ .hero{padding-inline:36px}
+ .cols{grid-template-columns:minmax(0,1.5fr) minmax(0,1fr);align-items:start}
+ .lift .cols>div:last-child{padding-top:54px}
+}
+@media(min-width:600px) and (max-width:959px){.tabbar{left:50%;right:auto;width:520px;transform:translateX(-50%)}}
+@media(min-width:960px) and (max-width:1199px){.side{width:212px}}
 </style>
 </head>
 <body>
