@@ -574,6 +574,20 @@ main{container:main/inline-size}
 .side .sout:hover{background:var(--navy-700);color:var(--on-1)}
 .ldfoot .lnk{display:inline;padding:0}
 @media(min-width:960px){.side{padding-bottom:52px}}
+
+/* v3.20 notas, soportes y veces anteriores */
+.sops{margin-top:16px;padding-top:16px;border-top:1px solid var(--line);display:flex;flex-direction:column;gap:10px;align-items:flex-start}
+.sops h3{font-size:17px;font-weight:800;color:var(--fg-1);margin:0}
+.sop,.prev{display:flex;gap:12px;align-items:flex-start;width:100%;background:var(--cream);border-radius:14px;padding:12px}
+.sop>svg{flex:none;color:var(--gold-700);margin-top:2px}
+.sop>div,.prev>div{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
+.sop p,.prev p{margin:0;color:var(--fg-1);font-size:16px;line-height:1.4}
+.sop b,.prev b{color:var(--fg-1);font-size:16px;overflow-wrap:anywhere}
+.sop .k,.prev .k{font-size:14px;color:var(--fg-3)}
+.sop img{max-width:220px;max-height:160px;border-radius:12px;display:block;margin:4px 0}
+.sop .lnk,.prev .lnk{flex:none;align-self:center}
+.prevs{display:flex;flex-direction:column;gap:8px;margin-top:14px}
+.prev .docic{flex:none}
 </style>
 </head>
 <body>
@@ -617,12 +631,12 @@ function seed(){P=baseP();ENT=baseEnt();return{
  items:[
   {id:'gas',ent:'casa',title:'Pagar el gas',sub:'Factura de octubre',cat:'pago',resp:'luis',due:D(11,12),amount:'$ 86.400',rec:'Cada mes',open:true,hist:[['1 nov','Sistema','Se creó para este mes']]},
   {id:'rtm',ent:'carro',title:'Revisión técnico-mecánica',sub:'Certificado anual',cat:'vehiculo',resp:'luis',due:D(11,10),rec:'Cada año',open:true,hist:[['10 oct','Sistema','Se creó al acercarse el vencimiento del certificado']]},
-  {id:'remlu',ent:'lucero',title:'Remedios de Lucero',sub:'Compra del mes',cat:'medicamento',resp:'luis',due:D(11,17),rec:'Cada mes',open:true,sens:true,hist:[['1 nov','Sistema','Se creó para este mes']]},
+  {id:'remlu',ent:'lucero',title:'Remedios de Lucero',sub:'Compra del mes',cat:'medicamento',resp:'luis',due:D(11,17),rec:'Cada mes',open:true,sens:true,attach:{name:'formula_lucero.jpg'},apuntes:[{by:'lucero',at:'2 nov',note:'Son los tres de la fórmula. Uno se acaba antes: pedir la caja grande.'}],prev:[{by:'luis',at:'17 oct · 11:05 a. m.',kind:'foto',file:'recibo_drogueria_oct.jpg',note:'Compré los tres. Uno quedó pendiente y lo trajeron el lunes.'},{by:'luis',at:'16 sep · 4:30 p. m.',kind:'voz',dur:22,note:'No dieron recibo. Los compré en la droguería de la esquina.'}],hist:[['1 nov','Sistema','Se creó para este mes'],['2 nov','Lucero','Agregó una nota']]},
   {id:'luz',ent:'casa',title:'Pagar la luz',sub:'Factura de noviembre',cat:'pago',resp:'adriana',due:D(11,18),amount:'$ 214.900',rec:'Cada mes',open:true,hist:[['13 nov','Adriana','Se encargó: la paga por internet']]},
   {id:'cardio',ent:'luis',title:'Cita de cardiología',sub:'Control',cat:'cita',resp:'luis',due:D(11,20),time:'9:30 a. m.',place:'p1',acomp:'lucero',open:true,sens:true,prep:'Llevar la orden y los exámenes',attach:{name:'orden_cardiologia.jpg'},hist:[['2 nov','Luis','Anotó la cita']]},
   {id:'tension',ent:'lucero',title:'Control de tensión',sub:'Medicina general',cat:'cita',resp:'lucero',due:D(11,13),time:'10:00 a. m.',place:'p2',open:true,sens:true,hist:[['3 nov','Lucero','Anotó la cita']]},
   {id:'eco',ent:'luis',title:'Ecografía abdominal',sub:'Examen',cat:'examen',resp:'luis',due:D(11,24),time:'7:00 a. m.',place:'p4',ayunas:true,open:true,sens:true,attach:{name:'orden_ecografia.jpg'},hist:[['10 nov','Lucero','Anotó el examen y adjuntó la orden']]},
-  {id:'remluis',ent:'luis',title:'Remedios de Luis',sub:'Compra del mes',cat:'medicamento',resp:'luis',due:D(11,21),rec:'Cada mes',open:true,sens:true,hist:[['1 nov','Sistema','Se creó para este mes']]},
+  {id:'remluis',ent:'luis',title:'Remedios de Luis',sub:'Compra del mes',cat:'medicamento',resp:'luis',due:D(11,21),rec:'Cada mes',open:true,sens:true,attach:{name:'formula_luis.jpg'},prev:[{by:'luis',at:'21 oct · 9:40 a. m.',kind:'foto',file:'recibo_drogueria_oct.jpg',note:''}],hist:[['1 nov','Sistema','Se creó para este mes']]},
   {id:'soat',ent:'carro',title:'Renovar el SOAT',sub:'Vence la póliza actual',cat:'vehiculo',resp:'diego',due:D(11,28),rec:'Cada año',open:true,hist:[['29 oct','Sistema','Se creó porque el SOAT vence el 28 nov'],['30 oct','Diego','Se encargó: lo compra por internet']]},
   {id:'odonto',ent:'lucero',title:'Cita de odontología',sub:'Control',cat:'cita',resp:'lucero',due:D(12,3),time:'2:00 p. m.',place:'p3',acomp:'luis',open:true,sens:true,hist:[['14 nov','Lucero','Anotó la cita']]},
   {id:'predial',ent:'casa',title:'Impuesto predial',sub:'Año 2026',cat:'pago',resp:'diego',due:D(12,15),amount:'$ 1.120.000',rec:'Cada año',open:true,hist:[['1 nov','Sistema','Se creó para este año']]},
@@ -849,6 +863,18 @@ function vHomeRemote(){
  ${theirs.length?`<div class="shd"><h2>Lo de ${P[other].short}</h2></div><div class="stack">${theirs.map(i=>taskRow(i)).join('')}</div>`:''}
  </div><div><div class="shd"><h2>Lo último en casa</h2></div><div class="card">${feedHtml(6)}</div></div></div></div>`;
 }
+const EJ='Archivo de ejemplo. En la app real aquí se abre la foto o el documento.';
+function verArch(name,url){return url?`<a class="lnk" href="${url}" target="_blank">Ver</a>`:`<button class="lnk" data-a="toast" data-m="${EJ}">Ver</button>`}
+function soportes(i){
+ const ap=i.apuntes||[],adj=i.attach&&!isAppt(i);
+ const rows=(adj?`<div class="sop">${ic('file')}<div><span class="k">${i.cat==='medicamento'?'Fórmula':'Adjunto'}</span><b>${esc(i.attach.name)}</b></div>${verArch(i.attach.name,i.attach.url)}</div>`:'')+
+  ap.map(a=>`<div class="sop">${a.file?ic('file'):ic('msg')}<div>${a.note?`<p>${esc(a.note)}</p>`:''}${a.file?(a.file.url&&(a.file.type||'').startsWith('image/')?`<img src="${a.file.url}" alt="${esc(a.file.name)}">`:`<b>${esc(a.file.name)}</b>`):''}<span class="k">${P[a.by].short} · ${a.at}</span></div>${a.file&&!(a.file.url&&(a.file.type||'').startsWith('image/'))?verArch(a.file.name,a.file.url):''}</div>`).join('');
+ const can=i.open&&seesItem(i);
+ if(!rows&&!can)return '';
+ return `<div class="sops"><h3>Notas y soportes</h3>${rows||'<p class="muted" style="margin:0">Aquí va lo que ayuda a hacerlo: la fórmula, la factura, una indicación.</p>'}${can?`<button class="btn gh sm" data-a="apunte" data-id="${i.id}">${ic('plus','s')}Agregar nota o foto</button>`:''}</div>`}
+function anteriores(i){
+ const pv=i.prev||[];if(!pv.length)return '';
+ return `<div class="card"><h2 style="font-size:20px">Veces anteriores</h2><p class="muted" style="margin:2px 0 0">${i.rec?esc(i.rec)+'. ':''}Con lo que se dejó como constancia.</p><div class="prevs">${pv.map(c=>`<div class="prev">${c.kind==='voz'?`<span class="docic" style="background:var(--gold-50);color:var(--gold-700)">${ic('mic')}</span>`:c.kind==='nota'?`<span class="docic" style="background:var(--info-50);color:var(--info)">${ic('msg')}</span>`:`<span class="docic">${(c.file||'').split('.').pop().toUpperCase()}</span>`}<div><b>${c.kind==='voz'?'Audio de '+P[c.by].short+(c.dur?' · '+fmtDur(c.dur):''):c.kind==='nota'?'Nota de '+P[c.by].short:esc(c.file)}</b>${c.note?`<p>“${esc(c.note)}”</p>`:''}<span class="k">${P[c.by].short} · ${c.at}</span></div>${c.kind==='voz'?`<button class="lnk" data-a="toast" data-m="Audio de ejemplo. En la app real aquí se escucha la grabación.">Oír</button>`:c.file?verArch(c.file,c.url):''}</div>`).join('')}</div></div>`}
 function vItem(id){
  const i=IT(id);if(!i)return '';
  if(!seesItem(i))return `<div class="wrap"><button class="back" data-a="back">${ic('back','s')}Volver</button><div class="empty" style="margin-top:16px"><div class="big" style="background:var(--navy-100);color:var(--navy-500)">${ic('lock','l')}</div><h3>No tienes acceso</h3><p>Esto no está en tu alcance. Pídeselo a Diego o Adriana.</p></div></div>`;
@@ -868,6 +894,7 @@ function vItem(id){
  ${isAppt(i)&&i.open?`<p class="remind">${ic('bell','s')}Se recuerda todos los días en la app, y con aviso 7, 3 y 1 día antes.</p>`:''}
  ${isAppt(i)&&i.open&&days(i.due)>0&&canEdit()?`<button class="btn gh sm" style="margin-top:12px" data-a="report" data-id="${i.id}" data-res="cambio">Cambió la fecha</button>`:''}
  ${i.prep?`<div class="banner info" style="margin-top:14px">${ic('info','s')}<div>${esc(i.prep)}</div></div>`:''}
+ ${soportes(i)}
  ${i.reopened&&i.open?`<div class="banner warn" style="margin-top:14px">${ic('alert','s')}<div><b>${P[i.reopened.by].short} pidió revisar:</b> ${esc(i.reopened.reason)}</div></div>`:''}
  ${can?`<button class="btn pri big full" style="margin-top:18px" data-a="report" data-id="${i.id}">${isAppt(i)?ic('msg'):ic('cam')}${actLabel(i)}</button>`:''}
  ${i.open&&!can&&remote()&&i.resp!==S.user?`<div style="display:flex;gap:10px;margin-top:18px;flex-wrap:wrap"><button class="btn sec sm" data-a="take" data-id="${i.id}">Lo gestiono yo</button>${P[i.resp].kind!=='afuera'?`<button class="btn gh sm" data-a="write" data-id="${i.id}">${ic('msg','s')}Escribirle a ${P[i.resp].short}</button>`:''}</div>`:''}
@@ -877,6 +904,7 @@ function vItem(id){
   <div><div style="font-weight:700;color:var(--fg-1)">${c.kind==='voz'?'Audio de '+P[c.by].short:c.kind==='nota'?'Nota de '+P[c.by].short:c.kind==='nofui'?'No asistió':esc(c.file)}</div>${c.url&&(c.mime||'').startsWith('image/')?`<img src="${c.url}" alt="" style="max-width:220px;max-height:160px;border-radius:12px;margin-top:8px;display:block">`:''}<div class="muted">Lo registró ${P[c.by].short} · ${c.at}</div>${c.audio?`<audio controls src="${c.audio.url}" style="width:100%;max-width:320px;margin-top:8px"></audio><div class="muted" style="font-size:13px">Audio de ${fmtDur(c.audio.dur)} · se borra a los 90 días</div>`:''}${c.how?`<span class="pill ${c.how==='Bien'?'ok':c.how==='Regular'?'warn':'info'}" style="margin-top:6px">${esc(c.how)}</span>`:''}${c.note?`<div style="margin-top:4px">“${esc(c.note)}”</div>`:''}</div></div>
   ${c.kind==='voz'?`<div class="banner warn" style="margin-top:12px">${ic('info','s')}<div>Se cerró sin papel. Queda la palabra de ${P[c.by].short}.</div></div>`:c.file?`<div class="muted" style="margin-top:10px">Guardado en Papeles · ${isAppt(i)?'Salud':'Recibos'}</div>`:''}
   ${remote()?`<div style="margin-top:14px"><button class="btn gh sm" data-a="reopen" data-id="${i.id}">Pedir que se revise</button></div>`:''}</div>`:''}
+ ${anteriores(i)}
  </div>
  <div class="card"><h2 style="font-size:20px">Historia</h2><div class="feed" style="margin-top:14px">${i.hist.slice().reverse().map((h,k,a)=>`<div class="fi"><div class="rail"><i class="${k===0?'k':''}"></i>${k<a.length-1?'<span></span>':''}</div><div class="bd"><div class="fx">${esc(h[2])}</div><div class="fw">${h[0]} · ${h[1]}</div></div></div>`).join('')}</div></div>
  </div></div>`;
@@ -1112,6 +1140,14 @@ function modal(){
   }
  }
  if(m.k==='add'){h=addModal(m,X)}
+ if(m.k==='apunte'){
+  const i=IT(m.id);
+  h=`<div class="sh"><h2>Agregar nota o foto</h2>${X}</div><div class="sb">
+  <p style="margin:0">Queda en “${esc(i.title)}” para que cualquiera la vea antes de hacerlo. No lo cierra.</p>
+  <div><span class="lbl">Nota</span><textarea class="inp" id="apnote" rows="3" placeholder="Ej.: pedir la caja grande, llevar la fórmula">${esc(m.note||'')}</textarea></div>
+  <div><span class="lbl">Foto o archivo (opcional)</span>${pickers('apunte',!!m.file)}${m.file?`<div style="background:var(--navy-50);border-radius:14px;padding:10px;margin-top:8px">${filePreview(m.file)}</div>`:''}</div>
+  ${m.err?`<div class="er">${m.err}</div>`:''}
+  <button class="btn pri big full" data-a="apsave">Guardar</button></div>`}
  if(m.k==='reopen'){
   const i=IT(m.id),who=i.closed?.by||i.resp;
   h=`<div class="sh"><h2>Pedir que se revise</h2>${X}</div><div class="sb">
@@ -1294,6 +1330,7 @@ document.addEventListener('change',e=>{const t=e.target,a=t.dataset.a;
   if(f.size>15*1024*1024){if(m.k==='report')m.err='El archivo pesa más de 15 MB. Prueba con una foto.';render();return}
   if(m.k==='report'&&!isAppt(IT(m.id))){m.note=val('note');m.kind=t.dataset.kind;m.err=null;m.rec=false}
   if(m.k==='add'){collectA(m)}
+  if(m.k==='apunte'){m.note=val('apnote');m.err=null}
   if(m.k==='report'&&isAppt(IT(m.id))){m.note=val('fbnote');m.err=null}
   if(m.k==='adddoc'){m.n=val('dname')||f.name.replace(/\.[^.]+$/,'');m.v=val('dvence');if(m.err)m.err.f=0}
   m.file={name:f.name,type:f.type,url:URL.createObjectURL(f)};render();return}
@@ -1365,6 +1402,8 @@ document.addEventListener('click',e=>{
  case 'tg':S.notif[t.dataset.k]=!S.notif[t.dataset.k];render();break;
  case 'close':case 'scrim':if(REC){try{REC.mr.stop()}catch(e){}}S.modal=null;render();break;
  case 'report':S.modal={k:'report',id:t.dataset.id,res:t.dataset.res||null};render();break;
+ case 'apunte':S.modal={k:'apunte',id:t.dataset.id};render();break;
+ case 'apsave':{m.note=val('apnote');if(!m.note&&!m.file){m.err='Escribe una nota o agrega una foto.';render();break}const i=IT(m.id);(i.apuntes=i.apuntes||[]).push({by:S.user,at:nowS(),note:m.note,file:m.file||null});i.hist.push(['Hoy',me().short,m.file?(m.note?'Agregó una nota con foto':'Agregó una foto'):'Agregó una nota']);S.modal=null;render();toast('Guardado en notas y soportes');break}
  case 'kind':m.note=val('note');m.kind=t.dataset.v;if(m.kind==='voz')m.file=null;m.err=null;if(m.kind!=='voz')m.rec=false;render();break;
  case 'recvoice':m.note=val('note')||val('fbnote');m.err=null;m.audio=null;startRec(m);break;
  case 'recstop':if(REC)REC.mr.stop();break;
