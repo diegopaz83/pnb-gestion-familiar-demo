@@ -791,6 +791,13 @@ main{container:main/inline-size}
 .inm-pago .lnk{align-self:flex-start;padding:0;margin-top:4px}
 .mov .tx .k{display:block!important}
 .mov .tx .k .ic{display:inline-block;vertical-align:-3px;width:15px;height:15px}
+
+/* v3.35 valor de plata fácil de leer */
+.monto-in{display:flex;align-items:center;gap:10px;border:2px solid var(--line-strong);border-radius:16px;padding:0 16px;background:var(--white)}
+.monto-in:focus-within{border-color:var(--navy-500);box-shadow:0 0 0 4px var(--navy-100)}
+.monto-in span{font-size:28px;font-weight:800;color:var(--fg-3)}
+.monto-in input{flex:1;min-width:0;border:0;outline:0;background:none;font-size:32px;font-weight:800;color:var(--fg-1);padding:12px 0;font-variant-numeric:tabular-nums;letter-spacing:.01em}
+.monto-w{margin-top:8px;min-height:24px;font-size:17px;font-weight:700;color:var(--gold-700)}
 </style>
 </head>
 <body>
@@ -1223,6 +1230,13 @@ const PROPS=[
  ['DEC-031','Fotos en lugar de iniciales y fila de caritas con contador de pendientes en el inicio. Retratos ilustrados de ejemplo hasta subir fotos reales, que se guardan privadas.']
 ];
 const COP=n=>'$ '+Math.round(n).toLocaleString('es-CO');
+const miles=v=>{const n=String(v||'').replace(/\D/g,'').replace(/^0+(?=\d)/,'');return n?Number(n).toLocaleString('es-CO'):''};
+function enLetras(n){const U=['','un','dos','tres','cuatro','cinco','seis','siete','ocho','nueve','diez','once','doce','trece','catorce','quince','dieciséis','diecisiete','dieciocho','diecinueve','veinte','veintiún','veintidós','veintitrés','veinticuatro','veinticinco','veintiséis','veintisiete','veintiocho','veintinueve'];
+ const D=['','','','treinta','cuarenta','cincuenta','sesenta','setenta','ochenta','noventa'],C=['','ciento','doscientos','trescientos','cuatrocientos','quinientos','seiscientos','setecientos','ochocientos','novecientos'];
+ const t=x=>{if(x===0)return '';if(x===100)return 'cien';const c=Math.floor(x/100),r=x%100;let s=C[c];if(r){s+=(s?' ':'')+(r<30?U[r]:D[Math.floor(r/10)]+(r%10?' y '+U[r%10]:''))}return s};
+ if(!n)return 'cero';const mm=Math.floor(n/1e6),k=Math.floor((n%1e6)/1000),u=n%1000;const p=[];
+ if(mm)p.push(mm===1?'un millón':t(mm)+' millones');if(k)p.push(k===1?'mil':t(k)+' mil');if(u)p.push(t(u));return p.join(' ')}
+function palabrasPesos(v){const n=Number(String(v||'').replace(/\D/g,''));if(!n)return '';const m=n%1e6===0&&n>=1e6;return enLetras(n).replace(/^./,c=>c.toUpperCase())+(n===1?' peso':m?' de pesos':' pesos')}
 const COPs=n=>(n<0?'− ':'')+COP(Math.abs(n));
 const CATG=['Mantenimiento','Materiales','Mano de obra','Transporte','Servicios','Otro'];
 const seesInm=()=>!isCare();
@@ -1478,7 +1492,7 @@ function modal(){
   h=`<div class="sh"><h2>${m.edit?'Corregir':eg?'Anotar un gasto':'Anotar un ingreso'}</h2>${X}</div><div class="sb">
   <div class="seg" role="group" aria-label="Tipo de movimiento"><button class="${eg?'on out':''}" data-a="setf" data-f="tipo" data-v="egreso">− Sale plata</button><button class="${!eg?'on in':''}" data-a="setf" data-f="tipo" data-v="ingreso">+ Entra plata</button></div>
   <div><span class="lbl">${eg?'Foto del recibo':'Soporte (opcional)'}</span>${pickers('inmgasto',!!m.file)}${m.file?`<div style="background:var(--navy-50);border-radius:14px;padding:10px;margin-top:8px">${filePreview(m.file)}</div>`:''}</div>
-  <div><span class="lbl">Valor</span><input class="inp" id="gval" inputmode="numeric" placeholder="Ej.: 180000" value="${esc(m.valor||'')}">${m.err&&m.err.valor?'<div class="er">Escribe el valor, solo números.</div>':''}</div>
+  <div><label class="lbl" for="gval">¿Cuánto fue?</label><div class="monto-in"><span>$</span><input id="gval" inputmode="numeric" autocomplete="off" placeholder="0" value="${esc(miles(m.valor||''))}" aria-describedby="gvalw"></div><div class="monto-w" id="gvalw" aria-live="polite">${palabrasPesos(m.valor)}</div>${m.err&&m.err.valor?'<div class="er">Escribe cuánto fue.</div>':''}</div>
   <div><span class="lbl">¿De qué propiedad?</span><div class="chips">${[...S.inm.props.map(p=>[p.id,p.nombre]),['gen','General']].map(o=>`<button class="chip ${m.prop===o[0]?'on':''}" data-a="setf" data-f="prop" data-v="${o[0]}">${esc(o[1])}</button>`).join('')}</div>${m.err&&m.err.prop?'<div class="er">Elige la propiedad o «General».</div>':''}</div>
   ${eg?`<div><span class="lbl">¿De qué es?</span><div class="chips">${CATG.map(o=>`<button class="chip ${m.cat===o?'on':''}" data-a="setf" data-f="cat" data-v="${o}">${o}</button>`).join('')}</div>${m.err&&m.err.cat?'<div class="er">Elige de qué es.</div>':''}</div>`:''}
   <div><span class="lbl">${eg?'¿Qué se compró o pagó?':'¿De qué es?'} (opcional)</span><input class="inp" id="gdesc" placeholder="${eg?'Ej.: pintura para la fachada':'Ej.: depósito del nuevo inquilino'}" value="${esc(m.desc||'')}"></div>
@@ -1674,6 +1688,7 @@ function render(){
 const val=id=>{const e=document.getElementById(id);return e?e.value.trim():''};
 function adminsLeft(except,newRole){return Object.values(P).filter(p=>p.status==='activo'&&(p.id===except?newRole==='admin':p.role==='admin')).length}
 
+document.addEventListener('input',e=>{const t=e.target;if(t.id!=='gval')return;const f=miles(t.value);t.value=f;const w=document.getElementById('gvalw');if(w)w.textContent=palabrasPesos(f);if(S.modal)S.modal.valor=f});
 document.addEventListener('change',e=>{const t=e.target,a=t.dataset.a;
  if(a==='photoin'){const f=t.files&&t.files[0];if(!f)return;if(!f.type.startsWith('image/')){toast('Elige una imagen (foto)');return}const id=t.dataset.id,u=URL.createObjectURL(f);if(ENT[id])ENT[id].photo=u;if(P[id])P[id].photo=u;if(S.modal&&S.modal.k==='editent'){const f2={};document.querySelectorAll('[id^=f_]').forEach(x=>f2[x.id.slice(2)]=x.value.trim());S.modal.f=f2}render();toast('Foto actualizada');return}
  if(a==='filein'){const f=t.files&&t.files[0];const m=S.modal;if(!f||!m)return;
