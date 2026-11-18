@@ -716,6 +716,39 @@ main{container:main/inline-size}
 .face b{max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .faces .fpic{width:100%!important;max-width:56px;height:auto!important;aspect-ratio:1/1}
 @media(max-width:400px){.face b{font-size:12px}}
+
+/* v3.31 dinero en colores de la marca, sin rojo/verde */
+.anota.sale,.anota.entra{background:var(--white);border:1px solid var(--line)}
+.anota.sale .sg{background:var(--navy-800);color:var(--on-1)}
+.anota.entra .sg{background:var(--gold-500);color:var(--navy-800)}
+.rb.entra{background:var(--white);color:var(--fg-1);box-shadow:var(--sh-sm)}
+.rb.sale{background:var(--white);color:var(--fg-3);box-shadow:var(--sh-sm)}
+.rb.sale b{color:var(--fg-2)}
+.rb.queda{background:var(--navy-800);color:var(--gold-500)}
+.mov.ingreso .sig{background:var(--gold-50);color:var(--gold-700)}
+.mov.egreso .sig{background:var(--navy-50);color:var(--navy-500)}
+.mov.ingreso .val{color:var(--fg-1)}
+.mov.egreso .val{color:var(--fg-3)}
+.seg .on.out{background:var(--navy-800);color:var(--on-1)}
+.seg .on.in{background:var(--gold-500);color:var(--navy-800)}
+.inm-monto{background:var(--gold-50)}.inm-monto b{color:var(--fg-1)}
+.res-tabla table{width:100%;border-collapse:collapse;margin-top:10px;font-variant-numeric:tabular-nums}
+.res-tabla th,.res-tabla td{padding:12px 6px;border-top:1px solid var(--line);text-align:right;font-size:15px;color:var(--fg-2)}
+.res-tabla thead th{border-top:0;font-size:13px;color:var(--fg-3);font-weight:700;padding-top:4px}
+.res-tabla th[scope=row],.res-tabla thead th:first-child{text-align:left;color:var(--fg-1);font-weight:700}
+.res-tabla td b{color:var(--fg-1)}
+@media(max-width:420px){.res-tabla th,.res-tabla td{font-size:13px;padding:10px 3px}}
+
+.res-lista .rl{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:14px 0;border-top:1px solid var(--line)}
+.res-lista .rl:first-of-type{border-top:0}
+.rl-n{min-width:0;display:flex;flex-direction:column}
+.rl-n b{color:var(--fg-1);font-size:17px}
+.rl-n span{color:var(--fg-3);font-size:14px}
+.rl-q{flex:none;text-align:right;display:flex;flex-direction:column}
+.rl-q small{color:var(--fg-3);font-size:12px}
+.rl-q b{color:var(--fg-1);font-size:18px;white-space:nowrap}
+.inm-pago b{color:var(--fg-1)}
+.inm .btn.wa{border-color:var(--line-strong);color:var(--fg-1)}
 </style>
 </head>
 <body>
@@ -1148,6 +1181,7 @@ const PROPS=[
  ['DEC-031','Fotos en lugar de iniciales y fila de caritas con contador de pendientes en el inicio. Retratos ilustrados de ejemplo hasta subir fotos reales, que se guardan privadas.']
 ];
 const COP=n=>'$ '+Math.round(n).toLocaleString('es-CO');
+const COPs=n=>(n<0?'− ':'')+COP(Math.abs(n));
 const CATG=['Mantenimiento','Materiales','Mano de obra','Transporte','Servicios','Otro'];
 const seesInm=()=>!isCare();
 function inmVence(p){return new Date(TODAY.getFullYear(),TODAY.getMonth(),p.dia)}
@@ -1188,7 +1222,6 @@ function vInmoRes(){
  const ent=mv.filter(x=>x.tipo==='ingreso').reduce((s,x)=>s+x.valor,0),sal=mv.filter(x=>x.tipo==='egreso').reduce((s,x)=>s+x.valor,0),q=ent-sal;
  const por=esHoy?S.inm.props.filter(p=>!S.inm.pagos[p.id]&&(!S.resP||S.resP===p.id)):[];
  const filas=[...S.inm.props.map(p=>[p.id,p.nombre]),['gen','General']].map(([id,n])=>{const xs=todos.filter(x=>id==='gen'?!x.prop:x.prop===id);const e=xs.filter(x=>x.tipo==='ingreso').reduce((s,x)=>s+x.valor,0),s_=xs.filter(x=>x.tipo==='egreso').reduce((s,x)=>s+x.valor,0);return {id,n,e,s:s_}}).filter(f=>f.e||f.s);
- const max=Math.max(1,...filas.map(f=>Math.max(f.e,f.s)));
  return `<div class="wrap"><button class="back" data-a="nav" data-v="inmo">${ic('back','s')}Inmobiliaria</button>
  <div class="res-cab"><h1>¿Cuánto entró y salió?</h1>
   <div class="res-mes"><button data-a="resmes" data-d="-1" aria-label="Mes anterior">${ic('back')}</button><b>${MES[m].charAt(0).toUpperCase()+MES[m].slice(1)} ${y}</b><button data-a="resmes" data-d="1" aria-label="Mes siguiente" ${esHoy?'disabled':''}>${ic('chev')}</button></div></div>
@@ -1196,10 +1229,11 @@ function vInmoRes(){
  <div class="res-big">
   <div class="rb entra"><span>Entró</span><b>+ ${COP(ent)}</b></div>
   <div class="rb sale"><span>Salió</span><b>− ${COP(sal)}</b></div>
-  <div class="rb queda"><span>Quedó</span><b>${COP(q)}</b></div>
+  <div class="rb queda"><span>Quedó</span><b>${COPs(q)}</b></div>
  </div>
  ${por.length?`<p class="res-por">${ic('alert','s')}Falta cobrar ${COP(por.reduce((s,p)=>s+p.renta,0))}: ${por.map(p=>esc(p.inq)).join(', ')}.</p>`:''}
- ${!S.resP&&filas.length?`<div class="card" style="margin-top:18px"><h2 style="font-size:20px">Por propiedad</h2><div class="barras">${filas.map(f=>`<div class="bar-f"><b>${esc(f.n)}</b><div class="bar-l"><span class="bar e" style="width:${f.e/max*100}%"></span><em>+ ${COP(f.e)}</em></div><div class="bar-l"><span class="bar s" style="width:${f.s/max*100}%"></span><em>− ${COP(f.s)}</em></div></div>`).join('')}</div></div>`:''}
+ ${!S.resP&&filas.length?`<div class="card res-lista" style="margin-top:18px"><h2 style="font-size:20px">Por propiedad</h2>
+  ${filas.map(f=>`<div class="rl"><div class="rl-n"><b>${esc(f.n)}</b><span>Entró ${f.e?COP(f.e):'$ 0'} · Salió ${f.s?COP(f.s):'$ 0'}</span></div><div class="rl-q"><small>Quedó</small><b>${COPs(f.e-f.s)}</b></div></div>`).join('')}</div>`:''}
  ${!mv.length?`<p class="muted" style="margin-top:16px">No hay nada anotado en ${MES[m]}${S.resP?' para esta propiedad':''}.</p>`:''}
  <p class="muted" style="margin-top:16px">Solo cuenta lo que se anotó en la app. No reemplaza la contabilidad.</p></div>`}
 function inmHoy(){if(!seesInm())return '';const pend=S.inm.props.filter(p=>!S.inm.pagos[p.id]);if(!pend.length)return `<button class="card inm-hoy hecha" data-a="nav" data-v="inmo"><span class="inm-ic">${ic('house')}</span><div class="tx"><b>Inmobiliaria</b><span class="k">Todas las rentas de ${MES[TODAY.getMonth()]} cobradas</span></div>${ic('chev','s')}</button>`;
