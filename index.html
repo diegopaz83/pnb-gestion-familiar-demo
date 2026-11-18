@@ -639,6 +639,48 @@ main{container:main/inline-size}
 .ack.fi{background:var(--navy-100);color:var(--navy-500)}
 .acm .lnk{font-size:13px;padding:0}
 .acgo{flex:none;color:var(--line-strong)}
+
+/* v3.28 Inmobiliaria */
+.inm-res{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:16px}
+.inm-res>div{background:var(--white);border-radius:18px;box-shadow:var(--sh-sm);padding:14px 16px;display:flex;flex-direction:column;gap:2px;min-width:0}
+.inm-res b{font-size:22px;color:var(--fg-1);font-weight:800;overflow-wrap:anywhere}
+.inm-res .r-in b{color:#17785a}.inm-res .r-out b{color:var(--bad)}.inm-res .r-por b{color:#b4570f}
+.inm-res .r-neto{background:var(--navy-800)}.inm-res .r-neto b{color:var(--gold-500)}.inm-res .r-neto .k{color:var(--on-2)}
+@media(min-width:720px){.inm-res{grid-template-columns:repeat(4,minmax(0,1fr))}}
+.gasto-btn{margin-top:16px;flex-wrap:wrap}.gasto-btn small{display:block;width:100%;font-size:13px;font-weight:600;opacity:.75}
+.inm-grid{display:grid;gap:12px}
+@media(min-width:900px){.inm-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.inm{background:var(--white);border-radius:22px;box-shadow:var(--sh-sm);padding:16px;display:flex;flex-direction:column;gap:12px;border:1px solid transparent}
+.inm.hecha{background:#f0f9f4;border-color:#d9f0e4}.inm.tarde{background:#fdf3f1;border-color:#f6dcd6}
+.inm-top{display:flex;gap:12px;align-items:flex-start}
+.inm-top .tx{flex:1;min-width:0;display:flex;flex-direction:column}.inm-top b{font-size:18px;color:var(--fg-1)}
+.inm-ic{flex:none;width:44px;height:44px;border-radius:14px;background:var(--gold-50);color:var(--gold-700);display:grid;place-items:center}
+.inm .pill{flex:none}
+.inm-mid{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr);gap:10px}
+.inm-mid>div{display:flex;flex-direction:column;min-width:0}.inm-mid b{color:var(--fg-1);font-size:16px;overflow-wrap:anywhere}
+.inm-acc{display:flex;gap:8px;flex-wrap:wrap}.inm-acc a{text-decoration:none}
+.btn.wa{border-color:#25d366;color:#0f6b3a}
+.inm-pago{display:flex;gap:12px;align-items:center;border-top:1px solid rgba(13,27,51,.08);padding-top:12px}
+.inm-pago .tx{min-width:0;display:flex;flex-direction:column}.inm-pago b{color:#0d5a42}
+.mov{display:flex;gap:12px;align-items:center;padding:12px 16px;border-top:1px solid var(--line)}
+.mov:first-child{border-top:0}
+.mov .sig{flex:none;width:36px;height:36px;border-radius:50%;display:grid;place-items:center;font-weight:800;font-size:20px}
+.mov.ingreso .sig{background:#dcf3e8;color:#17785a}.mov.egreso .sig{background:#f7d6d0;color:var(--bad)}
+.mov .tx{flex:1;min-width:0;display:flex;flex-direction:column}.mov .tx b{color:var(--fg-1);font-size:16px;overflow-wrap:anywhere}
+.mov .val{flex:none;font-size:16px;white-space:nowrap}
+.mov.ingreso .val{color:#17785a}.mov.egreso .val{color:var(--bad)}
+@media(max-width:420px){.mov{flex-wrap:wrap}.mov .val{margin-left:48px}}
+.inm-hoy{display:flex;gap:12px;align-items:center;width:100%;text-align:left;margin-top:12px;border:1px solid var(--line);cursor:pointer}
+.inm-hoy .tx{flex:1;min-width:0;display:flex;flex-direction:column}.inm-hoy b{color:var(--fg-1);font-size:17px}
+.inm-hoy.tarde{background:#fdf3f1;border-color:#f6dcd6}
+.inm-monto{background:#f0f9f4;border-radius:16px;padding:14px 16px;display:flex;justify-content:space-between;align-items:center}
+.inm-monto b{font-size:24px;color:#17785a}
+.seg{display:grid;grid-template-columns:1fr 1fr;background:var(--navy-50);border-radius:999px;padding:4px;gap:4px}
+.seg button{border:0;background:none;border-radius:999px;min-height:48px;font-weight:800;font-size:16px;color:var(--fg-3)}
+.seg .on.out{background:var(--bad);color:#fff}.seg .on.in{background:#17785a;color:#fff}
+.inm-hoy.hecha{background:#f0f9f4;border-color:#d9f0e4}
+.inm-res b{font-size:clamp(17px,4.6vw,22px);white-space:nowrap}
+.inm-res .k{font-size:14px}
 </style>
 </head>
 <body>
@@ -700,6 +742,17 @@ function seed(){P=baseP();ENT=baseEnt();return{
   {id:'agua',ent:'casa',title:'Pagar el agua',sub:'Factura de octubre',cat:'pago',resp:'luis',due:D(11,5),amount:'$ 97.300',rec:'Cada mes',open:false,closed:{by:'luis',at:'3 nov · 10:12 a. m.',kind:'foto',file:'recibo_agua_oct.jpg',note:''},hist:[['1 oct','Sistema','Se creó para este mes'],['3 nov','Luis','Lo cerró con foto del recibo']]},
   {id:'labs',ent:'luis',title:'Exámenes de sangre',sub:'Laboratorio',cat:'examen',resp:'luis',due:D(11,14),time:'6:30 a. m.',place:'p4',ayunas:true,open:false,sens:true,closed:{by:'luis',at:'14 nov · 8:40 a. m.',kind:'voz',file:null,note:'No me dieron papel. Los resultados llegan al correo en 3 días'},hist:[['5 nov','Luis','Anotó los exámenes'],['14 nov','Luis','Lo cerró con un audio: no le dieron papel']]}
  ],
+ inm:{
+  props:[
+   {id:'p1',nombre:'Casa San Fernando',dir:'Calle 5 # 34-20',inq:'Martha Gómez',cel:'3001112233',renta:1200000,dia:5},
+   {id:'p2',nombre:'Apartamento 302',dir:'Edificio Los Álamos',inq:'Jorge Ruiz',cel:'3004445566',renta:950000,dia:10},
+   {id:'p3',nombre:'Local comercial',dir:'Carrera 8 # 12-05',inq:'Panadería La Espiga',cel:'3007778899',renta:1800000,dia:1}],
+  pagos:{p1:{at:'5 nov · 9:10 a. m.',by:'luis',medio:'Transferencia',file:'comprobante_martha.jpg'},p3:{at:'2 nov · 4:30 p. m.',by:'luis',medio:'Efectivo',file:null,nota:'Me lo entregó el dueño en persona.'}},
+  movs:[
+   {id:'g1',prop:'p1',tipo:'egreso',cat:'Materiales',desc:'Pintura para la fachada',valor:180000,fecha:D(11,9),by:'luis',file:'recibo_ferreteria.jpg'},
+   {id:'g2',prop:null,tipo:'egreso',cat:'Transporte',desc:'Taxi a las tres propiedades',valor:25000,fecha:D(11,9),by:'luis',file:null},
+   {id:'g3',prop:'p2',tipo:'egreso',cat:'Mano de obra',desc:'Plomero, fuga del baño',valor:120000,fecha:D(11,12),by:'luis',file:'recibo_plomero.jpg'}]
+ },
  docs:[
   {id:'d9',ent:'luis',cat:'Identidad',name:'Cédula de Luis',fmt:'JPG',log:[['Diego','2 nov · 9:15 a. m.']]},
   {id:'d11',ent:'luis',cat:'Identidad',name:'Licencia de conducción de Luis',fmt:'JPG',until:new Date(2027,0,20),link:'licencia',log:[]},
@@ -872,6 +925,7 @@ function vHomeLocal(){
  return `<section class="hero"><div class="top"><span class="eb day">${fdate(TODAY)}</span>${heroTools()}</div><h1>${esc(head)}</h1>${facesRow(false)}</section>
  <div class="wrap lift"><div class="cols"><div>
  ${mainCard}
+ ${inmHoy()}
  ${countdown()}
  ${rest.length?`<div class="shd"><span class="dot" style="background:var(--warn)"></span><h2>Esta semana</h2><span class="c">${rest.length}</span></div><div class="grp">${rest.map(i=>taskRow(i)).join('')}</div>`:''}
  ${deleg.length?`<div class="shd"><h2>Lo hacen Diego y Adriana</h2></div><div class="grp quiet">${deleg.map(i=>`<div class="dl">${av(i.resp,'sm')}<div class="tx"><b>${esc(i.title)}</b><span>${P[i.resp].short}, ${fday(i.due).toLowerCase()}</span></div></div>`).join('')}<p class="dlnote">No tienes que hacer nada con estos.</p></div>`:''}
@@ -930,6 +984,7 @@ function vHomeRemote(){
  <div class="shd"><h2>Lo que haces tú desde afuera</h2><span class="c">${mine.length}</span></div>
  ${mine.length?`<div class="stack">${mine.map(i=>taskRow(i,{showWho:false})).join('')}</div>`:`<div class="empty"><div class="big">${ic('check','l')}</div><h3>No tienes nada a tu cargo</h3><p>Puedes tomar algo que esté atrasado.</p></div>`}
  ${theirs.length?`<div class="shd"><h2>Lo de ${P[other].short}</h2></div><div class="stack">${theirs.map(i=>taskRow(i)).join('')}</div>`:''}
+ ${inmHoy()}
  ${hechoSec()}
  </div><div><div class="shd"><h2>Lo último en casa</h2></div><div class="card">${feedHtml(6)}</div></div></div></div>`;
 }
@@ -1050,6 +1105,44 @@ const PROPS=[
  ['DEC-036','Mascotas como integrantes: Aaron (perro) con su página, foto, baño, vacunas, veterinario, desparasitación y comida; veterinario y vacunas funcionan como citas.'],
  ['DEC-031','Fotos en lugar de iniciales y fila de caritas con contador de pendientes en el inicio. Retratos ilustrados de ejemplo hasta subir fotos reales, que se guardan privadas.']
 ];
+const COP=n=>'$ '+Math.round(n).toLocaleString('es-CO');
+const CATG=['Mantenimiento','Materiales','Mano de obra','Transporte','Servicios','Otro'];
+const seesInm=()=>!isCare();
+function inmVence(p){return new Date(TODAY.getFullYear(),TODAY.getMonth(),p.dia)}
+function inmEstado(p){if(S.inm.pagos[p.id])return 'ok';const n=days(inmVence(p));return n<0?'bad':n<=5?'warn':'neu'}
+function inmMovs(){
+ const ing=S.inm.props.filter(p=>S.inm.pagos[p.id]).map(p=>({id:'r'+p.id,prop:p.id,tipo:'ingreso',cat:'Renta',desc:'Renta de '+MES[TODAY.getMonth()]+' · '+p.inq,valor:p.renta,fecha:inmVence(p),by:S.inm.pagos[p.id].by,file:S.inm.pagos[p.id].file,url:S.inm.pagos[p.id].url,mime:S.inm.pagos[p.id].mime,at:S.inm.pagos[p.id].at}));
+ return [...ing,...S.inm.movs].sort((a,b)=>b.fecha-a.fecha)}
+function inmResumen(){const mv=inmMovs();const rec=mv.filter(x=>x.tipo==='ingreso').reduce((s,x)=>s+x.valor,0),gas=mv.filter(x=>x.tipo==='egreso').reduce((s,x)=>s+x.valor,0);
+ const por=S.inm.props.filter(p=>!S.inm.pagos[p.id]).reduce((s,p)=>s+p.renta,0);return {rec,gas,por,neto:rec-gas}}
+function vInmo(){
+ const r=inmResumen(),mv=inmMovs().filter(x=>!S.inmF||x.tipo===S.inmF);
+ const propName=id=>id?(S.inm.props.find(p=>p.id===id)||{}).nombre:'General';
+ const card=p=>{const st=inmEstado(p),pg=S.inm.pagos[p.id],n=days(inmVence(p));
+  const wa=`https://wa.me/57${p.cel}?text=${encodeURIComponent(`Hola ${p.inq.split(' ')[0]}, le recuerdo el pago del arriendo de ${MES[TODAY.getMonth()]} (${COP(p.renta)}). Gracias.`)}`;
+  return `<div class="inm ${st==='ok'?'hecha':st==='bad'?'tarde':''}"><div class="inm-top"><span class="inm-ic">${ic('house')}</span><div class="tx"><b>${esc(p.nombre)}</b><span class="k">${esc(p.dir)}</span></div><span class="pill ${st}">${st==='ok'?'Pagado':st==='bad'?`Atrasado ${-n} ${-n===1?'día':'días'}`:n===0?'Vence hoy':`Vence el ${p.dia}`}</span></div>
+  <div class="inm-mid"><div><span class="k">Inquilino</span><b>${esc(p.inq)}</b></div><div><span class="k">Renta</span><b>${COP(p.renta)}</b></div></div>
+  ${pg?`<div class="inm-pago">${pg.url&&(pg.mime||'').startsWith('image/')?`<span class="mini sm"><img src="${pg.url}" alt=""></span>`:`<span class="evi ${pg.file?'fi':'no'}">${ic(pg.file?'file':'msg','s')}</span>`}<div class="tx"><b>Pagó · ${esc(pg.medio)}</b><span class="k">Lo registró ${P[pg.by].short} · ${esc(pg.at)}</span>${pg.nota?`<span class="k">“${esc(pg.nota)}”</span>`:''}</div></div>`
+   :`<div class="inm-acc"><button class="btn pri sm" data-a="inmpago" data-id="${p.id}">${ic('check','s')}Ya pagó</button><a class="btn gh sm wa" href="${wa}" target="_blank" rel="noopener">${ic('msg','s')}Recordarle</a></div>`}
+  </div>`};
+ return `<div class="wrap"><div class="ph"><div><div class="eb dk">Trabajo de ${P.luis.short}</div><h1>Inmobiliaria</h1><p>Rentas por cobrar, lo que ya pagaron y los gastos de cada propiedad.</p></div></div>
+ <div class="inm-res">
+  <div class="r-in"><span class="k">Recibido</span><b>+ ${COP(r.rec)}</b></div>
+  <div class="r-por"><span class="k">Por cobrar</span><b>${COP(r.por)}</b></div>
+  <div class="r-out"><span class="k">Gastado</span><b>− ${COP(r.gas)}</b></div>
+  <div class="r-neto"><span class="k">Queda</span><b>${COP(r.neto)}</b></div>
+ </div>
+ <button class="btn pri big full gasto-btn" data-a="inmgasto">${ic('cam')}Anotar un gasto<small>Toma foto del recibo</small></button>
+ <div class="shd" style="margin-top:26px"><h2>Propiedades</h2><span class="c">${S.inm.props.length}</span></div>
+ <div class="inm-grid">${S.inm.props.map(card).join('')}</div>
+ <div class="shd" style="margin-top:26px"><h2>Movimientos de ${MES[TODAY.getMonth()]}</h2></div>
+ <div class="chips" style="margin-bottom:12px">${[['','Todo'],['ingreso','Entra plata'],['egreso','Sale plata']].map(o=>`<button class="chip ${(S.inmF||'')===o[0]?'on':''}" data-a="inmf" data-v="${o[0]}">${o[1]}</button>`).join('')}</div>
+ <div class="grp">${mv.length?mv.map(x=>`<div class="mov ${x.tipo}"><span class="sig">${x.tipo==='ingreso'?'+':'−'}</span><div class="tx"><b>${esc(x.desc)}</b><span class="k">${esc(x.cat)} · ${esc(propName(x.prop))} · ${fshort(x.fecha)} · ${P[x.by].short}</span></div>${x.url&&(x.mime||'').startsWith('image/')?`<span class="mini sm"><img src="${x.url}" alt=""></span>`:x.file?`<span class="evi fi" title="${esc(x.file)}">${ic('file','s')}</span>`:''}<b class="val">${x.tipo==='ingreso'?'+':'−'} ${COP(x.valor)}</b></div>`).join(''):'<p class="muted" style="padding:16px">No hay movimientos con ese filtro.</p>'}</div>
+ <p class="muted" style="margin-top:14px">Esto ayuda a no olvidar cobros y a guardar los soportes. No reemplaza la contabilidad ni la declaración de renta.</p>
+ </div>`}
+function inmHoy(){if(!seesInm())return '';const pend=S.inm.props.filter(p=>!S.inm.pagos[p.id]);if(!pend.length)return `<button class="card inm-hoy hecha" data-a="nav" data-v="inmo"><span class="inm-ic">${ic('house')}</span><div class="tx"><b>Inmobiliaria</b><span class="k">Todas las rentas de ${MES[TODAY.getMonth()]} cobradas</span></div>${ic('chev','s')}</button>`;
+ const tarde=pend.filter(p=>inmEstado(p)==='bad');
+ return `<button class="card inm-hoy ${tarde.length?'tarde':''}" data-a="nav" data-v="inmo"><span class="inm-ic">${ic('house')}</span><div class="tx"><b>Rentas por cobrar: ${pend.length}</b><span class="k">${pend.map(p=>esc(p.inq)+(inmEstado(p)==='bad'?' (atrasada)':'')).join(' · ')}</span></div>${ic('chev','s')}</button>`}
 function vEnt(id){
  const e=ENT[id];
  if(!e||!seesEnt(id))return `<div class="wrap"><button class="back" data-a="back">${ic('back','s')}Volver</button><div class="empty" style="margin-top:16px"><h3>No tienes acceso</h3></div></div>`;
@@ -1217,6 +1310,25 @@ function modal(){
   }
  }
  if(m.k==='add'){h=addModal(m,X)}
+ if(m.k==='inmpago'){
+  const p=S.inm.props.find(x=>x.id===m.id);
+  h=`<div class="sh"><div><span class="sobre">${esc(p.nombre)} · ${esc(p.inq)}</span><h2>¿Pagó la renta de ${MES[TODAY.getMonth()]}?</h2></div>${X}</div><div class="sb">
+  <div class="inm-monto"><span class="k">Renta</span><b>+ ${COP(p.renta)}</b></div>
+  <p class="muted" style="margin:0">Márcalo solo si pagó completo. Si falta plata, no lo marques todavía y deja una nota en la propiedad.</p>
+  <div><span class="lbl">¿Cómo pagó?</span><div class="chips">${['Transferencia','Efectivo','Consignación'].map(o=>`<button class="chip ${m.medio===o?'on':''}" data-a="setf" data-f="medio" data-v="${o}">${o}</button>`).join('')}</div>${m.err&&m.err.medio?'<div class="er">Elige cómo pagó.</div>':''}</div>
+  <div><span class="lbl">Comprobante (opcional)</span>${pickers('inmpago',!!m.file)}${m.file?`<div style="background:var(--navy-50);border-radius:14px;padding:10px;margin-top:8px">${filePreview(m.file)}</div>`:''}</div>
+  <div><span class="lbl">Nota (opcional)</span><textarea class="inp" id="inmnote" rows="2" placeholder="Ej.: pagó por Nequi">${esc(m.note||'')}</textarea></div>
+  <button class="btn pri big full" data-a="inmpagosave">${ic('check')}Sí, pagó completo</button></div>`}
+ if(m.k==='inmgasto'){
+  const eg=m.tipo!=='ingreso';
+  h=`<div class="sh"><h2>${eg?'Anotar un gasto':'Anotar un ingreso'}</h2>${X}</div><div class="sb">
+  <div class="seg" role="group" aria-label="Tipo de movimiento"><button class="${eg?'on out':''}" data-a="setf" data-f="tipo" data-v="egreso">− Sale plata</button><button class="${!eg?'on in':''}" data-a="setf" data-f="tipo" data-v="ingreso">+ Entra plata</button></div>
+  <div><span class="lbl">${eg?'Foto del recibo':'Soporte (opcional)'}</span>${pickers('inmgasto',!!m.file)}${m.file?`<div style="background:var(--navy-50);border-radius:14px;padding:10px;margin-top:8px">${filePreview(m.file)}</div>`:''}</div>
+  <div><span class="lbl">Valor</span><input class="inp" id="gval" inputmode="numeric" placeholder="Ej.: 180000" value="${esc(m.valor||'')}">${m.err&&m.err.valor?'<div class="er">Escribe el valor, solo números.</div>':''}</div>
+  <div><span class="lbl">¿De qué propiedad?</span><div class="chips">${[...S.inm.props.map(p=>[p.id,p.nombre]),['gen','General']].map(o=>`<button class="chip ${m.prop===o[0]?'on':''}" data-a="setf" data-f="prop" data-v="${o[0]}">${esc(o[1])}</button>`).join('')}</div>${m.err&&m.err.prop?'<div class="er">Elige la propiedad o «General».</div>':''}</div>
+  ${eg?`<div><span class="lbl">¿De qué es?</span><div class="chips">${CATG.map(o=>`<button class="chip ${m.cat===o?'on':''}" data-a="setf" data-f="cat" data-v="${o}">${o}</button>`).join('')}</div>${m.err&&m.err.cat?'<div class="er">Elige de qué es.</div>':''}</div>`:''}
+  <div><span class="lbl">${eg?'¿Qué se compró o pagó?':'¿De qué es?'} (opcional)</span><input class="inp" id="gdesc" placeholder="${eg?'Ej.: pintura para la fachada':'Ej.: depósito del nuevo inquilino'}" value="${esc(m.desc||'')}"></div>
+  <button class="btn pri big full" data-a="inmgastosave">${ic('check')}Guardar</button></div>`}
  if(m.k==='apunte'){
   const i=IT(m.id);
   h=`<div class="sh"><h2>Agregar nota o foto</h2>${X}</div><div class="sb">
@@ -1389,13 +1501,14 @@ function render(){
  if(v==='landing'){document.getElementById('app').innerHTML=`<div class="pbar"><b>PROTOTIPO</b><span>Demo · datos ficticios</span></div>${vLanding()}`;return}
  let c='';
  if(v==='home')c=remote()?vHomeRemote():vHomeLocal();
- else if(v==='item')c=vItem(S.arg);else if(v==='cal')c=vCal();else if(v==='docs')c=vDocs();else if(v==='fam')c=vFamily();else if(v==='ent')c=vEnt(S.arg);else if(v==='set')c=vSet();
+ else if(v==='item')c=vItem(S.arg);else if(v==='cal')c=vCal();else if(v==='docs')c=vDocs();else if(v==='fam')c=vFamily();else if(v==='ent')c=vEnt(S.arg);else if(v==='set')c=vSet();else if(v==='inmo')c=vInmo();
  const act=v==='item'?'home':v==='ent'?'fam':v;
  const navs=[['home','home',remote()?'Desde afuera':'Hoy'],['cal','cal','Calendario'],['docs','file','Papeles'],['fam','fam','Familia']];
+ const navsSide=seesInm()?[...navs.slice(0,2),['inmo','card','Inmobiliaria'],...navs.slice(2)]:navs;
  const z=SCALE[S.font[S.user]||'grande'];
  document.getElementById('app').innerHTML=`
  <div class="pbar"><b>PROTOTIPO</b><span>Demo · datos ficticios</span></div>
- <div class="app"><aside class="side"><div class="brand"><span>PNB Digital</span><b>Gestión familiar</b></div><nav>${navs.map(n=>`<button class="${act===n[0]?'on':''}" data-a="nav" data-v="${n[0]}">${ic(n[1])}${n[2]}</button>`).join('')}<button class="${act==='set'?'on':''}" data-a="nav" data-v="set">${ic('gear')}Ajustes</button></nav>
+ <div class="app"><aside class="side"><div class="brand"><span>PNB Digital</span><b>Gestión familiar</b></div><nav>${navsSide.map(n=>`<button class="${act===n[0]?'on':''}" data-a="nav" data-v="${n[0]}">${ic(n[1])}${n[2]}</button>`).join('')}<button class="${act==='set'?'on':''}" data-a="nav" data-v="set">${ic('gear')}Ajustes</button></nav>
  <button class="btn pri add" data-a="add">${ic('plus')}Anotar algo</button>
  <div class="me">${av(S.user,'sm')}<div>${me().name}<small>${ROLE[me().role]} · ${KIND[me().kind]}</small></div></div><button class="sout" data-a="signout">${ic('out','s')}Cerrar sesión</button></aside>
  <main style="zoom:${z}">${c}</main></div>
@@ -1415,6 +1528,8 @@ document.addEventListener('change',e=>{const t=e.target,a=t.dataset.a;
   if(m.k==='report'&&!isAppt(IT(m.id))){m.note=val('note');m.kind=t.dataset.kind;m.err=null;m.rec=false}
   if(m.k==='add'){collectA(m)}
   if(m.k==='apunte'){m.note=val('apnote');m.err=null}
+  if(m.k==='inmpago'){m.note=val('inmnote')}
+  if(m.k==='inmgasto'){m.valor=val('gval');m.desc=val('gdesc')}
   if(m.k==='report'&&isAppt(IT(m.id))){m.note=val('fbnote');m.err=null}
   if(m.k==='adddoc'){m.n=val('dname')||f.name.replace(/\.[^.]+$/,'');m.v=val('dvence');if(m.err)m.err.f=0}
   m.file={name:nombreArch(f,t.dataset.kind),type:f.type,url:URL.createObjectURL(f)};render();return}
@@ -1487,6 +1602,12 @@ document.addEventListener('click',e=>{
  case 'close':case 'scrim':if(REC){try{REC.mr.stop()}catch(e){}}S.modal=null;render();break;
  case 'report':S.modal={k:'report',id:t.dataset.id,res:t.dataset.res||null};render();break;
  case 'apunte':S.modal={k:'apunte',id:t.dataset.id};render();break;
+ case 'inmf':S.inmF=t.dataset.v||null;render();break;
+ case 'inmpago':S.modal={k:'inmpago',id:t.dataset.id,err:null};render();break;
+ case 'inmgasto':S.modal={k:'inmgasto',tipo:'egreso',err:null};render();break;
+ case 'inmpagosave':{m.note=val('inmnote');if(!m.medio){m.err={medio:1};render();break}const p=S.inm.props.find(x=>x.id===m.id);S.inm.pagos[p.id]={at:nowS(),by:S.user,medio:m.medio,file:m.file?m.file.name:null,url:m.file&&m.file.url,mime:m.file&&m.file.type,nota:m.note};S.modal=null;render();toast(`Renta de ${p.inq} registrada`);break}
+ case 'inmgastosave':{m.valor=val('gval');m.desc=val('gdesc');const er={};const v=Number(String(m.valor).replace(/\D/g,''));if(!v)er.valor=1;if(!m.prop)er.prop=1;if(m.tipo!=='ingreso'&&!m.cat)er.cat=1;if(Object.keys(er).length){m.err=er;render();break}
+  S.inm.movs.push({id:'g'+Date.now(),prop:m.prop==='gen'?null:m.prop,tipo:m.tipo==='ingreso'?'ingreso':'egreso',cat:m.tipo==='ingreso'?'Otro ingreso':m.cat,desc:m.desc||(m.tipo==='ingreso'?'Ingreso':m.cat),valor:v,fecha:TODAY,by:S.user,file:m.file?m.file.name:null,url:m.file&&m.file.url,mime:m.file&&m.file.type});S.modal=null;render();toast(m.tipo==='ingreso'?'Ingreso anotado':'Gasto anotado');break}
  case 'calf':S.calF=t.dataset.v||null;render();break;
  case 'moredone':S.moreDone=!S.moreDone;render();break;
  case 'apapel':S.modal={k:'apapel',id:t.dataset.id,cat:null};render();break;
@@ -1527,7 +1648,7 @@ document.addEventListener('click',e=>{
   if(tp==='pago'){it.rec=f.rec==='Una vez'?undefined:f.rec;if(f.valor)it.amount='$ '+Number(String(f.valor).replace(/\D/g,'')).toLocaleString('es-CO')}
   if(m.file){it.attach={name:m.file.name,url:m.file.url};S.docs.push({id:'d'+Date.now(),ent,cat:tp==='pago'?'Recibos':'Salud',name:(tp==='medicamento'?'Fórmula · ':'Orden · ')+it.title,fmt:m.file.type.includes('pdf')?'PDF':'JPG',by:S.user,url:m.file.url,mime:m.file.type,log:[]})}
   S.items.push(it);addFeed(`anotó “${it.title}”${tp==='cita'||tp==='examen'?' para el '+due.getDate()+' de '+MES[due.getMonth()]:''}`,id);S.modal=null;render();toast('Anotado. Ya lo ve toda la familia');break}
- case 'setf':if(m.k==='adddoc'){m.n=val('dname');m.v=val('dvence')}if(m.k==='invite'){m.n=val('iname');m.c=val('icontact')}if(m.k==='addent')m.n=val('ename');if(m.k==='edititem'){m.t=val('et');m.d=val('ed');m.h=val('eh')}if(m.k==='editdoc'){m.n=val('dn');m.v=val('dv')}if(m.k==='delitem'&&m.r==='Otro')m.o=val('dr');m[t.dataset.f]=t.dataset.v;if(m.err)m.err[t.dataset.f]=0;render();break;
+ case 'setf':if(m.k==='inmpago')m.note=val('inmnote');if(m.k==='inmgasto'){m.valor=val('gval');m.desc=val('gdesc')}if(m.k==='adddoc'){m.n=val('dname');m.v=val('dvence')}if(m.k==='invite'){m.n=val('iname');m.c=val('icontact')}if(m.k==='addent')m.n=val('ename');if(m.k==='edititem'){m.t=val('et');m.d=val('ed');m.h=val('eh')}if(m.k==='editdoc'){m.n=val('dn');m.v=val('dv')}if(m.k==='delitem'&&m.r==='Otro')m.o=val('dr');m[t.dataset.f]=t.dataset.v;if(m.err)m.err[t.dataset.f]=0;render();break;
  case 'fbres':m.res=t.dataset.v;m.err=null;render();break;
  case 'fbacomp':m.note=val('fbnote');m.acomp=t.dataset.v;render();break;
  case 'fbhow':m.note=val('fbnote');m.how=t.dataset.v;m.err=null;render();break;
