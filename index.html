@@ -683,6 +683,39 @@ main{container:main/inline-size}
 .inm-res .k{font-size:14px}
 .inm-face{display:grid!important;place-items:center;background:var(--gold-50);color:var(--gold-700)}
 .inm-face .ic{width:30px;height:30px}
+
+/* v3.30 Inmobiliaria simple + resumen aparte */
+.anota2{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:16px}
+.anota{border:0;border-radius:22px;padding:18px 14px;display:flex;flex-direction:column;align-items:flex-start;gap:4px;text-align:left;box-shadow:var(--sh-sm);min-width:0}
+.anota .sg{width:44px;height:44px;border-radius:50%;display:grid;place-items:center;font-size:28px;font-weight:800;color:#fff;margin-bottom:6px}
+.anota b{font-size:20px;color:var(--fg-1)}
+.anota small{font-size:14px;color:var(--fg-3);line-height:1.3}
+.anota.sale{background:#fdf3f1;border:1px solid #f6dcd6}.anota.sale .sg{background:var(--bad)}
+.anota.entra{background:#f0f9f4;border:1px solid #d9f0e4}.anota.entra .sg{background:#17785a}
+.ver-res{margin-top:12px}
+.res-cab{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:12px;margin-top:8px}
+.res-cab h1{font-size:28px;font-weight:800}
+.res-mes{display:flex;align-items:center;gap:10px}
+.res-mes b{font-size:18px;color:var(--fg-1);min-width:140px;text-align:center}
+.res-mes button{width:48px;height:48px;border-radius:50%;border:1px solid var(--line-strong);background:var(--white);display:grid;place-items:center;color:var(--fg-1)}
+.res-mes button:disabled{opacity:.35}
+.res-big{display:grid;gap:12px}
+@media(min-width:720px){.res-big{grid-template-columns:repeat(3,minmax(0,1fr))}}
+.rb{border-radius:22px;padding:18px 20px;display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+.rb span{font-size:18px;font-weight:700}
+.rb b{font-size:clamp(22px,6vw,30px);font-weight:800;white-space:nowrap}
+.rb.entra{background:#f0f9f4;color:#17785a}.rb.sale{background:#fdf3f1;color:var(--bad)}.rb.queda{background:var(--navy-800);color:var(--gold-500)}
+.res-por{display:flex;gap:8px;align-items:flex-start;margin:14px 0 0;color:#8a4a0f;background:#fef5ea;border-radius:14px;padding:12px 14px;font-weight:600}
+.barras{display:flex;flex-direction:column;gap:16px;margin-top:12px}
+.bar-f b{display:block;color:var(--fg-1);margin-bottom:6px}
+.bar-l{display:flex;align-items:center;gap:10px;margin-top:4px}
+.bar{display:block;height:14px;border-radius:7px;min-width:4px;flex:none;max-width:70%}
+.bar.e{background:#17785a}.bar.s{background:var(--bad)}
+.bar-l em{font-style:normal;font-size:14px;color:var(--fg-2);white-space:nowrap}
+.face{min-width:0}
+.face b{max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.faces .fpic{width:100%!important;max-width:56px;height:auto!important;aspect-ratio:1/1}
+@media(max-width:400px){.face b{font-size:12px}}
 </style>
 </head>
 <body>
@@ -753,7 +786,12 @@ function seed(){P=baseP();ENT=baseEnt();return{
   movs:[
    {id:'g1',prop:'p1',tipo:'egreso',cat:'Materiales',desc:'Pintura para la fachada',valor:180000,fecha:D(11,9),by:'luis',file:'recibo_ferreteria.jpg'},
    {id:'g2',prop:null,tipo:'egreso',cat:'Transporte',desc:'Taxi a las tres propiedades',valor:25000,fecha:D(11,9),by:'luis',file:null},
-   {id:'g3',prop:'p2',tipo:'egreso',cat:'Mano de obra',desc:'Plomero, fuga del baño',valor:120000,fecha:D(11,12),by:'luis',file:'recibo_plomero.jpg'}]
+   {id:'g3',prop:'p2',tipo:'egreso',cat:'Mano de obra',desc:'Plomero, fuga del baño',valor:120000,fecha:D(11,12),by:'luis',file:'recibo_plomero.jpg'},
+   {id:'o1',prop:'p1',tipo:'ingreso',cat:'Renta',desc:'Renta de octubre · Martha Gómez',valor:1200000,fecha:D(10,5),by:'luis',file:null},
+   {id:'o2',prop:'p2',tipo:'ingreso',cat:'Renta',desc:'Renta de octubre · Jorge Ruiz',valor:950000,fecha:D(10,11),by:'luis',file:null},
+   {id:'o3',prop:'p3',tipo:'ingreso',cat:'Renta',desc:'Renta de octubre · Panadería La Espiga',valor:1800000,fecha:D(10,1),by:'luis',file:null},
+   {id:'o4',prop:'p3',tipo:'egreso',cat:'Mantenimiento',desc:'Cambio de chapa del local',valor:210000,fecha:D(10,20),by:'luis',file:'recibo_cerrajero.jpg'},
+   {id:'o5',prop:null,tipo:'egreso',cat:'Transporte',desc:'Taxis del mes',valor:40000,fecha:D(10,28),by:'luis',file:null}]
  },
  docs:[
   {id:'d9',ent:'luis',cat:'Identidad',name:'Cédula de Luis',fmt:'JPG',log:[['Diego','2 nov · 9:15 a. m.']]},
@@ -1120,7 +1158,7 @@ function inmMovs(){
 function inmResumen(){const mv=inmMovs();const rec=mv.filter(x=>x.tipo==='ingreso').reduce((s,x)=>s+x.valor,0),gas=mv.filter(x=>x.tipo==='egreso').reduce((s,x)=>s+x.valor,0);
  const por=S.inm.props.filter(p=>!S.inm.pagos[p.id]).reduce((s,p)=>s+p.renta,0);return {rec,gas,por,neto:rec-gas}}
 function vInmo(){
- const r=inmResumen(),mv=inmMovs().filter(x=>!S.inmF||x.tipo===S.inmF);
+ const mes=TODAY.getMonth(),mv=inmMovs().filter(x=>x.fecha.getMonth()===mes&&x.fecha.getFullYear()===TODAY.getFullYear()).filter(x=>!S.inmF||x.tipo===S.inmF);
  const propName=id=>id?(S.inm.props.find(p=>p.id===id)||{}).nombre:'General';
  const card=p=>{const st=inmEstado(p),pg=S.inm.pagos[p.id],n=days(inmVence(p));
   const wa=`https://wa.me/57${p.cel}?text=${encodeURIComponent(`Hola ${p.inq.split(' ')[0]}, le recuerdo el pago del arriendo de ${MES[TODAY.getMonth()]} (${COP(p.renta)}). Gracias.`)}`;
@@ -1130,13 +1168,11 @@ function vInmo(){
    :`<div class="inm-acc"><button class="btn pri sm" data-a="inmpago" data-id="${p.id}">${ic('check','s')}Ya pagó</button><a class="btn gh sm wa" href="${wa}" target="_blank" rel="noopener">${ic('msg','s')}Recordarle</a></div>`}
   </div>`};
  return `<div class="wrap"><div class="ph"><div><div class="eb dk">Trabajo de ${P.luis.short}</div><h1>Inmobiliaria</h1><p>Rentas por cobrar, lo que ya pagaron y los gastos de cada propiedad.</p></div></div>
- <div class="inm-res">
-  <div class="r-in"><span class="k">Recibido</span><b>+ ${COP(r.rec)}</b></div>
-  <div class="r-por"><span class="k">Por cobrar</span><b>${COP(r.por)}</b></div>
-  <div class="r-out"><span class="k">Gastado</span><b>− ${COP(r.gas)}</b></div>
-  <div class="r-neto"><span class="k">Queda</span><b>${COP(r.neto)}</b></div>
+ <div class="anota2">
+  <button class="anota sale" data-a="inmgasto" data-v="egreso"><span class="sg">−</span><b>Sale plata</b><small>Un gasto: toma foto del recibo</small></button>
+  <button class="anota entra" data-a="inmgasto" data-v="ingreso"><span class="sg">+</span><b>Entra plata</b><small>Otro ingreso que no sea la renta</small></button>
  </div>
- <button class="btn pri big full gasto-btn" data-a="inmgasto">${ic('cam')}Anotar un gasto<small>Toma foto del recibo</small></button>
+ <button class="btn gh full ver-res" data-a="nav" data-v="inmores">${ic('cal','s')}Ver cuánto entró y salió</button>
  <div class="shd" style="margin-top:26px"><h2>Propiedades</h2><span class="c">${S.inm.props.length}</span></div>
  <div class="inm-grid">${S.inm.props.map(card).join('')}</div>
  <div class="shd" style="margin-top:26px"><h2>Movimientos de ${MES[TODAY.getMonth()]}</h2></div>
@@ -1144,6 +1180,28 @@ function vInmo(){
  <div class="grp">${mv.length?mv.map(x=>`<div class="mov ${x.tipo}"><span class="sig">${x.tipo==='ingreso'?'+':'−'}</span><div class="tx"><b>${esc(x.desc)}</b><span class="k">${esc(x.cat)} · ${esc(propName(x.prop))} · ${fshort(x.fecha)} · ${P[x.by].short}</span></div>${x.url&&(x.mime||'').startsWith('image/')?`<span class="mini sm"><img src="${x.url}" alt=""></span>`:x.file?`<span class="evi fi" title="${esc(x.file)}">${ic('file','s')}</span>`:''}<b class="val">${x.tipo==='ingreso'?'+':'−'} ${COP(x.valor)}</b></div>`).join(''):'<p class="muted" style="padding:16px">No hay movimientos con ese filtro.</p>'}</div>
  <p class="muted" style="margin-top:14px">Esto ayuda a no olvidar cobros y a guardar los soportes. No reemplaza la contabilidad ni la declaración de renta.</p>
  </div>`}
+function vInmoRes(){
+ if(S.resM==null)S.resM=TODAY.getFullYear()*12+TODAY.getMonth();
+ const y=Math.floor(S.resM/12),m=S.resM%12,esHoy=S.resM===TODAY.getFullYear()*12+TODAY.getMonth();
+ const todos=inmMovs().filter(x=>x.fecha.getMonth()===m&&x.fecha.getFullYear()===y);
+ const mv=S.resP?todos.filter(x=>(S.resP==='gen'?!x.prop:x.prop===S.resP)):todos;
+ const ent=mv.filter(x=>x.tipo==='ingreso').reduce((s,x)=>s+x.valor,0),sal=mv.filter(x=>x.tipo==='egreso').reduce((s,x)=>s+x.valor,0),q=ent-sal;
+ const por=esHoy?S.inm.props.filter(p=>!S.inm.pagos[p.id]&&(!S.resP||S.resP===p.id)):[];
+ const filas=[...S.inm.props.map(p=>[p.id,p.nombre]),['gen','General']].map(([id,n])=>{const xs=todos.filter(x=>id==='gen'?!x.prop:x.prop===id);const e=xs.filter(x=>x.tipo==='ingreso').reduce((s,x)=>s+x.valor,0),s_=xs.filter(x=>x.tipo==='egreso').reduce((s,x)=>s+x.valor,0);return {id,n,e,s:s_}}).filter(f=>f.e||f.s);
+ const max=Math.max(1,...filas.map(f=>Math.max(f.e,f.s)));
+ return `<div class="wrap"><button class="back" data-a="nav" data-v="inmo">${ic('back','s')}Inmobiliaria</button>
+ <div class="res-cab"><h1>¿Cuánto entró y salió?</h1>
+  <div class="res-mes"><button data-a="resmes" data-d="-1" aria-label="Mes anterior">${ic('back')}</button><b>${MES[m].charAt(0).toUpperCase()+MES[m].slice(1)} ${y}</b><button data-a="resmes" data-d="1" aria-label="Mes siguiente" ${esHoy?'disabled':''}>${ic('chev')}</button></div></div>
+ <div class="chips" style="margin:14px 0 16px">${[['','Todas'],...S.inm.props.map(p=>[p.id,p.nombre]),['gen','General']].map(o=>`<button class="chip ${(S.resP||'')===o[0]?'on':''}" data-a="resprop" data-v="${o[0]}">${esc(o[1])}</button>`).join('')}</div>
+ <div class="res-big">
+  <div class="rb entra"><span>Entró</span><b>+ ${COP(ent)}</b></div>
+  <div class="rb sale"><span>Salió</span><b>− ${COP(sal)}</b></div>
+  <div class="rb queda"><span>Quedó</span><b>${COP(q)}</b></div>
+ </div>
+ ${por.length?`<p class="res-por">${ic('alert','s')}Falta cobrar ${COP(por.reduce((s,p)=>s+p.renta,0))}: ${por.map(p=>esc(p.inq)).join(', ')}.</p>`:''}
+ ${!S.resP&&filas.length?`<div class="card" style="margin-top:18px"><h2 style="font-size:20px">Por propiedad</h2><div class="barras">${filas.map(f=>`<div class="bar-f"><b>${esc(f.n)}</b><div class="bar-l"><span class="bar e" style="width:${f.e/max*100}%"></span><em>+ ${COP(f.e)}</em></div><div class="bar-l"><span class="bar s" style="width:${f.s/max*100}%"></span><em>− ${COP(f.s)}</em></div></div>`).join('')}</div></div>`:''}
+ ${!mv.length?`<p class="muted" style="margin-top:16px">No hay nada anotado en ${MES[m]}${S.resP?' para esta propiedad':''}.</p>`:''}
+ <p class="muted" style="margin-top:16px">Solo cuenta lo que se anotó en la app. No reemplaza la contabilidad.</p></div>`}
 function inmHoy(){if(!seesInm())return '';const pend=S.inm.props.filter(p=>!S.inm.pagos[p.id]);if(!pend.length)return `<button class="card inm-hoy hecha" data-a="nav" data-v="inmo"><span class="inm-ic">${ic('house')}</span><div class="tx"><b>Inmobiliaria</b><span class="k">Todas las rentas de ${MES[TODAY.getMonth()]} cobradas</span></div>${ic('chev','s')}</button>`;
  const tarde=pend.filter(p=>inmEstado(p)==='bad');
  return `<button class="card inm-hoy ${tarde.length?'tarde':''}" data-a="nav" data-v="inmo"><span class="inm-ic">${ic('house')}</span><div class="tx"><b>Rentas por cobrar: ${pend.length}</b><span class="k">${pend.map(p=>esc(p.inq)+(inmEstado(p)==='bad'?' (atrasada)':'')).join(' · ')}</span></div>${ic('chev','s')}</button>`}
@@ -1505,8 +1563,8 @@ function render(){
  if(v==='landing'){document.getElementById('app').innerHTML=`<div class="pbar"><b>PROTOTIPO</b><span>Demo · datos ficticios</span></div>${vLanding()}`;return}
  let c='';
  if(v==='home')c=remote()?vHomeRemote():vHomeLocal();
- else if(v==='item')c=vItem(S.arg);else if(v==='cal')c=vCal();else if(v==='docs')c=vDocs();else if(v==='fam')c=vFamily();else if(v==='ent')c=vEnt(S.arg);else if(v==='set')c=vSet();else if(v==='inmo')c=vInmo();
- const act=v==='item'?'home':v==='ent'?'fam':v;
+ else if(v==='item')c=vItem(S.arg);else if(v==='cal')c=vCal();else if(v==='docs')c=vDocs();else if(v==='fam')c=vFamily();else if(v==='ent')c=vEnt(S.arg);else if(v==='set')c=vSet();else if(v==='inmo')c=vInmo();else if(v==='inmores')c=vInmoRes();
+ const act=v==='item'?'home':v==='ent'?'fam':v==='inmores'?'inmo':v;
  const navs=[['home','home',remote()?'Desde afuera':'Hoy'],['cal','cal','Calendario'],['docs','file','Papeles'],['fam','fam','Familia']];
  const navsSide=seesInm()?[...navs.slice(0,2),['inmo','card','Inmobiliaria'],...navs.slice(2)]:navs;
  const z=SCALE[S.font[S.user]||'grande'];
@@ -1608,7 +1666,9 @@ document.addEventListener('click',e=>{
  case 'apunte':S.modal={k:'apunte',id:t.dataset.id};render();break;
  case 'inmf':S.inmF=t.dataset.v||null;render();break;
  case 'inmpago':S.modal={k:'inmpago',id:t.dataset.id,err:null};render();break;
- case 'inmgasto':S.modal={k:'inmgasto',tipo:'egreso',err:null};render();break;
+ case 'inmgasto':S.modal={k:'inmgasto',tipo:t.dataset.v==='ingreso'?'ingreso':'egreso',err:null};render();break;
+ case 'resmes':{const k=S.resM+ +t.dataset.d;S.resM=Math.min(TODAY.getFullYear()*12+TODAY.getMonth(),k);render();break}
+ case 'resprop':S.resP=t.dataset.v||null;render();break;
  case 'inmpagosave':{m.note=val('inmnote');if(!m.medio){m.err={medio:1};render();break}const p=S.inm.props.find(x=>x.id===m.id);S.inm.pagos[p.id]={at:nowS(),by:S.user,medio:m.medio,file:m.file?m.file.name:null,url:m.file&&m.file.url,mime:m.file&&m.file.type,nota:m.note};S.modal=null;render();toast(`Renta de ${p.inq} registrada`);break}
  case 'inmgastosave':{m.valor=val('gval');m.desc=val('gdesc');const er={};const v=Number(String(m.valor).replace(/\D/g,''));if(!v)er.valor=1;if(!m.prop)er.prop=1;if(m.tipo!=='ingreso'&&!m.cat)er.cat=1;if(Object.keys(er).length){m.err=er;render();break}
   S.inm.movs.push({id:'g'+Date.now(),prop:m.prop==='gen'?null:m.prop,tipo:m.tipo==='ingreso'?'ingreso':'egreso',cat:m.tipo==='ingreso'?'Otro ingreso':m.cat,desc:m.desc||(m.tipo==='ingreso'?'Ingreso':m.cat),valor:v,fecha:TODAY,by:S.user,file:m.file?m.file.name:null,url:m.file&&m.file.url,mime:m.file&&m.file.type});S.modal=null;render();toast(m.tipo==='ingreso'?'Ingreso anotado':'Gasto anotado');break}
