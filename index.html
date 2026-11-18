@@ -681,6 +681,8 @@ main{container:main/inline-size}
 .inm-hoy.hecha{background:#f0f9f4;border-color:#d9f0e4}
 .inm-res b{font-size:clamp(17px,4.6vw,22px);white-space:nowrap}
 .inm-res .k{font-size:14px}
+.inm-face{display:grid!important;place-items:center;background:var(--gold-50);color:var(--gold-700)}
+.inm-face .ic{width:30px;height:30px}
 </style>
 </head>
 <body>
@@ -852,7 +854,9 @@ function entInner(e,cls=''){const E_=ENT[e];return E_.type==='persona'?E_.ini:ic
 function entTile(e,cls=''){const E_=ENT[e];return `<span class="tile pic ${cls} ${E_.type==='persona'?'round':''}">${entPic(e)}</span>`}
 function av(id,cls=''){const p=P[id];if(p.status==='pendiente')return `<span class="av ${cls} pend">${p.ini}</span>`;return `<span class="av pic ${cls}" title="${esc(p.name)}">${photoOf(id)?imgTag(photoOf(id)):portrait(id,p.kind==='afuera'?'#e4e9f1':p.bg)}</span>`}
 function counts(eid){const its=S.items.filter(i=>i.ent===eid&&i.open&&seesItem(i));return {late:its.filter(i=>stat(i)==='bad').length,week:its.filter(i=>stat(i)==='warn').length,open:its.length}}
-function facesRow(remoteMode){const L_=Object.values(ENT).filter(e=>seesEnt(e.id));return `<div class="faces" style="--n:${Math.min(L_.length,5)}">${L_.map(e=>{const c=counts(e.id);const n=c.late||c.week;return `<button class="face" data-a="ent" data-id="${e.id}"><span class="fpic ${e.type==='persona'?'':'sq'}">${entPic(e.id)}</span>${n?`<span class="fb ${c.late?'bad':'warn'}">${n}</span>`:''}<b>${esc(e.name)}</b>${remoteMode?`<small>${c.late?c.late+' atrasado':c.week?c.week+' esta semana':'Al día'}</small>`:''}</button>`}).join('')}</div>`}
+function facesRow(remoteMode){const L_=Object.values(ENT).filter(e=>seesEnt(e.id));return `<div class="faces" style="--n:${Math.min(L_.length+(!isCare()?1:0),6)}">${L_.map(e=>{const c=counts(e.id);const n=c.late||c.week;return `<button class="face" data-a="ent" data-id="${e.id}"><span class="fpic ${e.type==='persona'?'':'sq'}">${entPic(e.id)}</span>${n?`<span class="fb ${c.late?'bad':'warn'}">${n}</span>`:''}<b>${esc(e.name)}</b>${remoteMode?`<small>${c.late?c.late+' atrasado':c.week?c.week+' esta semana':'Al día'}</small>`:''}</button>`}).join('')}${inmFace(remoteMode)}</div>`}
+function inmFace(remoteMode){if(typeof seesInm!=='function'||!seesInm()||!S.inm)return '';const pend=S.inm.props.filter(p=>!S.inm.pagos[p.id]),late=pend.filter(p=>inmEstado(p)==='bad').length;
+ return `<button class="face" data-a="nav" data-v="inmo"><span class="fpic sq inm-face">${ic('card')}</span>${pend.length?`<span class="fb ${late?'bad':'warn'}">${pend.length}</span>`:''}<b>Inmobiliaria</b>${remoteMode?`<small>${late?late+' renta atrasada':pend.length?pend.length+' por cobrar':'Al día'}</small>`:''}</button>`}
 /* alcance */
 function seesEnt(eid,u=S.user){const p=P[u];if(p.kind!=='cuidador')return true;return (p.scope||[]).includes(eid)}
 function seesItem(i,u=S.user){if(!seesEnt(i.ent,u))return false;if(i.sens&&isCare(u)&&!P[u].salud)return i.resp===u;return true}
