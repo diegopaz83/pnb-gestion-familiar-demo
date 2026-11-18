@@ -1277,7 +1277,7 @@ function vInmo(){
    :`<div class="inm-acc"><button class="btn pri sm" data-a="inmpago" data-id="${p.id}">${ic('check','s')}Ya pagó</button><a class="btn gh sm wa" href="${wa}" target="_blank" rel="noopener">${ic('msg','s')}Recordarle</a></div>`}
   <button class="lnk inm-edit" data-a="propedit" data-id="${p.id}">${ic('edit','s')}Editar propiedad o inquilino</button>
   </div>`};
- return `<div class="wrap"><div class="ph"><div><div class="eb dk">Trabajo de ${P.luis.short}</div><h1>Inmobiliaria</h1><p>Rentas por cobrar, lo que ya pagaron y los gastos de cada propiedad.</p></div></div>
+ return `<div class="wrap"><button class="back" data-a="back">${ic('back','s')}Volver</button><div class="ph"><div><div class="eb dk">Trabajo de ${P.luis.short}</div><h1>Inmobiliaria</h1><p>Rentas por cobrar, lo que ya pagaron y los gastos de cada propiedad.</p></div></div>
  <div class="anota2">
   <button class="anota sale" data-a="inmgasto" data-v="egreso"><span class="sg">−</span><b>Sale plata</b><small>Un gasto: toma foto del recibo</small></button>
   <button class="anota entra" data-a="inmgasto" data-v="ingreso"><span class="sg">+</span><b>Entra plata</b><small>Otro ingreso que no sea la renta</small></button>
