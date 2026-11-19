@@ -870,6 +870,8 @@ button.cfg-row:hover{background:var(--navy-50)}
 .fijo.tarde{background:#fdf3f1;border-color:#f6dcd6}
 .fijo .tx{flex:1 1 160px;min-width:0;display:flex;flex-direction:column}.fijo b{color:var(--fg-1);font-size:17px;overflow-wrap:anywhere}
 .dup{align-items:flex-start}.dup-acc{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.fijo.btnrow{width:100%;text-align:left;color:inherit;cursor:pointer}
+.fijo.btnrow:hover{border-color:var(--navy-500)}
 </style>
 </head>
 <body>
@@ -1730,10 +1732,13 @@ function modal(){
   if(!m.tipo)h=`<div class="sh"><h2>Plata</h2>${X}</div><div class="sb"><p class="pregunta">¿Entró o salió plata?</p>
   <div class="anota2" style="margin-top:0"><button class="anota sale" data-a="setf" data-f="tipo" data-v="egreso"><span class="sg">−</span><b>Salió plata</b><small>Un gasto o un pago</small></button><button class="anota entra" data-a="setf" data-f="tipo" data-v="ingreso"><span class="sg">+</span><b>Entró plata</b><small>Le pagaron o recibió</small></button></div>
   ${seesInm()&&S.inm.props.some(p=>inmPend(p))?`<p class="lbl" style="margin:8px 0 0">¿Pagaron una renta?</p><div class="chips">${S.inm.props.filter(p=>inmPend(p)).map(p=>`<button class="chip" data-a="inmpago" data-id="${p.id}">${esc(p.inq)} · ${esc(p.nombre)}</button>`).join('')}</div>`:''}</div>`;
-  else h=`<div class="sh"><div><span class="sobre">${m.tipo==='egreso'?'Salió plata':'Entró plata'}</span><h2>¿De qué fue?</h2></div>${X}</div><div class="sb"><div class="tipos">
+  else{const pend=m.tipo==='egreso'?S.items.filter(i=>i.open&&(i.cat==='pago'||i.amount)&&seesItem(i)&&canReport(i)&&(i.ent==='trabajo'?seesInm():seesCasa()||!isCare())).sort((a,b)=>a.due-b.due):[];
+  h=`<div class="sh"><div><span class="sobre">${m.tipo==='egreso'?'Salió plata':'Entró plata'}</span><h2>${pend.length?'¿Pagaste uno de estos?':'¿De qué fue?'}</h2></div>${X}</div><div class="sb">
+  ${pend.length?`<div class="fijos">${pend.map(i=>{const st=stat(i);return `<button class="fijo btnrow ${st==='bad'?'tarde':''}" data-a="report" data-id="${i.id}"><span class="tx"><b>${esc(i.title)}</b><span class="k">${i.amount?esc(i.amount)+' · ':''}${st==='bad'?'atrasado':'vence el '+fdate(i.due)}${i.ent!=='casa'?' · '+esc(ENT[i.ent].name):''}</span></span><span class="btn pri sm">${ic('check','s')}Este</span></button>`}).join('')}</div><span class="lbl" style="margin-top:4px">¿O fue otro gasto?</span>`:''}
+  <div class="tipos">
   ${seesCasa()?`<button class="tipo" data-a="plataamb" data-v="casa"><span class="fic otr">${ic('house')}</span><span class="tt"><b>Casa · familia</b><small>${m.tipo==='egreso'?'Pan, mercado, almuerzo, transporte…':'Pensión, ayuda de la familia…'}</small></span>${ic('chev','s')}</button>`:''}
   ${seesInm()?`<button class="tipo" data-a="plataamb" data-v="inm"><span class="fic pag">${ic('card')}</span><span class="tt"><b>Trabajo · inmobiliaria</b><small>${m.tipo==='egreso'?'Arreglos, predial, servicios, transporte…':'Depósito u otro ingreso'}</small></span>${ic('chev','s')}</button>`:''}
-  </div><button class="lnk" data-a="setf" data-f="tipo" data-v="">${ic('back','s')}Cambiar: entró o salió</button></div>`}
+  </div><button class="lnk" data-a="setf" data-f="tipo" data-v="">${ic('back','s')}Cambiar: entró o salió</button></div>`}}
  if(m.k==='casamov'){const eg=m.tipo!=='ingreso',cats=eg?CASA_G:CASA_I;
   h=`<div class="sh"><div><span class="sobre">La casa</span><h2>${m.edit?'Corregir':eg?'Salió plata':'Entró plata'}</h2></div>${X}</div><div class="sb">
   <div class="seg" role="group" aria-label="Tipo de movimiento"><button class="${eg?'on out':''}" data-a="setf" data-f="tipo" data-v="egreso">− Salió</button><button class="${!eg?'on in':''}" data-a="setf" data-f="tipo" data-v="ingreso">+ Entró</button></div>
