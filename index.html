@@ -865,6 +865,11 @@ button.cfg-row:hover{background:var(--navy-50)}
 .para-b .fpic{width:64px;height:64px;border-radius:50%;overflow:hidden;display:block}.para-b .fpic.sq{border-radius:16px}
 .para-b b{color:var(--fg-1);font-size:17px;overflow-wrap:anywhere;text-align:center}
 .ph-acc{display:flex;gap:8px;flex-wrap:wrap}
+.fijos{display:flex;flex-direction:column;gap:10px}
+.fijo{display:flex;gap:12px;align-items:center;background:var(--white);border:1px solid var(--line);border-radius:16px;padding:12px 14px;flex-wrap:wrap}
+.fijo.tarde{background:#fdf3f1;border-color:#f6dcd6}
+.fijo .tx{flex:1 1 160px;min-width:0;display:flex;flex-direction:column}.fijo b{color:var(--fg-1);font-size:17px;overflow-wrap:anywhere}
+.dup{align-items:flex-start}.dup-acc{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
 </style>
 </head>
 <body>
@@ -911,6 +916,7 @@ function seed(){P=baseP();ENT=baseEnt();return{
   {id:'adm302',ent:'trabajo',prop:'p2',title:'Administración del edificio',sub:'Apartamento 302',cat:'pago',resp:'luis',due:D(11,10),amount:'$ 180.000',rec:'Cada mes',open:true,hist:[['1 nov','Sistema','Se creó para este mes']]},
   {id:'agualocal',ent:'trabajo',prop:'p3',title:'Agua del local',sub:'Local comercial · se descuenta a Hernán',cat:'pago',resp:'luis',due:D(11,25),amount:'$ 95.000',rec:'Cada mes',open:true,hist:[['1 nov','Sistema','Se creó para este mes']]},
   {id:'predsf',ent:'trabajo',prop:'p1',title:'Predial',sub:'Casa San Fernando · se descuenta a Gloria',cat:'pago',resp:'luis',due:D(12,6),amount:'$ 310.000',rec:'Cada 3 meses',open:true,hist:[['1 nov','Sistema','Se creó para este periodo']]},
+  {id:'cel',ent:'casa',title:'Plan del celular de Luis',sub:'Claro · cada mes',cat:'pago',resp:'luis',due:D(11,20),amount:'$ 65.000',rec:'Cada mes',open:true,hist:[['1 nov','Sistema','Se creó para este mes']]},
   {id:'gas',ent:'casa',title:'Pagar el gas',sub:'Factura de octubre',cat:'pago',resp:'luis',due:D(11,12),amount:'$ 86.400',rec:'Cada mes',open:true,hist:[['1 nov','Sistema','Se creó para este mes']]},
   {id:'rtm',ent:'carro',title:'Revisión técnico-mecánica',sub:'Certificado anual',cat:'vehiculo',resp:'luis',due:D(11,10),rec:'Cada año',open:true,hist:[['10 oct','Sistema','Se creó al acercarse el vencimiento del certificado']]},
   {id:'remlu',ent:'lucero',title:'Remedios de Lucero',sub:'Compra del mes',cat:'medicamento',resp:'luis',due:D(11,17),rec:'Cada mes',open:true,sens:true,attach:{name:'formula_lucero.jpg'},apuntes:[{by:'lucero',at:'2 nov',note:'Son los tres de la fórmula. Uno se acaba antes: pedir la caja grande.'}],prev:[{by:'luis',at:'17 oct · 11:05 a. m.',kind:'foto',file:'recibo_drogueria_oct.jpg',note:'Compré los tres. Uno quedó pendiente y lo trajeron el lunes.'},{by:'luis',at:'16 sep · 4:30 p. m.',kind:'voz',dur:22,note:'No dieron recibo. Los compré en la droguería de la esquina.'}],hist:[['1 nov','Sistema','Se creó para este mes'],['2 nov','Lucero','Agregó una nota']]},
@@ -1471,6 +1477,14 @@ function vConfig(){const puedeT=seesInm();let tab=S.cfgTab||'familia';if(tab==='
  <div class="shd" style="margin-top:26px"><h2>Inquilinos</h2><span class="c">${inqs.length}</span></div>
  <div class="cfg-list">${inqs.map(p=>`<button class="cfg-row" data-a="inqedit" data-id="${p.id}"><span class="inm-ic">${ic('id')}</span><span class="tx"><b>${esc(p.inq)}</b><span class="k">${esc(p.nombre)}${p.desde?' · desde '+desdeTxt(p.desde):''}${p.cel?' · '+celTxt(p.cel):''}</span></span>${ic('chev','s')}</button>`).join('')||'<p class="muted" style="padding:14px;margin:0">Sin inquilinos.</p>'}</div>
  <p class="muted" style="margin-top:10px">Para cambiar de inquilino o dejar una propiedad desocupada, ábrela arriba. Los anteriores quedan en su historial.</p></div>`}
+const normW=t=>String(t||'').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'').split(/[^a-z0-9]+/).filter(w=>w.length>=3&&!['pagar','pago','del','las','los','para','mes','cuota','factura','recibo','plan','luis','lucero','casa','cada','con','por','una','uno','que'].includes(w));
+const parecido=(a,b)=>{const A=normW(a),B=normW(b);return A.some(w=>B.some(x=>x===w||(w.length>=5&&x.startsWith(w.slice(0,5)))))};
+const MESES_REC={'Cada 15 días':0.5,'Cada mes':1,'Cada 3 meses':3,'Cada 6 meses':6,'Cada año':12};
+function siguiente(i){const k=MESES_REC[i.rec];if(!k||S.items.some(x=>x.serie===(i.serie||i.id)&&x.open&&x.id!==i.id))return null;
+ const d=k<1?new Date(i.due.getFullYear(),i.due.getMonth(),i.due.getDate()+15):new Date(i.due.getFullYear(),i.due.getMonth()+k,i.due.getDate());
+ const n={...i,id:i.id+'_'+Date.now(),serie:i.serie||i.id,due:d,open:true,closed:null,reopened:null,prev:undefined,apuntes:[],hist:[['Hoy','Sistema','Se creó el siguiente: '+i.rec.toLowerCase()]]};S.items.push(n);return n}
+function pagoParecido(texto,ents,prop){return S.items.filter(i=>i.open&&i.cat==='pago'&&ents.includes(i.ent)&&(prop===undefined||!prop||!i.prop||i.prop===prop)).find(i=>parecido(i.title,texto))}
+function cerrarDesdePlata(i){i.open=false;i.closed={ts:Date.now(),by:S.user,at:nowS(),kind:'nota',note:'Anotado desde Plata',file:null};i.hist.push(['Hoy',me().short,'Lo marcó pagado desde Plata']);addFeed(`pagó “${i.title}”`,i.id);return siguiente(i)}
 function gastoDeTarea(i,valor,file){const v=Number(String(valor||'').replace(/\D/g,''));if(!v||isCare())return '';
  const fl=file?{file:file.name,url:file.url,mime:file.type}:{file:null};
  if(i.ent==='trabajo'){S.inm.movs.push({id:'g'+Date.now(),prop:i.prop||null,tipo:'egreso',cat:/predial/i.test(i.title)?'Predial':/admin/i.test(i.title)?'Administración del edificio':/agua|luz|gas|servicio/i.test(i.title)?'Servicios':'Otro',desc:i.title,valor:v,fecha:TODAY,by:S.user,...fl});return 'trabajo'}
@@ -1548,6 +1562,11 @@ const QUE={persona:[['cita','Cita médica','heart','Con lugar, hora y quién aco
  mascota:[['mascota:Veterinario','Veterinario','heart','Consulta o control','mas'],['mascota:Vacuna','Vacuna','pill','Con su fecha','mas'],['mascota:Baño','Baño y peluquería','paw','Cada cuánto','mas'],['otro','Otra cosa','plus','Comida, desparasitar…','otr']],
  trabajo:[['pago','Pago de una propiedad','card','Administración, predial, servicios','pag'],['otro','Otra cosa del trabajo','plus','Arreglo, visita, trámite','otr']]};
 function addModal(m,X){
+ if(m.tipo==='pago'&&!m.nuevo&&m.f.para){const fijos=S.items.filter(i=>i.ent===m.f.para&&i.cat==='pago'&&i.open).sort((a,b)=>a.due-b.due);
+  if(fijos.length)return `<div class="sh"><div><button class="lnk" data-a="tipo" data-v="">${ic('back','s')} Cambiar</button><h2 style="margin-top:6px">Los pagos de siempre</h2><span class="sobre">${esc(ENT[m.f.para].full)}</span></div>${X}</div><div class="sb">
+  <p class="muted" style="margin:0">¿Es uno de estos? Márcalo como pagado. No hace falta anotarlo otra vez.</p>
+  <div class="fijos">${fijos.map(i=>{const st=stat(i);return `<div class="fijo ${st==='bad'?'tarde':''}"><span class="tx"><b>${esc(i.title)}</b><span class="k">${i.amount?esc(i.amount)+' · ':''}${i.rec?esc(i.rec).toLowerCase()+' · ':''}${st==='bad'?'atrasado':'vence el '+fdate(i.due)}</span></span><button class="btn pri sm" data-a="report" data-id="${i.id}">${ic('check','s')}Ya lo pagué</button></div>`}).join('')}</div>
+  <button class="btn gh big full" data-a="pagonuevo">${ic('plus')}Es un pago nuevo</button></div>`}
  if(!m.tipo){
   const plataOk=seesInm()||seesCasa();
   if(!m.que&&!m.f.para&&plataOk)return `<div class="sh"><h2>¿Qué quieres anotar?</h2>${X}</div><div class="sb"><div class="anota2" style="margin-top:0">
@@ -1570,7 +1589,7 @@ function addModal(m,X){
  if(t==='cita')body=`${m.f.para?'':`<div>${lbl('¿Para quién?')}${chipsF(m,'para',personas)}${er.para?'<div class="er">Elige para quién.</div>':''}</div>`}${inF(m,'esp','Especialidad o motivo','Ej.: cardiología, control, odontología','text',er)}${fecha()}${lugar}<div>${lbl('¿Quién acompaña? (opcional)')}${chipsF(m,'acomp',[['','Nadie']].concat(Object.values(P).filter(p=>p.status==='activo').map(p=>[p.id,p.short])))}</div>${inF(m,'prep','Preparación (opcional)','Ej.: llevar los exámenes anteriores','text',er)}${adj}`;
  if(t==='examen')body=`${m.f.para?'':`<div>${lbl('¿Para quién?')}${chipsF(m,'para',personas)}${er.para?'<div class="er">Elige para quién.</div>':''}</div>`}${inF(m,'esp','¿Qué examen?','Ej.: exámenes de sangre, ecografía','text',er)}${fecha()}${lugar}<div class="setrow" style="padding:4px 0;border:0"><div class="tx"><div class="t">En ayunas</div></div><button class="tg ${m.f.ayunas?'on':''}" data-a="af" data-f="ayunas" data-v="${m.f.ayunas?'':'1'}" aria-pressed="${!!m.f.ayunas}" aria-label="En ayunas"></button></div>${adj}`;
  if(t==='medicamento')body=`${m.f.para?'':`<div>${lbl('¿Para quién?')}${chipsF(m,'para',personas)}${er.para?'<div class="er">Elige para quién.</div>':''}</div>`}${inF(m,'fecha','Próxima compra','','date',er)}<div>${lbl('¿Cada cuánto?')}${chipsF(m,'rec',[['Cada mes','Cada mes'],['Cada 15 días','Cada 15 días'],['Una vez','Una vez']])}</div><div>${lbl('Fórmula (opcional)')}${pickers('add',!!m.file)}${m.file?`<div style="background:var(--navy-50);border-radius:14px;padding:10px;margin-top:8px">${filePreview(m.file)}</div>`:''}</div>`;
- if(t==='pago')body=`${m.f.para?'':`<div>${lbl('¿De qué?')}${chipsF(m,'para',todas.filter(x=>ENT[x[0]].type!=='persona').concat(todas.filter(x=>ENT[x[0]].type==='persona')))}${er.para?'<div class="er">Elige de qué es.</div>':''}</div>`}${m.f.para==='trabajo'?`<div>${lbl('¿De qué propiedad?')}${chipsF(m,'prop',S.inm.props.map(p=>[p.id,p.nombre]))}${er.prop?'<div class="er">Elige la propiedad.</div>':''}</div>`:''}${inF(m,'esp','¿Qué se paga?','Ej.: internet, administración, gas','text',er)}${inF(m,'valor','Valor (opcional)','Ej.: 86400','text',er)}${inF(m,'fecha','Fecha límite','','date',er)}<div>${lbl('¿Se repite?')}${chipsF(m,'rec',[['Cada mes','Cada mes'],['Cada año','Cada año'],['Una vez','Una vez']])}</div>`;
+ if(t==='pago')body=`${m.f.para?'':`<div>${lbl('¿De qué?')}${chipsF(m,'para',todas.filter(x=>ENT[x[0]].type!=='persona').concat(todas.filter(x=>ENT[x[0]].type==='persona')))}${er.para?'<div class="er">Elige de qué es.</div>':''}</div>`}${m.dup&&IT(m.dup)?`<div class="banner warn dup">${ic('alert','s')}<div><b>Ya tienes «${esc(IT(m.dup).title)}»</b> (${IT(m.dup).amount?esc(IT(m.dup).amount)+' · ':''}vence el ${fdate(IT(m.dup).due)}). ¿Es ese?<div class="dup-acc"><button class="btn pri sm" data-a="report" data-id="${m.dup}">Sí, es ese: ya lo pagué</button><button class="btn gh sm" data-a="dupno">No, es otro</button></div></div></div>`:''}${m.f.para==='trabajo'?`<div>${lbl('¿De qué propiedad?')}${chipsF(m,'prop',S.inm.props.map(p=>[p.id,p.nombre]))}${er.prop?'<div class="er">Elige la propiedad.</div>':''}</div>`:''}${inF(m,'esp','¿Qué se paga?','Ej.: internet, administración, gas','text',er)}${inF(m,'valor','Valor (opcional)','Ej.: 86400','text',er)}${inF(m,'fecha','Fecha límite','','date',er)}<div>${lbl('¿Se repite?')}${chipsF(m,'rec',[['Cada mes','Cada mes'],['Cada año','Cada año'],['Una vez','Una vez']])}</div>`;
  if(t==='documento')body=`${m.f.para?'':`<div>${lbl('¿De quién?')}${chipsF(m,'para',todas.filter(x=>ENT[x[0]].type!=='casa'))}${er.para?'<div class="er">Elige de quién.</div>':''}</div>`}${inF(m,'esp','¿Qué documento?','Ej.: licencia de conducción, pasaporte','text',er)}${inF(m,'fecha','¿Cuándo vence?','','date',er)}<p class="help" style="margin:0">Se recuerda desde un mes antes.</p>`;
  if(t==='mascota')body=`${m.f.para?'':`<div>${lbl('¿Cuál mascota?')}${chipsF(m,'para',Object.values(ENT).filter(e=>e.type==='mascota').map(e=>[e.id,e.name,e.fg]))}${er.para?'<div class="er">Elige la mascota.</div>':''}</div>`}<div>${lbl('¿Qué es?')}${chipsF(m,'esp',[['Veterinario','Veterinario'],['Vacuna','Vacuna'],['Baño','Baño y peluquería'],['Desparasitación','Desparasitación'],['Comida','Comprar comida']])}${er.esp?'<div class="er">Elige qué es.</div>':''}</div>${fecha()}${['Veterinario','Vacuna'].includes(m.f.esp)?lugar:''}<div>${lbl('¿Se repite?')}${chipsF(m,'rec',[['Una vez','Una vez'],['Cada mes','Cada mes'],['Cada 3 meses','Cada 3 meses'],['Cada año','Cada año']])}</div>${adj}`;
  if(t==='otro')body=`${inF(m,'esp','¿Qué hay que hacer?','Ej.: llevar el televisor a arreglar','text',er)}${m.f.para?'':`<div>${lbl('¿Para quién o para qué?')}${chipsF(m,'para',todas)}${er.para?'<div class="er">Elige uno.</div>':''}</div>`}${fecha()}${inF(m,'lugar','Lugar (opcional)','','text',er)}`;
@@ -1637,7 +1656,7 @@ function modal(){
   const i=IT(m.id),v=VERB[i.cat];
   if(m.done){
    const others=Object.values(P).filter(p=>p.id!==S.user&&p.kind!=='cuidador'&&p.status==='activo').map(p=>p.short);
-   h=`<div class="sb"><div class="done"><div class="big">${ic('check')}</div><h2>Listo, ${me().short}. Quedó cerrado.</h2><p class="muted" style="font-size:17px;margin:0">${m.offline?'Está guardado en el teléfono. Se envía solo cuando vuelva el internet.':`${others.slice(0,-1).join(', ')} y ${others.slice(-1)} ya lo pueden ver. El soporte quedó en Papeles.`}${m.plata?` Lo que costó quedó en Plata › ${m.plata==='trabajo'?'Trabajo':'Casa'}.`:''}</p>
+   h=`<div class="sb"><div class="done"><div class="big">${ic('check')}</div><h2>Listo, ${me().short}. Quedó cerrado.</h2><p class="muted" style="font-size:17px;margin:0">${m.offline?'Está guardado en el teléfono. Se envía solo cuando vuelva el internet.':`${others.slice(0,-1).join(', ')} y ${others.slice(-1)} ya lo pueden ver. El soporte quedó en Papeles.`}${m.plata?` Lo que costó quedó en Plata › ${m.plata==='trabajo'?'Trabajo':'Casa'}.`:''}${m.prox?` El próximo quedó para el ${m.prox}.`:''}</p>
    ${m.offline?`<button class="btn gh full" data-a="sync">${ic('refresh','s')}Ya volvió el internet</button>`:''}
    <button class="btn pri big full" data-a="close">Volver</button></div></div>`;
   } else {
@@ -1769,6 +1788,11 @@ function modal(){
   <p class="muted" style="margin:0">La cédula o el contrato van en Papeles, no aquí.</p>
   <button class="btn pri big full" data-a="inqsave">${ic('check')}Guardar</button>
   <button class="lnk" data-a="propedit" data-id="${p.id}">Cambió el inquilino o quedó desocupada</button></div>`}
+ if(m.k==='match'){const i=IT(m.item);
+  h=`<div class="sh"><div><span class="sobre">Gasto anotado</span><h2>¿Es el pago de «${esc(i.title)}»?</h2></div>${X}</div><div class="sb">
+  <p class="muted" style="margin:0">Está pendiente${i.amount?' por '+esc(i.amount):''}, ${stat(i)==='bad'?'atrasado':'vence el '+fdate(i.due)}. Si es ese, lo marco como pagado para que deje de avisar.</p>
+  <button class="btn pri big full" data-a="matchsi">${ic('check')}Sí, es ese: márcalo pagado</button>
+  <button class="btn gh big full" data-a="matchno">No, es otro gasto</button></div>`}
  if(m.k==='inmgasto'&&!m.tipo){
   h=`<div class="sh"><h2>Inmobiliaria</h2>${X}</div><div class="sb"><p style="margin:0;font-size:18px;font-weight:700;color:var(--fg-1)">¿Entró o salió plata?</p>
   <div class="anota2" style="margin-top:0"><button class="anota sale" data-a="setf" data-f="tipo" data-v="egreso"><span class="sg">−</span><b>Salió plata</b><small>Un gasto: foto del recibo</small></button><button class="anota entra" data-a="setf" data-f="tipo" data-v="ingreso"><span class="sg">+</span><b>Entró plata</b><small>Otro ingreso</small></button></div>
@@ -2092,7 +2116,9 @@ document.addEventListener('click',e=>{
  case 'casasave':{m.valor=val('gval');m.desc=val('gdesc');const v=Number(String(m.valor).replace(/\D/g,'')),cats=m.tipo==='ingreso'?CASA_I:CASA_G,er={};if(!fechaOk(m))er.fecha=1;if(!v)er.valor=1;if(!cats.includes(m.cat))er.cat=1;if(Object.keys(er).length){m.err=er;render();break}
   const fl=m.file?{file:m.file.name,url:m.file.url,mime:m.file.type}:{};
   if(m.edit){Object.assign(S.casa.movs.find(y=>y.id===m.edit),{tipo:m.tipo==='ingreso'?'ingreso':'egreso',cat:m.cat,desc:m.desc||m.cat,valor:v,fecha:deISO(m.fecha)},fl);S.modal=null;render();toast('Movimiento corregido');break}
-  S.casa.movs.push({id:'c'+Date.now(),tipo:m.tipo==='ingreso'?'ingreso':'egreso',cat:m.cat,desc:m.desc||m.cat,valor:v,fecha:deISO(m.fecha),by:S.user,file:null,...fl});S.modal=null;render();toast(m.tipo==='ingreso'?'Anotado: entró plata a la casa':'Anotado: salió plata de la casa');break}
+  S.casa.movs.push({id:'c'+Date.now(),tipo:m.tipo==='ingreso'?'ingreso':'egreso',cat:m.cat,desc:m.desc||m.cat,valor:v,fecha:deISO(m.fecha),by:S.user,file:null,...fl});
+  {const pm=m.tipo!=='ingreso'&&pagoParecido(m.desc||m.cat,Object.values(ENT).filter(e=>e.type!=='trabajo').map(e=>e.id));if(pm){S.modal={k:'match',item:pm.id,valor:v};render();break}}
+  S.modal=null;render();toast(m.tipo==='ingreso'?'Anotado: entró plata a la casa':'Anotado: salió plata de la casa');break}
  case 'cuentas':nav('cuentas',t.dataset.id);break;
  case 'transfer':{const c=cuentas(t.dataset.id);S.modal={k:'transfer',did:t.dataset.id,valor:String(Math.max(0,c.falta)),err:null};render();break}
  case 'transfersave':{m.valor=val('gval');const v=Number(String(m.valor).replace(/\D/g,'')),er={};if(!fechaOk(m))er.fecha=1;if(!v)er.valor=1;if(!m.medio)er.medio=1;if(Object.keys(er).length){m.err=er;render();break}
@@ -2123,7 +2149,9 @@ document.addEventListener('click',e=>{
  case 'inmpagosave':{m.note=val('inmnote');m.valor=val('gval');const p=S.inm.props.find(x=>x.id===m.id),old=S.inm.pagos[p.id]||{},ya=m.edit?0:pgVal(p),v=Number(String(m.valor).replace(/\D/g,'')),er={};if(!fechaOk(m))er.fecha=1;if(!m.medio)er.medio=1;if(!v)er.valor=1;else if(v>p.renta-ya)er.valor=2;if(Object.keys(er).length){m.err=er;render();break}S.inm.pagos[p.id]={valor:ya+v,fecha:deISO(m.fecha),at:m.edit?old.at:nowS(),by:m.edit?old.by:S.user,medio:m.medio,file:m.file?m.file.name:(m.edit?old.file:null),url:m.file?m.file.url:(m.edit?old.url:null),mime:m.file?m.file.type:(m.edit?old.mime:null),nota:m.note};S.modal=null;render();toast(m.edit?'Pago corregido':ya+v<p.renta?`Abono de ${p.inq} registrado: falta ${COP(p.renta-ya-v)}`:`Renta de ${p.inq} registrada`);break}
  case 'inmgastosave':{m.valor=val('gval');m.desc=val('gdesc');const er={};if(!fechaOk(m))er.fecha=1;const v=Number(String(m.valor).replace(/\D/g,''));if(!v)er.valor=1;if(!m.prop)er.prop=1;if(m.tipo!=='ingreso'&&!m.cat)er.cat=1;if(Object.keys(er).length){m.err=er;render();break}
   if(m.edit){const g=S.inm.movs.find(y=>y.id===m.edit);Object.assign(g,{prop:m.prop==='gen'?null:m.prop,tipo:m.tipo==='ingreso'?'ingreso':'egreso',cat:m.tipo==='ingreso'?(CATI.includes(m.cat)?m.cat:'Otro ingreso'):m.cat,desc:m.desc||g.desc,valor:v,fecha:deISO(m.fecha)});if(m.file)Object.assign(g,{file:m.file.name,url:m.file.url,mime:m.file.type});S.modal=null;render();toast('Movimiento corregido');break}
-  S.inm.movs.push({id:'g'+Date.now(),prop:m.prop==='gen'?null:m.prop,tipo:m.tipo==='ingreso'?'ingreso':'egreso',cat:m.tipo==='ingreso'?(CATI.includes(m.cat)?m.cat:'Otro ingreso'):m.cat,desc:m.desc||(m.tipo==='ingreso'?(CATI.includes(m.cat)?m.cat:'Ingreso'):m.cat),valor:v,fecha:deISO(m.fecha),by:S.user,file:m.file?m.file.name:null,url:m.file&&m.file.url,mime:m.file&&m.file.type});const rk=m.recur&&S.inm.recur.find(x=>x.id===m.recur);if(rk)rk.prox=new Date(rk.prox.getFullYear(),rk.prox.getMonth()+CADA[rk.cada],rk.prox.getDate());S.modal=null;render();toast(rk?`Pagado. El próximo es el ${fshort(rk.prox)}`:m.tipo==='ingreso'?'Ingreso anotado':'Gasto anotado');break}
+  S.inm.movs.push({id:'g'+Date.now(),prop:m.prop==='gen'?null:m.prop,tipo:m.tipo==='ingreso'?'ingreso':'egreso',cat:m.tipo==='ingreso'?(CATI.includes(m.cat)?m.cat:'Otro ingreso'):m.cat,desc:m.desc||(m.tipo==='ingreso'?(CATI.includes(m.cat)?m.cat:'Ingreso'):m.cat),valor:v,fecha:deISO(m.fecha),by:S.user,file:m.file?m.file.name:null,url:m.file&&m.file.url,mime:m.file&&m.file.type});
+  {const pm=m.tipo!=='ingreso'&&!m.recur&&pagoParecido((m.desc||'')+' '+(m.cat||''),['trabajo'],m.prop==='gen'?null:m.prop);if(pm){S.modal={k:'match',item:pm.id,valor:v};render();break}}
+  const rk=m.recur&&S.inm.recur.find(x=>x.id===m.recur);if(rk)rk.prox=new Date(rk.prox.getFullYear(),rk.prox.getMonth()+CADA[rk.cada],rk.prox.getDate());S.modal=null;render();toast(rk?`Pagado. El próximo es el ${fshort(rk.prox)}`:m.tipo==='ingreso'?'Ingreso anotado':'Gasto anotado');break}
  case 'calf':S.calF=t.dataset.v||null;render();break;
  case 'moredone':S.moreDone=!S.moreDone;render();break;
  case 'apapel':S.modal={k:'apapel',id:t.dataset.id,cat:null};render();break;
@@ -2138,13 +2166,17 @@ document.addEventListener('click',e=>{
   i.open=false;i.closed={ts:Date.now(),by:S.user,at:nowS(),kind:m.kind,audio:m.audio||null,file:m.file?m.file.name:null,url:m.file?m.file.url:null,mime:m.file?m.file.type:null,note:m.note};
   i.reopened=null;
   i.hist.push(['Hoy',me().short,`Lo cerró con ${m.kind==='foto'?'foto':m.kind==='archivo'?'archivo':'audio (sin papel)'}`]);
-  addFeed(`cerró “${i.title}”`,i.id,m.kind);m.plata=gastoDeTarea(i,m.valor,m.file);
+  addFeed(`cerró “${i.title}”`,i.id,m.kind);m.plata=gastoDeTarea(i,m.valor,m.file);const sg=siguiente(i);m.prox=sg?fdate(sg.due):null;
   m.done=true;m.offline=!!t.dataset.off;render();break}
  case 'sync':S.modal=null;render();toast('Enviado. La familia ya lo puede ver');break;
  case 'add':S.modal={k:'add',f:{para:t.dataset.ent||null,rec:null},tipo:null,fijo:!!t.dataset.ent};render();break;
  case 'followup':S.modal={k:'add',tipo:t.dataset.v,f:{para:t.dataset.ent,rec:t.dataset.v==='medicamento'?'Cada mes':null}};render();break;
  case 'tipo':if(t.dataset.v==='plata'){S.modal={k:'plata',tipo:null,err:null};render();break}collectA(m);m.tipo=t.dataset.v||null;if(m.tipo&&m.tipo.startsWith('mascota:')){m.f.esp=m.tipo.split(':')[1];m.tipo='mascota'}m.err=null;if(m.tipo==='pago'&&!m.f.rec)m.f.rec='Cada mes';if(m.tipo==='medicamento'&&!m.f.rec)m.f.rec='Cada mes';render();break;
  case 'que':m.que=t.dataset.v||null;render();break;
+ case 'pagonuevo':m.nuevo=true;render();break;
+ case 'dupno':m.forzar=true;m.dup=null;S.modal=m;document.querySelector('[data-a=saveadd]')&&document.querySelector('[data-a=saveadd]').click();break;
+ case 'matchsi':{const i=IT(m.item);const sg=cerrarDesdePlata(i);S.modal=null;render();toast(`«${i.title}» quedó pagado.${sg?' El próximo: '+fdate(sg.due)+'.':''}`);break}
+ case 'matchno':S.modal=null;render();toast('Listo, quedó solo como gasto');break;
  case 'para':m.f.para=t.dataset.v||null;m.tipo=null;render();break;
  case 'af':collectA(m);m.f[t.dataset.f]=t.dataset.v;if(m.err)m.err[t.dataset.f]=0;render();break;
  case 'saveadd':{collectA(m);const f=m.f,tp=m.tipo,er={};
@@ -2154,6 +2186,7 @@ document.addEventListener('click',e=>{
   const vet=tp==='mascota'&&['Veterinario','Vacuna'].includes(f.esp);
   if((tp==='cita'||tp==='examen'||vet)){if(!f.hora)er.hora='Indica la hora.';if(!f.place)er.place='Elige el lugar.';if(f.place==='nuevo'&&!f.pname)er.pname='Escribe el nombre del lugar.'}
   if(Object.keys(er).length){m.err=er;render();break}
+  if(tp==='pago'&&!m.forzar){const d=pagoParecido(f.esp,[f.para],f.prop);if(d){m.dup=d.id;render();break}}
   let place=f.place;if(place==='nuevo'){place='p'+Date.now();S.places[place]={name:f.pname,dir:f.pdir||'',tel:''}}
   const due=fromIso(f.fecha);const time=f.hora?fmtTime(f.hora):undefined;const id='n'+Date.now();
   const ent=f.para,isP=ENT[ent].type==='persona';const resp=isP&&P[ent]?ent:'luis';
@@ -2175,7 +2208,7 @@ document.addEventListener('click',e=>{
  case 'fbsave':{if(m.recording){m.err='Detén la grabación primero.';render();break}m.note=val('fbnote');if(document.getElementById('gval'))m.valor=val('gval');const i=IT(m.id);if(!m.how){m.err='Elige cómo le fue.';render();break}if(!m.note&&!m.rec&&!m.file){m.err='Cuéntalo con una nota, un audio o una foto. Así queda la constancia.';render();break}
   i.open=false;i.closed={ts:Date.now(),by:S.user,at:nowS(),acomp:(m.acomp??(i.acomp||''))||null,audio:m.audio||null,kind:m.file?'foto':m.rec?'voz':'nota',file:m.file?m.file.name:null,url:m.file?m.file.url:null,mime:m.file?m.file.type:null,note:m.note,how:m.how};i.reopened=null;
   i.hist.push(['Hoy',me().short,`${S.user===i.ent?'Contó cómo le fue':'Contó cómo le fue a '+ENT[i.ent].name}: ${m.how.toLowerCase()}${m.note?' · '+m.note:''}`]);
-  addFeed(`${S.user===i.ent?'contó cómo le fue en':'contó cómo le fue a '+ENT[i.ent].name+' en'} “${i.title}”: ${m.how.toLowerCase()}`,i.id,m.file?'foto':m.rec?'voz':null);m.plata=gastoDeTarea(i,m.valor,m.file);m.done=true;render();break}
+  addFeed(`${S.user===i.ent?'contó cómo le fue en':'contó cómo le fue a '+ENT[i.ent].name+' en'} “${i.title}”: ${m.how.toLowerCase()}`,i.id,m.file?'foto':m.rec?'voz':null);m.plata=gastoDeTarea(i,m.valor,m.file);const sg=siguiente(i);m.prox=sg?fdate(sg.due):null;m.done=true;render();break}
  case 'fbcambio':{m.d=val('fbd');m.h=val('fbh');if(!m.d){m.err='Indica la nueva fecha.';render();break}const i=IT(m.id);const old=fshort(i.due);i.due=fromIso(m.d);if(m.h)i.time=fmtTime(m.h);i.hist.push(['Hoy',me().short,`Cambió la fecha: ${old} → ${fshort(i.due)}`]);addFeed(`movió “${i.title}” al ${i.due.getDate()} de ${MES[i.due.getMonth()]}`,i.id);m.done=true;render();break}
  case 'fbnofui':{m.d=val('fbd');if(!m.why){m.err='Elige qué pasó.';render();break}const i=IT(m.id);
   if(m.d){const old=fshort(i.due);i.due=fromIso(m.d);i.hist.push(['Hoy',me().short,`No asistió (${m.why.toLowerCase()}). Se reprogramó: ${old} → ${fshort(i.due)}`]);addFeed(`reprogramó “${i.title}”`,i.id);S.modal=null;render();toast('Reprogramada. Los recordatorios siguen');break}
