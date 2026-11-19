@@ -849,6 +849,14 @@ main{container:main/inline-size}
 .rec-tx{grid-column:1/-1;display:flex;flex-direction:column;background:none;border:0;padding:0;text-align:left;color:inherit;min-width:0}
 .rec-tx b{color:var(--fg-1);font-size:17px;overflow-wrap:anywhere}
 .rec-row .pill{justify-self:start}
+.cfg-list{background:var(--white);border-radius:20px;box-shadow:var(--sh-sm);overflow:hidden}
+.cfg-row{display:flex;gap:12px;align-items:center;width:100%;padding:14px 16px;border:0;border-top:1px solid var(--line);background:none;text-align:left;color:inherit;min-width:0}
+.cfg-row:first-child{border-top:0}
+button.cfg-row:hover{background:var(--navy-50)}
+.cfg-row .tx{flex:1;min-width:0;display:flex;flex-direction:column}.cfg-row b{color:var(--fg-1);font-size:17px;overflow-wrap:anywhere}
+.cfg-row .k{overflow-wrap:anywhere}.cfg-row .falta{color:var(--bad);font-weight:700}
+.enviar-a{margin-top:14px;display:flex;flex-direction:column;gap:2px}.enviar-a b{font-size:18px;color:var(--fg-1);overflow-wrap:anywhere}
+.shd{flex-wrap:wrap;row-gap:8px}
 </style>
 </head>
 <body>
@@ -911,7 +919,7 @@ function seed(){P=baseP();ENT=baseEnt();return{
   {id:'labs',ent:'luis',title:'Exámenes de sangre',sub:'Laboratorio',cat:'examen',resp:'luis',due:D(11,14),time:'6:30 a. m.',place:'p4',ayunas:true,open:false,sens:true,closed:{by:'luis',at:'14 nov · 8:40 a. m.',kind:'voz',file:null,note:'No me dieron papel. Los resultados llegan al correo en 3 días'},hist:[['5 nov','Luis','Anotó los exámenes'],['14 nov','Luis','Lo cerró con un audio: no le dieron papel']]}
  ],
  inm:{
-  duenos:[{id:'d1',nombre:'Gloria Restrepo',cel:'3105551122'},{id:'d2',nombre:'Hernán Castillo',cel:'3157778899'}],
+  duenos:[{id:'d1',nombre:'Gloria Restrepo',cel:'3105551122',mail:'gloria.ejemplo@correo.com'},{id:'d2',nombre:'Hernán Castillo',cel:'3157778899',mail:''}],
   liq:[],
   recur:[{id:'k1',prop:'p2',cat:'Administración del edificio',desc:'Administración del edificio',valor:180000,cada:'Cada mes',prox:D(11,10)},{id:'k2',prop:'p3',cat:'Servicios',desc:'Agua del local',valor:95000,cada:'Cada mes',prox:D(11,25)},{id:'k3',prop:'p1',cat:'Predial',desc:'Predial',valor:310000,cada:'Cada 3 meses',prox:D(12,6)}],
   props:[
@@ -1266,11 +1274,8 @@ function vDocs(){
 function vFamily(){
  const ents=Object.values(ENT).filter(e=>seesEnt(e.id)).map(e=>{const its=S.items.filter(i=>i.ent===e.id&&i.open&&seesItem(i));const l=its.filter(i=>stat(i)==='bad').length;return `<button class="ent ${l?'al':''}" data-a="ent" data-id="${e.id}">${entTile(e.id,'sm')}<b>${e.full}</b><span style="color:${l?'var(--bad)':'var(--fg-3)'}">${l?l+' atrasado':its.length?its.length+' por hacer':'Al día'}</span></button>`}).join('');
  const mem=Object.values(P).map(p=>`<tr><td data-l="Persona"><div style="display:flex;gap:10px;align-items:center">${av(p.id,'sm')}<b style="color:var(--fg-1)">${p.name}</b></div></td><td data-l="Rol">${ROLE[p.role]}${p.status==='pendiente'?' · <span class="pill warn">Invitación pendiente</span>':''}</td><td>${KIND[p.kind]}</td></tr>`).join('');
- return `<div class="wrap"><div class="ph"><div><div class="eb dk">Familia</div><h1>Personas, casa y carro</h1><p>Cada uno con sus cosas por hacer y sus papeles.</p></div><button class="btn gh sm" data-a="nav" data-v="set">${ic('gear','s')}Ajustes</button></div>
+ return `<div class="wrap"><div class="ph"><div><div class="eb dk">Familia</div><h1>Personas, casa y carro</h1><p>Cada uno con sus cosas por hacer y sus papeles.</p></div>${isCare()?'':`<button class="btn gh sm" data-a="config" data-v="familia">${ic('gear','s')}Configurar</button>`}</div>
  <div class="ents" style="margin-top:18px">${ents}</div>
- <div class="shd"><h2>Quiénes participan</h2></div>
- <div><table class="tbl rt"><thead><tr><th>Persona</th><th>Rol</th><th>Relación</th></tr></thead><tbody>${mem}</tbody></table></div>
- ${isAdmin()?`<p class="muted" style="margin-top:10px">Para invitar, cambiar roles o quitar accesos ve a <button class="lnk" data-a="nav" data-v="set">Ajustes</button>.</p>`:''}
  <div class="shd"><h2>Decisiones nuevas de este prototipo</h2></div>
  <div class="card"><div class="stack" style="gap:10px">${PROPS.map(p=>`<div style="display:flex;gap:10px;align-items:flex-start"><span class="pill prop">${p[0]}</span><div style="font-size:15px">${p[1]}</div></div>`).join('')}</div></div></div>`;
 }
@@ -1348,7 +1353,9 @@ function vCuentas(did){const d=DUE(did);if(!d)return vPlata();const c=cuentas(di
   ${c.tr.map(t=>`<button class="cl tr" data-a="movver" data-id="${t.id}"><span>Transferido el ${fshort(t.fecha)}</span><b>− ${COP(t.valor)}</b></button>`).join('')}
   <div class="cl big ${c.falta<0?'debe':''}"><span>${c.falta>0?'Falta transferirle':c.falta<0?'Le debe a '+P.luis.short:'Cuentas al día'}</span><b>${COP(Math.abs(c.falta))}</b></div>
  </div>
- <div class="cta-acc">${c.falta>0?`<button class="btn pri big" data-a="transfer" data-id="${did}">${ic('check')}Ya le transferí</button>`:''}${wa?`<a class="btn gh big" href="${wa}" target="_blank" rel="noopener">${ic('msg')}Enviar las cuentas por WhatsApp</a>`:''}</div>
+ <div class="cta-acc">${c.falta>0?`<button class="btn pri big" data-a="transfer" data-id="${did}">${ic('check')}Ya le transferí</button>`:''}</div>
+ <div class="card enviar-a"><span class="k">Las cuentas se le envían al dueño</span><b>${esc(d.nombre)} · ${d.cel?celTxt(d.cel):'sin celular'}</b>${d.mail?`<span class="k">${esc(d.mail)}</span>`:''}
+  <div class="cta-acc" style="margin-top:10px">${wa?`<a class="btn gh big" href="${wa}" target="_blank" rel="noopener">${ic('msg')}Enviar por WhatsApp</a>`:`<button class="btn gh big" data-a="dueno" data-id="${did}">${ic('edit')}Agregar su celular</button>`}${d.mail?`<a class="btn gh big" href="mailto:${encodeURIComponent(d.mail)}?subject=${encodeURIComponent('Cuentas de '+MES[TODAY.getMonth()])}&body=${encodeURIComponent(cuentasTexto(did))}">${ic('file')}Enviar por correo</a>`:''}</div></div>
  <p class="muted" style="margin-top:14px">La administración se descuenta solo cuando se cobró la renta. Los gastos de sus propiedades se le descuentan.</p></div>`}
 function casaPlata(){const mo=TODAY.getMonth(),y=TODAY.getFullYear(),xs=S.casa.movs.filter(x=>x.fecha.getMonth()===mo&&x.fecha.getFullYear()===y).sort((a,b)=>b.fecha-a.fecha);
  const ent=xs.filter(x=>x.tipo==='ingreso').reduce((s,x)=>s+x.valor,0),sal=xs.filter(x=>x.tipo==='egreso').reduce((s,x)=>s+x.valor,0);
@@ -1375,13 +1382,12 @@ function vTrabajo(){
  const card=p=>{const st=inmEstado(p),pg=S.inm.pagos[p.id],n=days(inmVence(p));
   if(st==='vacia')return `<div class="inm vacia"><div class="inm-top"><span class="inm-ic">${ic('house')}</span><div class="tx"><b>${esc(p.nombre)}</b><span class="k">${esc(p.dir)}</span><span class="k due-l">${p.dueno?'De '+esc(DUE(p.dueno).nombre):'Es de '+P.luis.short}</span></div><span class="pill">Desocupada</span></div>
    <p class="muted" style="margin:0">Sin inquilino: no se cobra renta.${p.hist.length?` Último: ${esc(p.hist[p.hist.length-1].inq)}, hasta ${desdeTxt(p.hist[p.hist.length-1].hasta)}.`:''}</p>
-   <div class="inm-acc"><button class="btn pri sm" data-a="propedit" data-id="${p.id}" data-v="nuevo">${ic('plus','s')}Agregar inquilino</button><button class="btn gh sm" data-a="propedit" data-id="${p.id}">${ic('edit','s')}Editar</button></div></div>`;
+   <div class="inm-acc"><button class="btn pri sm" data-a="propedit" data-id="${p.id}" data-v="nuevo">${ic('plus','s')}Agregar inquilino</button></div></div>`;
   const wa=`https://wa.me/57${p.cel}?text=${encodeURIComponent(`Hola ${p.inq.split(' ')[0]}, le recuerdo el pago del arriendo de ${MES[TODAY.getMonth()]} (${COP(p.renta)}). Gracias.`)}`;
   return `<div class="inm ${st==='ok'?'hecha':st==='bad'?'tarde':''}"><div class="inm-top"><span class="inm-ic">${ic('house')}</span><div class="tx"><b>${esc(p.nombre)}</b><span class="k">${esc(p.dir)}</span><span class="k due-l">${p.dueno?'De '+esc(DUE(p.dueno).nombre)+' · Adm. '+COP(p.admin||0):'Es de '+P.luis.short}</span></div><span class="pill ${st==='parcial'?'warn':st}">${st==='ok'?'Pagado':st==='parcial'?'Pagó una parte':st==='bad'?`Atrasado ${-n} ${-n===1?'día':'días'}`:n===0?'Vence hoy':`Vence el ${p.dia}`}</span></div>
   <div class="inm-mid"><div><span class="k">Inquilino${p.desde?' desde '+desdeTxt(p.desde):''}</span><b>${esc(p.inq)}</b></div><div><span class="k">Renta</span><b>${COP(p.renta)}</b></div></div>
   ${pg?`<div class="inm-pago">${pg.url&&(pg.mime||'').startsWith('image/')?`<span class="mini sm"><img src="${pg.url}" alt=""></span>`:`<span class="evi ${pg.file?'fi':'no'}">${ic(pg.file?'file':'msg','s')}</span>`}<div class="tx"><b>${st==='parcial'?`Pagó ${COP(pgVal(p))} · falta ${COP(p.renta-pgVal(p))}`:'Pagó · '+esc(pg.medio)}</b><span class="k">Lo registró ${P[pg.by].short} · ${esc(pg.at)}</span>${pg.nota?`<span class="k">“${esc(pg.nota)}”</span>`:''}<button class="lnk" data-a="movver" data-id="r${p.id}">Ver o corregir</button></div></div>${st==='parcial'?`<div class="inm-acc"><button class="btn pri sm" data-a="inmpago" data-id="${p.id}">${ic('plus','s')}Pagó lo que faltaba</button><a class="btn gh sm wa" href="${wa}" target="_blank" rel="noopener">${ic('msg','s')}Recordarle</a></div>`:''}`
    :`<div class="inm-acc"><button class="btn pri sm" data-a="inmpago" data-id="${p.id}">${ic('check','s')}Ya pagó</button><a class="btn gh sm wa" href="${wa}" target="_blank" rel="noopener">${ic('msg','s')}Recordarle</a></div>`}
-  <button class="lnk inm-edit" data-a="propedit" data-id="${p.id}">${ic('edit','s')}Editar propiedad o inquilino</button>
   </div>`};
  const recs=S.inm.recur.slice().sort((a,b)=>a.prox-b.prox);
  const recRow=k=>{const p=S.inm.props.find(x=>x.id===k.prop),n=days(k.prox),st=recEst(k);return `<div class="rec-row ${st==='bad'?'tarde':''}"><button class="rec-tx" data-a="recur" data-id="${k.id}"><b>${esc(k.desc)} · ${COP(k.valor)}</b><span class="k">${p?esc(p.nombre)+(p.dueno?' · se descuenta a '+esc(DUE(p.dueno).nombre.split(' ')[0]):''):'General'} · ${esc(k.cada).toLowerCase()}</span></button><span class="pill ${st}">${n<0?`Atrasado ${-n} ${-n===1?'día':'días'}`:n===0?'Vence hoy':'Vence el '+fshort(k.prox)}</span><button class="btn pri sm" data-a="recpagar" data-id="${k.id}">${ic('check','s')}Ya lo pagué</button></div>`};
@@ -1391,7 +1397,7 @@ function vTrabajo(){
   <button class="anota entra" data-a="inmgasto" data-v="ingreso"><span class="sg">+</span><b>Entra plata</b><small>Otro ingreso que no sea la renta</small></button>
  </div>
  <button class="btn gh full ver-res" data-a="nav" data-v="inmores">${ic('cal','s')}Ver cuánto le quedó a ${P.luis.short} este mes</button>
- <div class="shd" style="margin-top:26px"><h2>Propiedades</h2><span class="c">${S.inm.props.length}</span><button class="btn gh sm empuja" data-a="propedit" data-id="">${ic('plus','s')}Agregar</button></div>
+ <div class="shd" style="margin-top:26px"><h2>Propiedades</h2><span class="c">${S.inm.props.length}</span><button class="btn gh sm empuja" data-a="config" data-v="trabajo">${ic('gear','s')}Configurar</button></div>
  <div class="inm-grid">${S.inm.props.map(card).join('')}</div>
  ${S.inm.duenos.some(d=>S.inm.props.some(p=>p.dueno===d.id))?`<div class="shd" style="margin-top:26px"><h2>Cuentas de los dueños</h2></div><div class="inm-grid">${S.inm.duenos.filter(d=>S.inm.props.some(p=>p.dueno===d.id)).map(d=>{const c=cuentas(d.id),n=c.props.length;return `<button class="card due ${c.falta<=0&&c.hecho>0?'hecha':''}" data-a="cuentas" data-id="${d.id}"><span class="inm-ic">${ic('fam')}</span><span class="tx"><b>${esc(d.nombre)}</b><span class="k">${n} ${n===1?'propiedad':'propiedades'} · ${c.falta>0?'Falta transferirle '+COP(c.falta):c.falta<0?'Le debe a '+P.luis.short+' '+COP(-c.falta):c.hecho?'Ya se le transfirió':'Nada este mes'}</span></span>${ic('chev','s')}</button>`}).join('')}</div>`:''}
  <div class="shd" style="margin-top:26px"><h2>Pagos que se repiten</h2><span class="c">${recs.length}</span><button class="btn gh sm empuja" data-a="recur" data-id="">${ic('plus','s')}Agregar</button></div>
@@ -1424,12 +1430,35 @@ function vInmoRes(){
  <p class="muted" style="margin-top:16px">La plata de los dueños no es de ${P.luis.short}: solo cuenta su administración. No reemplaza la contabilidad.</p></div>`}
 function desdeTxt(f){if(!f)return '';const [y,m]=String(f).split('-');return MES[+m-1]+' de '+y}
 function propCollect(m){const g=id=>{const e=document.getElementById(id);return e?e.value.trim():undefined};const f=m.f;
- [['pn','nombre'],['pd','dir'],['gval','renta'],['gadm','admin'],['pdia','dia'],['qn','inq'],['qc','cel'],['qd','desde'],['dn','dnom'],['dc','dcel']].forEach(([id,k])=>{const v=g(id);if(v!==undefined)f[k]=v})}
+ [['pn','nombre'],['pd','dir'],['gval','renta'],['gadm','admin'],['pdia','dia'],['qn','inq'],['qc','cel'],['qd','desde'],['dn','dnom'],['dc','dcel'],['dm','dmail']].forEach(([id,k])=>{const v=g(id);if(v!==undefined)f[k]=v})}
 function inmHoy(){if(!seesInm())return '';const pend=S.inm.props.filter(p=>inmPend(p)),rec=S.inm.recur.filter(k=>recEst(k)!=='neu');
  const tarde=pend.filter(p=>inmEstado(p)==='bad').length+rec.filter(k=>recEst(k)==='bad').length;
  if(!pend.length&&!rec.length)return `<button class="card inm-hoy hecha" data-a="ctaver" data-v="trabajo"><span class="inm-ic">${ic('card')}</span><div class="tx"><b>Cuentas del trabajo</b><span class="k">Rentas de ${MES[TODAY.getMonth()]} cobradas y pagos al día</span></div>${ic('chev','s')}</button>`;
  const parts=[pend.length?`${pend.length} ${pend.length===1?'renta':'rentas'} por cobrar`:'',rec.length?`${rec.length} ${rec.length===1?'pago':'pagos'} por hacer`:''].filter(Boolean);
  return `<button class="card inm-hoy ${tarde?'tarde':''}" data-a="ctaver" data-v="trabajo"><span class="inm-ic">${ic('card')}</span><div class="tx"><b>Cuentas: ${parts.join(' y ')}</b><span class="k">${[...pend.map(p=>esc(p.inq)+(inmEstado(p)==='bad'?' (atrasada)':'')),...rec.map(k=>esc(k.desc)+(recEst(k)==='bad'?' (atrasado)':''))].join(' · ')}</span></div>${ic('chev','s')}</button>`}
+const celTxt=c=>{const d=String(c||'').replace(/\D/g,'');return d.length===10?`${d.slice(0,3)} ${d.slice(3,6)} ${d.slice(6)}`:d};
+function vConfig(){const puedeT=seesInm();let tab=S.cfgTab||'familia';if(tab==='trabajo'&&!puedeT)tab='familia';
+ const t=(v,i,a,b)=>`<button role="tab" aria-selected="${tab===v}" class="${tab===v?'on':''}" data-a="cfgtab" data-v="${v}">${ic(i)}<span><b>${a}</b><small>${b}</small></span></button>`;
+ const head=`<div class="wrap cta-head"><button class="back" data-a="back">${ic('back','s')}Volver</button><div class="ph"><div><h1>Configurar</h1><p>Lo que se arma una vez y se cambia poco.</p></div></div>
+ ${puedeT?`<div class="cta-tabs" role="tablist">${t('familia','fam','Familia','Personas y accesos')}${t('trabajo','card','Trabajo','Propiedades y contactos')}</div>`:''}</div>`;
+ if(tab==='familia'){
+  const ents=Object.values(ENT).filter(e=>seesEnt(e.id)).map(e=>`<button class="cfg-row" data-a="ent" data-id="${e.id}">${entTile(e.id,'sm')}<span class="tx"><b>${esc(e.full)}</b><span class="k">${tLabel(e.type)}</span></span>${ic('chev','s')}</button>`).join('');
+  const mem=Object.values(P).map(p=>`<div class="cfg-row stat">${av(p.id,'sm')}<span class="tx"><b>${p.name}</b><span class="k">${ROLE[p.role]} · ${KIND[p.kind]}${p.status==='pendiente'?' · invitación pendiente':''}</span></span></div>`).join('');
+  return head+`<div class="wrap">
+  <div class="shd"><h2>Lo que se cuida</h2><span class="c">${Object.values(ENT).filter(e=>seesEnt(e.id)).length}</span>${canEdit()?`<button class="btn gh sm empuja" data-a="addent">${ic('plus','s')}Agregar</button>`:''}</div>
+  <div class="cfg-list">${ents}</div>
+  <div class="shd" style="margin-top:26px"><h2>Quiénes participan</h2></div>
+  <div class="cfg-list">${mem}</div>
+  <button class="btn gh full" style="margin-top:14px" data-a="nav" data-v="set">${ic('gear','s')}${isAdmin()?'Invitar, permisos, letra y avisos':'Letra y avisos'}</button></div>`}
+ const props=S.inm.props,ds=S.inm.duenos,inqs=props.filter(p=>p.inq);
+ return head+`<div class="wrap">
+ <div class="shd"><h2>Propiedades</h2><span class="c">${props.length}</span><button class="btn gh sm empuja" data-a="propedit" data-id="">${ic('plus','s')}Agregar</button></div>
+ <div class="cfg-list">${props.map(p=>`<button class="cfg-row" data-a="propedit" data-id="${p.id}"><span class="inm-ic">${ic('house')}</span><span class="tx"><b>${esc(p.nombre)}</b><span class="k">${p.dueno?'De '+esc(DUE(p.dueno).nombre):'Es de '+P.luis.short} · ${p.inq?esc(p.inq):'Desocupada'} · ${COP(p.renta)} el ${p.dia}</span></span>${ic('chev','s')}</button>`).join('')||'<p class="muted" style="padding:14px;margin:0">Sin propiedades.</p>'}</div>
+ <div class="shd" style="margin-top:26px"><h2>Dueños</h2><span class="c">${ds.length}</span><button class="btn gh sm empuja" data-a="dueno" data-id="">${ic('plus','s')}Agregar</button></div>
+ <div class="cfg-list">${ds.map(d=>{const ps=props.filter(p=>p.dueno===d.id);return `<button class="cfg-row" data-a="dueno" data-id="${d.id}"><span class="inm-ic">${ic('fam')}</span><span class="tx"><b>${esc(d.nombre)}</b><span class="k">${d.cel?celTxt(d.cel):'<span class="falta">Falta el celular</span>'}${d.mail?' · '+esc(d.mail):''}</span><span class="k">${ps.length?ps.map(p=>esc(p.nombre)).join(', '):'Sin propiedades'}</span></span>${ic('chev','s')}</button>`}).join('')||'<p class="muted" style="padding:14px;margin:0">Sin dueños.</p>'}</div>
+ <div class="shd" style="margin-top:26px"><h2>Inquilinos</h2><span class="c">${inqs.length}</span></div>
+ <div class="cfg-list">${inqs.map(p=>`<button class="cfg-row" data-a="inqedit" data-id="${p.id}"><span class="inm-ic">${ic('id')}</span><span class="tx"><b>${esc(p.inq)}</b><span class="k">${esc(p.nombre)}${p.desde?' · desde '+desdeTxt(p.desde):''}${p.cel?' · '+celTxt(p.cel):''}</span></span>${ic('chev','s')}</button>`).join('')||'<p class="muted" style="padding:14px;margin:0">Sin inquilinos.</p>'}</div>
+ <p class="muted" style="margin-top:10px">Para cambiar de inquilino o dejar una propiedad desocupada, ábrela arriba. Los anteriores quedan en su historial.</p></div>`}
 function vEnt(id){
  const e=ENT[id];
  if(!e||!seesEnt(id))return `<div class="wrap"><button class="back" data-a="back">${ic('back','s')}Volver</button><div class="empty" style="margin-top:16px"><h3>No tienes acceso</h3></div></div>`;
@@ -1607,8 +1636,9 @@ function modal(){
   <div><span class="lbl">Dirección (opcional)</span><input class="inp" id="pd" value="${esc(f.dir||'')}"></div>
   <div class="dos-c"><div><label class="lbl" for="gval">Renta mensual</label><div class="monto-in"><span>$</span><input id="gval" size="4" inputmode="numeric" autocomplete="off" placeholder="0" value="${esc(miles(f.renta||''))}" aria-describedby="gvalw"></div><div class="monto-w" id="gvalw" aria-live="polite">${palabrasPesos(f.renta)}</div>${m.err&&m.err.renta?'<div class="er">Escribe la renta.</div>':''}</div>
   <div><span class="lbl">Día de pago</span><input class="inp" id="pdia" inputmode="numeric" placeholder="Ej.: 5" value="${esc(f.dia||'')}">${m.err&&m.err.dia?'<div class="er">Un día entre 1 y 31.</div>':''}</div></div>
-  <div><span class="lbl">¿De quién es?</span><div class="chips"><button class="chip ${!f.dueno?'on':''}" data-a="propf" data-f="dueno" data-v="">De ${P.luis.short}</button>${S.inm.duenos.map(d=>`<button class="chip ${f.dueno===d.id?'on':''}" data-a="propf" data-f="dueno" data-v="${d.id}">${esc(d.nombre)}</button>`).join('')}<button class="chip ${f.dueno==='nuevo'?'on':''}" data-a="propf" data-f="dueno" data-v="nuevo">${ic('plus','s')}Otro dueño</button></div></div>
-  ${f.dueno==='nuevo'?`<div class="inq-box"><b>Dueño</b><div><span class="lbl">Nombre</span><input class="inp" id="dn" placeholder="Ej.: Gloria Restrepo" value="${esc(f.dnom||'')}">${m.err&&m.err.dnom?'<div class="er">Escribe el nombre del dueño.</div>':''}</div><div><span class="lbl">Celular (para enviarle las cuentas)</span><input class="inp" id="dc" inputmode="tel" placeholder="Ej.: 3101234567" value="${esc(f.dcel||'')}">${m.err&&m.err.dcel?'<div class="er">Escribe los 10 números del celular.</div>':''}</div></div>`:''}
+  <div><span class="lbl">¿De quién es?</span><div class="chips"><button class="chip ${!f.dueno?'on':''}" data-a="propf" data-f="dueno" data-v="">De ${P.luis.short}</button>${S.inm.duenos.map(d=>`<button class="chip ${f.dueno===d.id?'on':''}" data-a="propf" data-f="dueno" data-v="${d.id}">${esc(d.nombre)}</button>`).join('')}<button class="chip ${f.dueno==='nuevo'?'on':''}" data-a="propf" data-f="dueno" data-v="nuevo">${ic('plus','s')}Otro dueño</button></div>${m.err&&m.err.dueno?'<div class="er">Ese dueño no tiene celular. Agrégalo en Configurar → Dueños.</div>':''}</div>
+  ${f.dueno==='nuevo'?`<div class="inq-box"><b>Dueño</b><div><span class="lbl">Nombre</span><input class="inp" id="dn" placeholder="Ej.: Gloria Restrepo" value="${esc(f.dnom||'')}">${m.err&&m.err.dnom?'<div class="er">Escribe el nombre del dueño.</div>':''}</div><div><span class="lbl">Celular (a este número le llegan las cuentas)</span><input class="inp" id="dc" inputmode="tel" placeholder="Ej.: 3101234567" value="${esc(f.dcel||'')}">${m.err&&m.err.dcel?'<div class="er">Escribe los 10 números del celular del dueño.</div>':''}</div><div><span class="lbl">Correo (opcional)</span><input class="inp" id="dm" inputmode="email" placeholder="Ej.: nombre@correo.com" value="${esc(f.dmail||'')}">${m.err&&m.err.dmail?'<div class="er">Revisa el correo.</div>':''}</div></div>`:''}
+  ${f.dueno&&f.dueno!=='nuevo'&&DUE(f.dueno)?`<p class="hint-due">${ic('msg','s')}Las cuentas le llegan a ${esc(DUE(f.dueno).nombre)} al ${DUE(f.dueno).cel?celTxt(DUE(f.dueno).cel):'(sin celular: agrégalo en Configurar)'}.</p>`:''}
   ${f.dueno?`<div><label class="lbl" for="gadm">Administración mensual de ${P.luis.short}</label><div class="monto-in"><span>$</span><input id="gadm" size="4" inputmode="numeric" autocomplete="off" placeholder="0" value="${esc(miles(f.admin||''))}" aria-describedby="gadmw"></div><div class="monto-w" id="gadmw" aria-live="polite">${palabrasPesos(f.admin)}</div>${m.err&&m.err.admin?'<div class="er">Escribe cuánto cobra por administrarla.</div>':''}<p class="muted" style="margin:6px 0 0">Se descuenta de las cuentas del dueño solo cuando se cobra la renta.</p></div>`:''}
   <div><span class="lbl">¿Tiene inquilino?</span><div class="chips"><button class="chip ${f.ocupada?'on':''}" data-a="setf" data-f="ocupada" data-v="1">Sí, está arrendada</button><button class="chip ${!f.ocupada?'on':''}" data-a="setf" data-f="ocupada" data-v="">No, está desocupada</button></div></div>`}
   ${f.ocupada||m.cambio?`<div class="inq-box"><b>Inquilino</b>
@@ -1690,6 +1720,23 @@ function modal(){
   <div><label class="lbl" for="rfecha">¿Cuándo es el próximo?</label><input class="inp" type="date" id="rfecha" value="${esc(m.prox||'')}">${m.err&&m.err.prox?'<div class="er">Elige la fecha.</div>':''}</div>
   <button class="btn pri big full" data-a="recsave">${ic('check')}Guardar</button>
   ${k?'<button class="enlace peligro-t" data-a="setf" data-f="borrar" data-v="1">Quitar este pago</button>':''}</div>`}
+ if(m.k==='dueno'){const d=m.id?DUE(m.id):null,ps=d?S.inm.props.filter(p=>p.dueno===d.id):[];
+  if(m.borrar&&d)h=`<div class="sh"><h2>¿Quitar a ${esc(d.nombre)}?</h2>${X}</div><div class="sb"><div class="aviso-borrar">${ic('alert')}<div><b>Se quita de los dueños.</b><p>Sus transferencias anotadas se conservan.</p></div></div><button class="btn big full peligro" data-a="duenodelok">Sí, quitarlo</button><button class="btn gh big full" data-a="setf" data-f="borrar" data-v="">No, volver</button></div>`;
+  else h=`<div class="sh"><div><span class="sobre">Trabajo · dueño</span><h2>${d?esc(d.nombre):'Agregar dueño'}</h2></div>${X}</div><div class="sb">
+  <div><span class="lbl">Nombre</span><input class="inp" id="dn" value="${esc(m.n||'')}" placeholder="Ej.: Gloria Restrepo">${m.err&&m.err.n?'<div class="er">Escribe el nombre.</div>':''}</div>
+  <div><span class="lbl">Celular (a este número le llegan las cuentas)</span><input class="inp" id="dc" inputmode="tel" value="${esc(m.c||'')}" placeholder="Ej.: 3101234567">${m.err&&m.err.c?'<div class="er">Escribe los 10 números del celular.</div>':''}</div>
+  <div><span class="lbl">Correo (opcional)</span><input class="inp" id="dm" inputmode="email" value="${esc(m.mail||'')}" placeholder="Ej.: nombre@correo.com">${m.err&&m.err.mail?'<div class="er">Revisa el correo.</div>':''}</div>
+  ${ps.length?`<div><span class="lbl">Sus propiedades</span>${ps.map(p=>`<div class="hist-inq"><b>${esc(p.nombre)}</b><span class="k">Administración ${COP(p.admin||0)} al mes</span></div>`).join('')}</div>`:''}
+  <button class="btn pri big full" data-a="duenosave">${ic('check')}Guardar</button>
+  ${d?(ps.length?`<p class="muted" style="margin:0">Para quitarlo, primero cambia el dueño de sus propiedades.</p>`:'<button class="enlace peligro-t" data-a="setf" data-f="borrar" data-v="1">Quitar este dueño</button>'):''}</div>`}
+ if(m.k==='inqedit'){const p=S.inm.props.find(x=>x.id===m.id);
+  h=`<div class="sh"><div><span class="sobre">Inquilino · ${esc(p.nombre)}</span><h2>${esc(p.inq)}</h2></div>${X}</div><div class="sb">
+  <div><span class="lbl">Nombre</span><input class="inp" id="qn" value="${esc(m.n||'')}">${m.err&&m.err.n?'<div class="er">Escribe el nombre.</div>':''}</div>
+  <div><span class="lbl">Celular (para recordarle la renta)</span><input class="inp" id="qc" inputmode="tel" value="${esc(m.c||'')}">${m.err&&m.err.c?'<div class="er">Escribe los 10 números del celular.</div>':''}</div>
+  <div><span class="lbl">¿Desde cuándo?</span><input class="inp" id="qd" type="month" value="${esc((m.d||'').slice(0,7))}"></div>
+  <p class="muted" style="margin:0">La cédula o el contrato van en Papeles, no aquí.</p>
+  <button class="btn pri big full" data-a="inqsave">${ic('check')}Guardar</button>
+  <button class="lnk" data-a="propedit" data-id="${p.id}">Cambió el inquilino o quedó desocupada</button></div>`}
  if(m.k==='inmgasto'&&!m.tipo){
   h=`<div class="sh"><h2>Inmobiliaria</h2>${X}</div><div class="sb"><p style="margin:0;font-size:18px;font-weight:700;color:var(--fg-1)">¿Entró o salió plata?</p>
   <div class="anota2" style="margin-top:0"><button class="anota sale" data-a="setf" data-f="tipo" data-v="egreso"><span class="sg">−</span><b>Salió plata</b><small>Un gasto: foto del recibo</small></button><button class="anota entra" data-a="setf" data-f="tipo" data-v="ingreso"><span class="sg">+</span><b>Entró plata</b><small>Otro ingreso</small></button></div>
@@ -1879,8 +1926,8 @@ function render(){
  if(v==='landing'){document.getElementById('app').innerHTML=`<div class="pbar"><b>PROTOTIPO</b><span>Demo · datos ficticios</span></div>${vLanding()}`;return}
  let c='';
  if(v==='home')c=remote()?vHomeRemote():vHomeLocal();
- else if(v==='item')c=vItem(S.arg);else if(v==='cal')c=vCal();else if(v==='docs')c=vDocs();else if(v==='fam')c=vFamily();else if(v==='ent')c=vEnt(S.arg);else if(v==='set')c=vSet();else if(v==='inmo')c=vPlata();else if(v==='inmores')c=vInmoRes();else if(v==='cuentas')c=vCuentas(S.arg);
- const act=v==='item'?'home':v==='ent'?'fam':v==='inmores'||v==='cuentas'?'inmo':v;
+ else if(v==='item')c=vItem(S.arg);else if(v==='cal')c=vCal();else if(v==='docs')c=vDocs();else if(v==='fam')c=vFamily();else if(v==='ent')c=vEnt(S.arg);else if(v==='set')c=vSet();else if(v==='inmo')c=vPlata();else if(v==='inmores')c=vInmoRes();else if(v==='cuentas')c=vCuentas(S.arg);else if(v==='config')c=vConfig();
+ const act=v==='item'?'home':v==='ent'?'fam':v==='inmores'||v==='cuentas'?'inmo':v==='config'?'fam':v;
  const navs=[['home','home',remote()?'Desde afuera':'Hoy'],['cal','cal','Calendario'],['docs','file','Papeles'],['fam','fam','Familia']];
  const navsSide=seesInm()?[...navs.slice(0,2),['inmo','card','Cuentas'],...navs.slice(2)]:navs;
  const z=SCALE[S.font[S.user]||'grande'];
@@ -1991,10 +2038,10 @@ document.addEventListener('click',e=>{
  case 'propsave':{propCollect(m);const f=m.f,er={};const p=m.id?S.inm.props.find(x=>x.id===m.id):null;
   const renta=Number(String(f.renta||'').replace(/\D/g,'')),dia=Number(f.dia),cel=String(f.cel||'').replace(/\D/g,'');
   const admin=Number(String(f.admin||'').replace(/\D/g,'')),dcel=String(f.dcel||'').replace(/\D/g,'');
-  if(!m.cambio){if(!f.nombre)er.nombre=1;if(!renta)er.renta=1;if(!(dia>=1&&dia<=31))er.dia=1;if(f.dueno&&!admin)er.admin=1;if(f.dueno==='nuevo'){if(!f.dnom)er.dnom=1;if(dcel&&dcel.length!==10)er.dcel=1}}
+  if(!m.cambio){if(!f.nombre)er.nombre=1;if(!renta)er.renta=1;if(!(dia>=1&&dia<=31))er.dia=1;if(f.dueno&&!admin)er.admin=1;if(f.dueno==='nuevo'){if(!f.dnom)er.dnom=1;if(dcel.length!==10)er.dcel=1;if(f.dmail&&!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(f.dmail))er.dmail=1}else if(f.dueno&&DUE(f.dueno)&&!DUE(f.dueno).cel)er.dueno=1}
   const ocup=m.cambio||!!f.ocupada;if(ocup){if(!f.inq)er.inq=1;if(cel&&cel.length!==10)er.cel=1}
   if(Object.keys(er).length){m.err=er;render();break}
-  let due=f.dueno||null;if(!m.cambio&&due==='nuevo'){due='d'+Date.now();S.inm.duenos.push({id:due,nombre:f.dnom,cel:dcel})}
+  let due=f.dueno||null;if(!m.cambio&&due==='nuevo'){due='d'+Date.now();S.inm.duenos.push({id:due,nombre:f.dnom,cel:dcel,mail:f.dmail||''})}
   if(p){if(!m.cambio)Object.assign(p,{dueno:due,admin:due?admin:0});const cambia=p.inq&&(!ocup||m.cambio||f.inq!==p.inq);if(cambia){const hasta=new Date(TODAY.getFullYear(),TODAY.getMonth(),0);p.hist.push({inq:p.inq,cel:p.cel,desde:p.desde||'',hasta:`${hasta.getFullYear()}-${String(hasta.getMonth()+1).padStart(2,'0')}-${hasta.getDate()}`});delete S.inm.pagos[p.id]}
    if(!m.cambio)Object.assign(p,{nombre:f.nombre,dir:f.dir||'',renta,dia});Object.assign(p,ocup?{inq:f.inq,cel,desde:f.desde?f.desde.slice(0,7)+'-01':null}:{inq:null,cel:'',desde:null});
    S.modal=null;render();toast(cambia&&ocup?`Nuevo inquilino: ${f.inq}`:!ocup?'Quedó desocupada':'Propiedad actualizada');break}
@@ -2019,6 +2066,15 @@ document.addEventListener('click',e=>{
   const fl=m.file?{file:m.file.name,url:m.file.url,mime:m.file.type}:{};
   if(m.edit){Object.assign(S.inm.liq.find(l=>l.id===m.edit),{valor:v,medio:m.medio,fecha:deISO(m.fecha)},fl);S.modal=null;render();toast('Transferencia corregida');break}
   S.inm.liq.push({id:Date.now(),dueno:m.did,valor:v,medio:m.medio,fecha:deISO(m.fecha),by:S.user,file:null,...fl});S.modal=null;render();toast('Transferencia a '+DUE(m.did).nombre+' registrada');break}
+ case 'config':S.cfgTab=t.dataset.v||S.cfgTab;nav('config');break;
+ case 'cfgtab':S.cfgTab=t.dataset.v;render();break;
+ case 'dueno':{const d=t.dataset.id?DUE(t.dataset.id):null;S.modal=d?{k:'dueno',id:d.id,n:d.nombre,c:d.cel||'',mail:d.mail||'',err:null}:{k:'dueno',err:null};render();break}
+ case 'duenosave':{m.n=val('dn');m.c=val('dc');m.mail=val('dm');const c=m.c.replace(/\D/g,''),er={};if(!m.n)er.n=1;if(c.length!==10)er.c=1;if(m.mail&&!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(m.mail))er.mail=1;if(Object.keys(er).length){m.err=er;render();break}
+  if(m.id)Object.assign(DUE(m.id),{nombre:m.n,cel:c,mail:m.mail});else S.inm.duenos.push({id:'d'+Date.now(),nombre:m.n,cel:c,mail:m.mail});S.modal=null;render();toast(m.id?'Dueño actualizado':'Dueño agregado');break}
+ case 'duenodelok':S.inm.duenos=S.inm.duenos.filter(d=>d.id!==m.id);S.modal=null;render();toast('Dueño quitado');break;
+ case 'inqedit':{const p=S.inm.props.find(x=>x.id===t.dataset.id);S.modal={k:'inqedit',id:p.id,n:p.inq,c:p.cel||'',d:p.desde||'',err:null};render();break}
+ case 'inqsave':{const p=S.inm.props.find(x=>x.id===m.id);m.n=val('qn');m.c=val('qc');m.d=val('qd');const c=m.c.replace(/\D/g,''),er={};if(!m.n)er.n=1;if(c&&c.length!==10)er.c=1;if(Object.keys(er).length){m.err=er;render();break}
+  Object.assign(p,{inq:m.n,cel:c,desde:m.d?m.d.slice(0,7)+'-01':null});S.modal=null;render();toast('Inquilino actualizado');break}
  case 'ctatab':S.ctaTab=t.dataset.v;render();break;
  case 'ctaver':S.ctaTab=t.dataset.v;nav('inmo');break;
  case 'recur':{const k=t.dataset.id?S.inm.recur.find(x=>x.id===t.dataset.id):null;S.modal=k?{k:'recur',id:k.id,desc:k.desc,prop:k.prop||'gen',cat:k.cat,valor:String(k.valor),cada:k.cada,prox:isoD(k.prox),err:null}:{k:'recur',cada:'Cada mes',err:null};render();break}
@@ -2075,7 +2131,7 @@ document.addEventListener('click',e=>{
   if(tp==='pago'){it.rec=f.rec==='Una vez'?undefined:f.rec;if(f.valor)it.amount='$ '+Number(String(f.valor).replace(/\D/g,'')).toLocaleString('es-CO')}
   if(m.file){it.attach={name:m.file.name,url:m.file.url};S.docs.push({id:'d'+Date.now(),ent,cat:tp==='pago'?'Recibos':'Salud',name:(tp==='medicamento'?'Fórmula · ':'Orden · ')+it.title,fmt:m.file.type.includes('pdf')?'PDF':'JPG',by:S.user,url:m.file.url,mime:m.file.type,log:[]})}
   S.items.push(it);addFeed(`anotó “${it.title}”${tp==='cita'||tp==='examen'?' para el '+due.getDate()+' de '+MES[due.getMonth()]:''}`,id);S.modal=null;render();toast('Anotado. Ya lo ve toda la familia');break}
- case 'setf':if(m.k==='prop')propCollect(m);if(['inmpago','inmgasto','casamov','transfer'].includes(m.k)&&document.getElementById('gfecha'))m.fecha=val('gfecha');if(m.k==='inmpago'){m.note=val('inmnote');m.valor=val('gval')}if(m.k==='casamov'||m.k==='transfer'){m.valor=val('gval');m.desc=val('gdesc')}if(m.k==='recur'){m.valor=val('gval');m.desc=val('rdesc');m.prox=val('rfecha')}if(m.k==='inmgasto'){m.valor=val('gval');m.desc=val('gdesc')}if(m.k==='adddoc'){m.n=val('dname');m.v=val('dvence')}if(m.k==='invite'){m.n=val('iname');m.c=val('icontact')}if(m.k==='addent')m.n=val('ename');if(m.k==='edititem'){m.t=val('et');m.d=val('ed');m.h=val('eh')}if(m.k==='editdoc'){m.n=val('dn');m.v=val('dv')}if(m.k==='delitem'&&m.r==='Otro')m.o=val('dr');m[t.dataset.f]=t.dataset.v;if(m.err)m.err[t.dataset.f]=0;render();break;
+ case 'setf':if(m.k==='prop')propCollect(m);if(['inmpago','inmgasto','casamov','transfer'].includes(m.k)&&document.getElementById('gfecha'))m.fecha=val('gfecha');if(m.k==='inmpago'){m.note=val('inmnote');m.valor=val('gval')}if(m.k==='casamov'||m.k==='transfer'){m.valor=val('gval');m.desc=val('gdesc')}if(m.k==='recur'){m.valor=val('gval');m.desc=val('rdesc');m.prox=val('rfecha')}if(m.k==='dueno'){m.n=val('dn');m.c=val('dc');m.mail=val('dm')}if(m.k==='inmgasto'){m.valor=val('gval');m.desc=val('gdesc')}if(m.k==='adddoc'){m.n=val('dname');m.v=val('dvence')}if(m.k==='invite'){m.n=val('iname');m.c=val('icontact')}if(m.k==='addent')m.n=val('ename');if(m.k==='edititem'){m.t=val('et');m.d=val('ed');m.h=val('eh')}if(m.k==='editdoc'){m.n=val('dn');m.v=val('dv')}if(m.k==='delitem'&&m.r==='Otro')m.o=val('dr');m[t.dataset.f]=t.dataset.v;if(m.err)m.err[t.dataset.f]=0;render();break;
  case 'fbres':m.res=t.dataset.v;m.err=null;render();break;
  case 'fbacomp':m.note=val('fbnote');m.acomp=t.dataset.v;render();break;
  case 'fbhow':m.note=val('fbnote');m.how=t.dataset.v;m.err=null;render();break;
