@@ -857,6 +857,14 @@ button.cfg-row:hover{background:var(--navy-50)}
 .cfg-row .k{overflow-wrap:anywhere}.cfg-row .falta{color:var(--bad);font-weight:700}
 .enviar-a{margin-top:14px;display:flex;flex-direction:column;gap:2px}.enviar-a b{font-size:18px;color:var(--fg-1);overflow-wrap:anywhere}
 .shd{flex-wrap:wrap;row-gap:8px}
+.anota.hacer .sg{background:var(--navy-50);color:var(--navy-800);font-size:22px}
+.anota .sg .ic{width:24px;height:24px}
+.para-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(96px,1fr));gap:12px}
+.para-b{display:flex;flex-direction:column;align-items:center;gap:8px;background:var(--white);border:1px solid var(--line);border-radius:18px;padding:14px 8px;color:inherit;min-width:0}
+.para-b:hover{border-color:var(--navy-500)}
+.para-b .fpic{width:64px;height:64px;border-radius:50%;overflow:hidden;display:block}.para-b .fpic.sq{border-radius:16px}
+.para-b b{color:var(--fg-1);font-size:17px;overflow-wrap:anywhere;text-align:center}
+.ph-acc{display:flex;gap:8px;flex-wrap:wrap}
 </style>
 </head>
 <body>
@@ -878,7 +886,8 @@ function baseEnt(){return{
  lucero:{id:'lucero',name:'Lucero',full:'Lucero',type:'persona',ini:'LS',bg:'#fbe3c8',fg:'#b4570f',perfil:{doc:'CC 00.000.7380',nace:'4 de agosto de 1954',cel:'300 000 0002',mail:'lucero.ejemplo@correo.com',dir:'Calle Ejemplo # 00-00, Cali',eps:'EPS Ejemplo (ficticia)'}},
  casa:{id:'casa',name:'Casa',full:'Casa familiar · Cali',type:'casa',nombre:'Casa familiar',dir:'Calle 00 # 00-00 (ficticia)',ciudad:'Cali',bg:'#d3f1e5',fg:'#17785a'},
  aaron:{id:'aaron',name:'Aaron',full:'Aaron',type:'mascota',especie:'Perro',raza:'Criollo (ejemplo)',nace:'Marzo de 2019 (ejemplo)',vet:'Veterinaria Patitas (ficticia)',bg:'#dcefe9',fg:'#1f6f5c'},
- carro:{id:'carro',name:'Carro',full:'Renault Logan · KTZ 418',type:'carro',marca:'Renault',modelo:'Logan',anio:'2016',placa:'KTZ 418',bg:'#f8efcc',fg:'#8a6d0f'}
+ carro:{id:'carro',name:'Carro',full:'Renault Logan · KTZ 418',type:'carro',marca:'Renault',modelo:'Logan',anio:'2016',placa:'KTZ 418',bg:'#f8efcc',fg:'#8a6d0f'},
+ trabajo:{id:'trabajo',name:'Trabajo',full:'Trabajo de Luis',type:'trabajo',bg:'#f8efcc',fg:'#8a6d0f'}
 }}
 let P=baseP(),ENT=baseEnt();
 const ROLE={admin:'Administrador',miembro:'Miembro',cuidador:'Cuidador/a'};
@@ -899,6 +908,9 @@ function seed(){P=baseP();ENT=baseEnt();return{
  notif:{app:true,mail:true,wa:false,hora:'7:00 a. m.'},
  places:{p1:{name:'Clínica del Valle (ficticia)',dir:'Av. Ejemplo # 10-20',tel:'602 000 0001'},p2:{name:'EPS Ejemplo · sede Norte',dir:'Calle Ejemplo # 40-15',tel:'602 000 0002'},p3:{name:'Consultorio dental Norte (ficticio)',dir:'Carrera Ejemplo # 5-30',tel:'602 000 0003'},p4:{name:'Laboratorio Central (ficticio)',dir:'Calle Ejemplo # 22-08',tel:'602 000 0004'},p5:{name:'Veterinaria Patitas (ficticia)',dir:'Carrera Ejemplo # 8-12',tel:'602 000 0005'}},
  items:[
+  {id:'adm302',ent:'trabajo',prop:'p2',title:'Administración del edificio',sub:'Apartamento 302',cat:'pago',resp:'luis',due:D(11,10),amount:'$ 180.000',rec:'Cada mes',open:true,hist:[['1 nov','Sistema','Se creó para este mes']]},
+  {id:'agualocal',ent:'trabajo',prop:'p3',title:'Agua del local',sub:'Local comercial · se descuenta a Hernán',cat:'pago',resp:'luis',due:D(11,25),amount:'$ 95.000',rec:'Cada mes',open:true,hist:[['1 nov','Sistema','Se creó para este mes']]},
+  {id:'predsf',ent:'trabajo',prop:'p1',title:'Predial',sub:'Casa San Fernando · se descuenta a Gloria',cat:'pago',resp:'luis',due:D(12,6),amount:'$ 310.000',rec:'Cada 3 meses',open:true,hist:[['1 nov','Sistema','Se creó para este periodo']]},
   {id:'gas',ent:'casa',title:'Pagar el gas',sub:'Factura de octubre',cat:'pago',resp:'luis',due:D(11,12),amount:'$ 86.400',rec:'Cada mes',open:true,hist:[['1 nov','Sistema','Se creó para este mes']]},
   {id:'rtm',ent:'carro',title:'Revisión técnico-mecánica',sub:'Certificado anual',cat:'vehiculo',resp:'luis',due:D(11,10),rec:'Cada año',open:true,hist:[['10 oct','Sistema','Se creó al acercarse el vencimiento del certificado']]},
   {id:'remlu',ent:'lucero',title:'Remedios de Lucero',sub:'Compra del mes',cat:'medicamento',resp:'luis',due:D(11,17),rec:'Cada mes',open:true,sens:true,attach:{name:'formula_lucero.jpg'},apuntes:[{by:'lucero',at:'2 nov',note:'Son los tres de la fórmula. Uno se acaba antes: pedir la caja grande.'}],prev:[{by:'luis',at:'17 oct · 11:05 a. m.',kind:'foto',file:'recibo_drogueria_oct.jpg',note:'Compré los tres. Uno quedó pendiente y lo trajeron el lunes.'},{by:'luis',at:'16 sep · 4:30 p. m.',kind:'voz',dur:22,note:'No dieron recibo. Los compré en la droguería de la esquina.'}],hist:[['1 nov','Sistema','Se creó para este mes'],['2 nov','Lucero','Agregó una nota']]},
@@ -921,7 +933,7 @@ function seed(){P=baseP();ENT=baseEnt();return{
  inm:{
   duenos:[{id:'d1',nombre:'Gloria Restrepo',cel:'3105551122',mail:'gloria.ejemplo@correo.com'},{id:'d2',nombre:'Hernán Castillo',cel:'3157778899',mail:''}],
   liq:[],
-  recur:[{id:'k1',prop:'p2',cat:'Administración del edificio',desc:'Administración del edificio',valor:180000,cada:'Cada mes',prox:D(11,10)},{id:'k2',prop:'p3',cat:'Servicios',desc:'Agua del local',valor:95000,cada:'Cada mes',prox:D(11,25)},{id:'k3',prop:'p1',cat:'Predial',desc:'Predial',valor:310000,cada:'Cada 3 meses',prox:D(12,6)}],
+  recur:[],
   props:[
    {id:'p1',dueno:'d1',admin:120000,nombre:'Casa San Fernando',dir:'Calle 5 # 34-20',inq:'Martha Gómez',cel:'3001112233',desde:'2024-03-01',renta:1200000,dia:5,hist:[{inq:'Carlos Mejía',cel:'3009990000',desde:'2021-02-01',hasta:'2024-02-29'}]},
    {id:'p2',dueno:null,admin:0,nombre:'Apartamento 302',dir:'Edificio Los Álamos',inq:'Jorge Ruiz',cel:'3004445566',desde:'2025-07-01',renta:950000,dia:10,hist:[]},
@@ -1024,7 +1036,7 @@ const fdate=d=>`${DIA[d.getDay()]} ${d.getDate()} de ${MES[d.getMonth()]}${d.get
 const fshort=d=>`${d.getDate()} ${MES[d.getMonth()].slice(0,3)}${d.getFullYear()!==2026?' '+d.getFullYear():''}`;
 function stat(i){if(!i.open)return 'ok';const n=days(i.due);if(n<0)return 'bad';if(n<=7)return 'warn';return 'neu'}
 const isAppt=i=>i.cat==='cita'||i.cat==='examen';
-const tLabel=t=>({persona:'Persona',casa:'Casa',carro:'Vehículo',mascota:'Mascota'})[t];
+const tLabel=t=>({persona:'Persona',casa:'Casa',carro:'Vehículo',mascota:'Mascota',trabajo:'Trabajo'})[t];
 const PL=i=>i.place&&S.places[i.place];
 function statTxt(i){if(!i.open)return 'Hecho';if(isAppt(i)){const n=days(i.due);if(n<0)return `Fue hace ${-n} ${-n===1?'día':'días'} · ¿cómo le fue?`;if(n===0)return `Hoy${i.time?' '+i.time:''}`;if(n===1)return `Mañana${i.time?' '+i.time:''}`;return `Faltan ${n} días`}const n=days(i.due);if(n<0)return `Atrasado ${-n} ${-n===1?'día':'días'}`;return fday(i.due)}
 const statColor={bad:'var(--bad)',warn:'var(--warn)',neu:'var(--fg-3)',ok:'var(--ok)'};
@@ -1035,20 +1047,20 @@ function portrait(key,bg){const L=LOOK[key]||{skin:'#d9b08f',hair:'#5a4636',styl
  const gl=L.glasses?`<g fill="none" stroke="#1d2a40" stroke-width="1.3"><circle cx="27.5" cy="29.5" r="3.4"/><circle cx="36.5" cy="29.5" r="3.4"/><path d="M30.9 29.5h2.2"/></g>`:'';
  const bd=L.beard?`<path d="M24 32c1 6 4 8 8 8s7-2 8-8c-2 2-5 3-8 3s-6-1-8-3z" fill="${L.hair}" opacity=".85"/>`:'';
  return `<svg viewBox="0 0 64 64" aria-hidden="true" style="display:block;width:100%;height:100%"><rect width="64" height="64" fill="${bg}"/>${back}<path d="M9 64c2-12 11-18 23-18s21 6 23 18z" fill="${L.shirt}"/><rect x="28" y="38" width="8" height="9" rx="3" fill="${L.skin}"/><circle cx="32" cy="28.5" r="11" fill="${L.skin}"/>${hair}${gl}${bd}</svg>`}
-function scene(type,bg){if(type==='mascota')return `<svg viewBox="0 0 64 64" aria-hidden="true" style="display:block;width:100%;height:100%"><rect width="64" height="64" fill="${bg}"/><rect y="50" width="64" height="14" fill="#b9dccf"/><path d="M18 52c0-10 6-16 14-16s14 6 14 16z" fill="#b07a45"/><ellipse cx="32" cy="30" rx="11" ry="10" fill="#c48a52"/><path d="M21 24c-4 2-5 9-2 12 2-2 4-6 4-10z" fill="#7a4f2a"/><path d="M43 24c4 2 5 9 2 12-2-2-4-6-4-10z" fill="#7a4f2a"/><ellipse cx="32" cy="35" rx="5.5" ry="4" fill="#e8c49c"/><circle cx="28" cy="28" r="1.6" fill="#0d1b33"/><circle cx="36" cy="28" r="1.6" fill="#0d1b33"/><ellipse cx="32" cy="33" rx="2" ry="1.4" fill="#0d1b33"/><path d="M26 44h12" stroke="#c9a227" stroke-width="2.5"/></svg>`;return type==='casa'?`<svg viewBox="0 0 64 64" aria-hidden="true" style="display:block;width:100%;height:100%"><rect width="64" height="64" fill="${bg}"/><rect y="48" width="64" height="16" fill="#a9d9c2"/><path d="M14 30 32 15l18 15v20H14z" fill="#fbf7ee"/><path d="M10 31 32 12l22 19-3 3-19-16-19 16z" fill="#17785a"/><rect x="28" y="36" width="8" height="14" rx="1" fill="#8a6d0f"/><rect x="18" y="34" width="7" height="6" fill="#d6e5f6"/><rect x="39" y="34" width="7" height="6" fill="#d6e5f6"/></svg>`
+function scene(type,bg){if(type==='trabajo')return `<svg viewBox="0 0 64 64" aria-hidden="true" style="display:block;width:100%;height:100%"><rect width="64" height="64" fill="${bg}"/><rect x="14" y="22" width="36" height="28" rx="4" fill="#c9a227"/><rect x="25" y="15" width="14" height="9" rx="3" fill="none" stroke="#8a6d0f" stroke-width="3"/><rect x="14" y="33" width="36" height="3" fill="#8a6d0f"/></svg>`;if(type==='mascota')return `<svg viewBox="0 0 64 64" aria-hidden="true" style="display:block;width:100%;height:100%"><rect width="64" height="64" fill="${bg}"/><rect y="50" width="64" height="14" fill="#b9dccf"/><path d="M18 52c0-10 6-16 14-16s14 6 14 16z" fill="#b07a45"/><ellipse cx="32" cy="30" rx="11" ry="10" fill="#c48a52"/><path d="M21 24c-4 2-5 9-2 12 2-2 4-6 4-10z" fill="#7a4f2a"/><path d="M43 24c4 2 5 9 2 12-2-2-4-6-4-10z" fill="#7a4f2a"/><ellipse cx="32" cy="35" rx="5.5" ry="4" fill="#e8c49c"/><circle cx="28" cy="28" r="1.6" fill="#0d1b33"/><circle cx="36" cy="28" r="1.6" fill="#0d1b33"/><ellipse cx="32" cy="33" rx="2" ry="1.4" fill="#0d1b33"/><path d="M26 44h12" stroke="#c9a227" stroke-width="2.5"/></svg>`;return type==='casa'?`<svg viewBox="0 0 64 64" aria-hidden="true" style="display:block;width:100%;height:100%"><rect width="64" height="64" fill="${bg}"/><rect y="48" width="64" height="16" fill="#a9d9c2"/><path d="M14 30 32 15l18 15v20H14z" fill="#fbf7ee"/><path d="M10 31 32 12l22 19-3 3-19-16-19 16z" fill="#17785a"/><rect x="28" y="36" width="8" height="14" rx="1" fill="#8a6d0f"/><rect x="18" y="34" width="7" height="6" fill="#d6e5f6"/><rect x="39" y="34" width="7" height="6" fill="#d6e5f6"/></svg>`
  :`<svg viewBox="0 0 64 64" aria-hidden="true" style="display:block;width:100%;height:100%"><rect width="64" height="64" fill="${bg}"/><rect y="44" width="64" height="20" fill="#e5d7a6"/><path d="M8 42v-6c0-3 2-5 5-5h5l6-7h16l7 7h5c3 0 4 2 4 5v6z" fill="#c4cddb"/><path d="M25 25h14l5 6H20z" fill="#d6e5f6"/><circle cx="19" cy="43" r="5.5" fill="#0d1b33"/><circle cx="45" cy="43" r="5.5" fill="#0d1b33"/><circle cx="19" cy="43" r="2" fill="#c4cddb"/><circle cx="45" cy="43" r="2" fill="#c4cddb"/><rect x="26" y="34" width="12" height="4" rx="1" fill="#fff" stroke="#8a6d0f" stroke-width=".8"/></svg>`}
 const imgTag=u=>`<img src="${u}" alt="" style="width:100%;height:100%;object-fit:cover;display:block">`;
 function photoOf(id){return (ENT[id]&&ENT[id].photo)||(P[id]&&P[id].photo)||null}
 function entPic(e){if(photoOf(e))return imgTag(photoOf(e));const E_=ENT[e];return E_.type==='persona'?portrait(e,E_.bg):scene(E_.type,E_.bg)}
-function entInner(e,cls=''){const E_=ENT[e];return E_.type==='persona'?E_.ini:ic(E_.type==='casa'?'house':E_.type==='mascota'?'paw':'car',cls)}
+function entInner(e,cls=''){const E_=ENT[e];return E_.type==='persona'?E_.ini:ic(E_.type==='casa'?'house':E_.type==='mascota'?'paw':E_.type==='trabajo'?'card':'car',cls)}
 function entTile(e,cls=''){const E_=ENT[e];return `<span class="tile pic ${cls} ${E_.type==='persona'?'round':''}">${entPic(e)}</span>`}
 function av(id,cls=''){const p=P[id];if(p.status==='pendiente')return `<span class="av ${cls} pend">${p.ini}</span>`;return `<span class="av pic ${cls}" title="${esc(p.name)}">${photoOf(id)?imgTag(photoOf(id)):portrait(id,p.kind==='afuera'?'#e4e9f1':p.bg)}</span>`}
 function counts(eid){const its=S.items.filter(i=>i.ent===eid&&i.open&&seesItem(i));return {late:its.filter(i=>stat(i)==='bad').length,week:its.filter(i=>stat(i)==='warn').length,open:its.length}}
-function facesRow(remoteMode){const L_=Object.values(ENT).filter(e=>seesEnt(e.id));return `<div class="faces" style="--n:${Math.min(L_.length+(!isCare()?1:0),6)}">${L_.map(e=>{const c=counts(e.id);const n=c.late||c.week;return `<button class="face" data-a="ent" data-id="${e.id}"><span class="fpic ${e.type==='persona'?'':'sq'}">${entPic(e.id)}</span>${n?`<span class="fb ${c.late?'bad':'warn'}">${n}</span>`:''}<b>${esc(e.name)}</b>${remoteMode?`<small>${c.late?c.late+' atrasado':c.week?c.week+' esta semana':'Al día'}</small>`:''}</button>`}).join('')}${inmFace(remoteMode)}</div>`}
+function facesRow(remoteMode){const L_=Object.values(ENT).filter(e=>seesEnt(e.id));return `<div class="faces" style="--n:${Math.min(L_.length,6)}">${L_.map(e=>{const c=counts(e.id);if(e.type==='trabajo'&&S.inm){const pr=S.inm.props.filter(p=>inmPend(p));c.late+=pr.filter(p=>inmEstado(p)==='bad').length;c.week+=pr.filter(p=>inmEstado(p)!=='bad').length}const n=c.late||c.week;return `<button class="face" ${e.type==='trabajo'?'data-a="ctaver" data-v="trabajo"':`data-a="ent" data-id="${e.id}"`}><span class="fpic ${e.type==='persona'?'':'sq'}">${entPic(e.id)}</span>${n?`<span class="fb ${c.late?'bad':'warn'}">${n}</span>`:''}<b>${esc(e.name)}</b>${remoteMode?`<small>${c.late?c.late+' atrasado':c.week?c.week+' esta semana':'Al día'}</small>`:''}</button>`}).join('')}</div>`}
 function inmFace(remoteMode){if(typeof seesInm!=='function'||!S.inm||isCare())return '';const pend=seesInm()?S.inm.props.filter(p=>inmPend(p)):[],rec=seesInm()?S.inm.recur.filter(k=>recEst(k)==='bad'):[],late=pend.filter(p=>inmEstado(p)==='bad').length+rec.length,n=pend.length+rec.length;
  return `<button class="face" data-a="nav" data-v="inmo"><span class="fpic sq inm-face">${ic('card')}</span>${n?`<span class="fb ${late?'bad':'warn'}">${n}</span>`:''}<b>Cuentas</b>${remoteMode?`<small>${late?late+' atrasado':n?n+' por hacer':'Al día'}</small>`:''}</button>`}
 /* alcance */
-function seesEnt(eid,u=S.user){const p=P[u];if(p.kind!=='cuidador')return true;return (p.scope||[]).includes(eid)}
+function seesEnt(eid,u=S.user){const p=P[u];if(eid==='trabajo')return p.kind!=='cuidador';if(p.kind!=='cuidador')return true;return (p.scope||[]).includes(eid)}
 function seesItem(i,u=S.user){if(!seesEnt(i.ent,u))return false;if(i.sens&&isCare(u)&&!P[u].salud)return i.resp===u;return true}
 function seesDoc(d,u=S.user){if(!seesEnt(d.ent,u))return false;if(isCare(u)){if(['Identidad','Propiedad'].includes(d.cat))return false;if(d.cat==='Salud'&&!P[u].salud)return false}return true}
 function canReport(i,u=S.user){if(!i.open)return false;if(isAppt(i)&&days(i.due)>0)return false;const k=P[u].kind;if(k==='casa')return i.resp==='luis'||i.resp==='lucero';if(k==='cuidador')return seesItem(i,u)&&(i.resp==='luis'||i.resp==='lucero'||i.resp===u);return i.resp===u}
@@ -1272,9 +1284,9 @@ function vDocs(){
  ${isCare()?`<p class="muted" style="margin-top:14px">Como cuidador/a no ves identidad ni propiedad${P[S.user].salud?'':' ni salud'}.</p>`:''}</div>`;
 }
 function vFamily(){
- const ents=Object.values(ENT).filter(e=>seesEnt(e.id)).map(e=>{const its=S.items.filter(i=>i.ent===e.id&&i.open&&seesItem(i));const l=its.filter(i=>stat(i)==='bad').length;return `<button class="ent ${l?'al':''}" data-a="ent" data-id="${e.id}">${entTile(e.id,'sm')}<b>${e.full}</b><span style="color:${l?'var(--bad)':'var(--fg-3)'}">${l?l+' atrasado':its.length?its.length+' por hacer':'Al día'}</span></button>`}).join('');
+ const ents=Object.values(ENT).filter(e=>seesEnt(e.id)&&e.type!=='trabajo').map(e=>{const its=S.items.filter(i=>i.ent===e.id&&i.open&&seesItem(i));const l=its.filter(i=>stat(i)==='bad').length;return `<button class="ent ${l?'al':''}" data-a="ent" data-id="${e.id}">${entTile(e.id,'sm')}<b>${e.full}</b><span style="color:${l?'var(--bad)':'var(--fg-3)'}">${l?l+' atrasado':its.length?its.length+' por hacer':'Al día'}</span></button>`}).join('');
  const mem=Object.values(P).map(p=>`<tr><td data-l="Persona"><div style="display:flex;gap:10px;align-items:center">${av(p.id,'sm')}<b style="color:var(--fg-1)">${p.name}</b></div></td><td data-l="Rol">${ROLE[p.role]}${p.status==='pendiente'?' · <span class="pill warn">Invitación pendiente</span>':''}</td><td>${KIND[p.kind]}</td></tr>`).join('');
- return `<div class="wrap"><div class="ph"><div><div class="eb dk">Familia</div><h1>Personas, casa y carro</h1><p>Cada uno con sus cosas por hacer y sus papeles.</p></div>${isCare()?'':`<button class="btn gh sm" data-a="config" data-v="familia">${ic('gear','s')}Configurar</button>`}</div>
+ return `<div class="wrap"><div class="ph"><div><div class="eb dk">Familia</div><h1>Personas, casa y carro</h1><p>Cada uno con sus cosas por hacer y sus papeles.</p></div><div class="ph-acc"><button class="btn gh sm" data-a="nav" data-v="docs">${ic('file','s')}Papeles</button>${isCare()?'':`<button class="btn gh sm" data-a="config" data-v="familia">${ic('gear','s')}Configurar</button>`}</div></div>
  <div class="ents" style="margin-top:18px">${ents}</div>
  <div class="shd"><h2>Decisiones nuevas de este prototipo</h2></div>
  <div class="card"><div class="stack" style="gap:10px">${PROPS.map(p=>`<div style="display:flex;gap:10px;align-items:flex-start"><span class="pill prop">${p[0]}</span><div style="font-size:15px">${p[1]}</div></div>`).join('')}</div></div></div>`;
@@ -1342,7 +1354,7 @@ function cuentasTexto(did){const d=DUE(did),c=cuentas(did),L=[`Hola ${d.nombre.s
  c.secs.forEach(x=>{L.push(x.p.nombre);x.lin.forEach(l=>L.push(`${l.v<0?'−':'+'} ${l.t}: ${COP(Math.abs(l.v))}`));if(inmPend(x.p))L.push(`(Falta cobrar ${COP(x.p.renta-pgVal(x.p))} de la renta)`);L.push(`Queda: ${COPs(x.sub)}`,'')});
  L.push(`Total: ${COPs(c.total)}`);if(c.hecho)L.push(`Ya transferido: ${COP(c.hecho)}`);L.push(c.falta>=0?`Por transferir: ${COP(c.falta)}`:`Usted le debe a ${P.luis.short}: ${COP(-c.falta)}`,'',P.luis.short);return L.join('\n')}
 function vCuentas(did){const d=DUE(did);if(!d)return vPlata();const c=cuentas(did),wa=d.cel?`https://wa.me/57${d.cel}?text=${encodeURIComponent(cuentasTexto(did))}`:'';
- return `<div class="wrap"><button class="back" data-a="back">${ic('back','s')}Cuentas</button>
+ return `<div class="wrap"><button class="back" data-a="back">${ic('back','s')}Plata</button>
  <div class="ph"><div><div class="eb dk">Las cuentas de ${MES[TODAY.getMonth()]}</div><h1>${esc(d.nombre)}</h1><p>Dueño de ${c.props.map(p=>esc(p.nombre)).join(' y ')}.</p></div></div>
  <div class="cta-grid">${c.secs.map(x=>`<div class="card cta-prop"><h2>${esc(x.p.nombre)}</h2>
   ${x.lin.length?x.lin.map(l=>`<div class="cl ${l.v<0?'menos':'mas'} ${l.adm?'adm':''}"><span>${esc(l.t)}</span><b>${l.v<0?'−':'+'} ${COP(Math.abs(l.v))}</b></div>`).join(''):'<p class="muted" style="margin:0">Nada anotado este mes.</p>'}
@@ -1368,13 +1380,13 @@ const CADA={'Cada mes':1,'Cada 3 meses':3,'Cada 6 meses':6,'Cada año':12};
 function recEst(k){const n=days(k.prox);return n<0?'bad':n<=5?'warn':'neu'}
 function vPlata(){const puedeT=seesInm();let tab=S.ctaTab||(puedeT?'trabajo':'casa');if(tab==='trabajo'&&!puedeT)tab='casa';
  const t=(v,i,a,b)=>`<button role="tab" aria-selected="${tab===v}" class="${tab===v?'on':''}" data-a="ctatab" data-v="${v}">${ic(i)}<span><b>${a}</b><small>${b}</small></span></button>`;
- return `<div class="wrap cta-head"><button class="back" data-a="back">${ic('back','s')}Volver</button><div class="ph"><div><h1>Cuentas</h1><p>La plata que entra y sale, y los pagos que se repiten.</p></div></div>
+ return `<div class="wrap cta-head"><button class="back" data-a="back">${ic('back','s')}Volver</button><div class="ph"><div><h1>Plata</h1><p>La plata que entra y sale, y los pagos que se repiten.</p></div></div>
  ${puedeT?`<div class="cta-tabs" role="tablist">${t('casa','house','Casa','Familia')}${t('trabajo','card','Trabajo','Inmobiliaria')}</div>`:''}</div>`+(tab==='casa'?vCasaCta():vTrabajo())}
 function vCasaCta(){const pagos=S.items.filter(i=>i.ent==='casa'&&i.cat==='pago'&&i.open&&seesItem(i)).sort((a,b)=>a.due-b.due);
  return `<div class="wrap">${seesCasa()||!isCare()?casaPlata():''}
  <div class="shd" style="margin-top:26px"><h2>Pagos que se repiten</h2><span class="c">${pagos.length}</span><button class="btn gh sm empuja" data-a="add" data-ent="casa">${ic('plus','s')}Agregar</button></div>
  ${pagos.length?`<div class="stack">${pagos.map(i=>taskRow(i)).join('')}</div>`:'<p class="muted">No hay pagos pendientes de la casa.</p>'}
- <p class="muted" style="margin-top:12px">Gas, agua, luz, predial… Cuando se pagan se marcan con «Ya lo hice» y su comprobante; ${P.diego.short} y ${P.adriana.short} los ven desde afuera.</p></div>`}
+ <p class="muted" style="margin-top:12px">Son las tareas de pago de la casa: avisan en Hoy y en el Calendario. Al marcarlas como pagadas se anota lo que costó aquí.</p></div>`}
 function vTrabajo(){
  const mes=TODAY.getMonth(),mv=inmMovs().filter(x=>x.fecha.getMonth()===mes&&x.fecha.getFullYear()===TODAY.getFullYear()).filter(x=>!S.inmF||x.tipo===S.inmF);
  const propName=id=>id?(S.inm.props.find(p=>p.id===id)||{}).nombre:'General';
@@ -1389,7 +1401,7 @@ function vTrabajo(){
   ${pg?`<div class="inm-pago">${pg.url&&(pg.mime||'').startsWith('image/')?`<span class="mini sm"><img src="${pg.url}" alt=""></span>`:`<span class="evi ${pg.file?'fi':'no'}">${ic(pg.file?'file':'msg','s')}</span>`}<div class="tx"><b>${st==='parcial'?`Pagó ${COP(pgVal(p))} · falta ${COP(p.renta-pgVal(p))}`:'Pagó · '+esc(pg.medio)}</b><span class="k">Lo registró ${P[pg.by].short} · ${esc(pg.at)}</span>${pg.nota?`<span class="k">“${esc(pg.nota)}”</span>`:''}<button class="lnk" data-a="movver" data-id="r${p.id}">Ver o corregir</button></div></div>${st==='parcial'?`<div class="inm-acc"><button class="btn pri sm" data-a="inmpago" data-id="${p.id}">${ic('plus','s')}Pagó lo que faltaba</button><a class="btn gh sm wa" href="${wa}" target="_blank" rel="noopener">${ic('msg','s')}Recordarle</a></div>`:''}`
    :`<div class="inm-acc"><button class="btn pri sm" data-a="inmpago" data-id="${p.id}">${ic('check','s')}Ya pagó</button><a class="btn gh sm wa" href="${wa}" target="_blank" rel="noopener">${ic('msg','s')}Recordarle</a></div>`}
   </div>`};
- const recs=S.inm.recur.slice().sort((a,b)=>a.prox-b.prox);
+ const recs=S.items.filter(i=>i.ent==='trabajo'&&i.open).sort((a,b)=>a.due-b.due);
  const recRow=k=>{const p=S.inm.props.find(x=>x.id===k.prop),n=days(k.prox),st=recEst(k);return `<div class="rec-row ${st==='bad'?'tarde':''}"><button class="rec-tx" data-a="recur" data-id="${k.id}"><b>${esc(k.desc)} · ${COP(k.valor)}</b><span class="k">${p?esc(p.nombre)+(p.dueno?' · se descuenta a '+esc(DUE(p.dueno).nombre.split(' ')[0]):''):'General'} · ${esc(k.cada).toLowerCase()}</span></button><span class="pill ${st}">${n<0?`Atrasado ${-n} ${-n===1?'día':'días'}`:n===0?'Vence hoy':'Vence el '+fshort(k.prox)}</span><button class="btn pri sm" data-a="recpagar" data-id="${k.id}">${ic('check','s')}Ya lo pagué</button></div>`};
  return `<div class="wrap">
  <div class="anota2">
@@ -1400,8 +1412,8 @@ function vTrabajo(){
  <div class="shd" style="margin-top:26px"><h2>Propiedades</h2><span class="c">${S.inm.props.length}</span><button class="btn gh sm empuja" data-a="config" data-v="trabajo">${ic('gear','s')}Configurar</button></div>
  <div class="inm-grid">${S.inm.props.map(card).join('')}</div>
  ${S.inm.duenos.some(d=>S.inm.props.some(p=>p.dueno===d.id))?`<div class="shd" style="margin-top:26px"><h2>Cuentas de los dueños</h2></div><div class="inm-grid">${S.inm.duenos.filter(d=>S.inm.props.some(p=>p.dueno===d.id)).map(d=>{const c=cuentas(d.id),n=c.props.length;return `<button class="card due ${c.falta<=0&&c.hecho>0?'hecha':''}" data-a="cuentas" data-id="${d.id}"><span class="inm-ic">${ic('fam')}</span><span class="tx"><b>${esc(d.nombre)}</b><span class="k">${n} ${n===1?'propiedad':'propiedades'} · ${c.falta>0?'Falta transferirle '+COP(c.falta):c.falta<0?'Le debe a '+P.luis.short+' '+COP(-c.falta):c.hecho?'Ya se le transfirió':'Nada este mes'}</span></span>${ic('chev','s')}</button>`}).join('')}</div>`:''}
- <div class="shd" style="margin-top:26px"><h2>Pagos que se repiten</h2><span class="c">${recs.length}</span><button class="btn gh sm empuja" data-a="recur" data-id="">${ic('plus','s')}Agregar</button></div>
- ${recs.length?`<div class="stack">${recs.map(recRow).join('')}</div>`:'<p class="muted">Administración del edificio, predial, servicios: anótalos aquí para que no se olviden.</p>'}
+ <div class="shd" style="margin-top:26px"><h2>Pagos que se repiten</h2><span class="c">${recs.length}</span><button class="btn gh sm empuja" data-a="add" data-ent="trabajo">${ic('plus','s')}Agregar</button></div>
+ ${recs.length?`<div class="stack">${recs.map(i=>taskRow(i)).join('')}</div>`:'<p class="muted">Administración del edificio, predial, servicios: anótalos aquí para que no se olviden.</p>'}
  <div class="shd" style="margin-top:26px"><h2>Movimientos de ${MES[TODAY.getMonth()]}</h2></div>
  <div class="chips" style="margin-bottom:12px">${[['','Todo'],['ingreso','Entra plata'],['egreso','Sale plata']].map(o=>`<button class="chip ${(S.inmF||'')===o[0]?'on':''}" data-a="inmf" data-v="${o[0]}">${o[1]}</button>`).join('')}</div>
  <div class="grp">${mv.length?mv.map(x=>`<button class="mov ${x.tipo}" data-a="movver" data-id="${x.id}"><span class="sig">${x.tipo==='ingreso'?'+':'−'}</span><span class="tx"><b>${esc(x.desc)}</b><span class="k">${x.dueno?'Cuentas de '+esc(DUE(x.dueno).nombre.split(' ')[0]):esc(propName(x.prop))} · ${fshort(x.fecha)}${x.file?` · ${ic('file','s')}`:''}</span></span><b class="val">${x.tipo==='ingreso'?'+':'−'} ${COP(x.valor)}</b></button>`).join(''):'<p class="muted" style="padding:16px">No hay movimientos con ese filtro.</p>'}</div>
@@ -1414,7 +1426,7 @@ function vInmoRes(){
  const L=luisMes(y,m),q=L.ent-L.sal,por=esHoy?S.inm.props.filter(p=>inmPend(p)):[];
  const ds=S.inm.duenos.filter(d=>S.inm.props.some(p=>p.dueno===d.id)).map(d=>({d,c:cuentas(d.id,y,m)})).filter(x=>x.c.total||x.c.hecho);
  const fila=(t,v,sg)=>v?`<div class="rl"><div class="rl-n"><b>${t}</b></div><div class="rl-q"><b>${sg} ${COP(v)}</b></div></div>`:'';
- return `<div class="wrap"><button class="back" data-a="nav" data-v="inmo">${ic('back','s')}Cuentas</button>
+ return `<div class="wrap"><button class="back" data-a="nav" data-v="inmo">${ic('back','s')}Plata</button>
  <div class="res-cab"><h1>¿Cuánto le quedó a ${P.luis.short}?</h1>
   <div class="res-mes"><button data-a="resmes" data-d="-1" aria-label="Mes anterior">${ic('back')}</button><b>${MES[m].charAt(0).toUpperCase()+MES[m].slice(1)} ${y}</b><button data-a="resmes" data-d="1" aria-label="Mes siguiente" ${esHoy?'disabled':''}>${ic('chev')}</button></div></div>
  <div class="res-big" style="margin-top:16px">
@@ -1431,21 +1443,21 @@ function vInmoRes(){
 function desdeTxt(f){if(!f)return '';const [y,m]=String(f).split('-');return MES[+m-1]+' de '+y}
 function propCollect(m){const g=id=>{const e=document.getElementById(id);return e?e.value.trim():undefined};const f=m.f;
  [['pn','nombre'],['pd','dir'],['gval','renta'],['gadm','admin'],['pdia','dia'],['qn','inq'],['qc','cel'],['qd','desde'],['dn','dnom'],['dc','dcel'],['dm','dmail']].forEach(([id,k])=>{const v=g(id);if(v!==undefined)f[k]=v})}
-function inmHoy(){if(!seesInm())return '';const pend=S.inm.props.filter(p=>inmPend(p)),rec=S.inm.recur.filter(k=>recEst(k)!=='neu');
- const tarde=pend.filter(p=>inmEstado(p)==='bad').length+rec.filter(k=>recEst(k)==='bad').length;
- if(!pend.length&&!rec.length)return `<button class="card inm-hoy hecha" data-a="ctaver" data-v="trabajo"><span class="inm-ic">${ic('card')}</span><div class="tx"><b>Cuentas del trabajo</b><span class="k">Rentas de ${MES[TODAY.getMonth()]} cobradas y pagos al día</span></div>${ic('chev','s')}</button>`;
+function inmHoy(){if(!seesInm())return '';const pend=S.inm.props.filter(p=>inmPend(p)),rec=S.items.filter(i=>i.ent==='trabajo'&&i.open&&stat(i)!=='neu'&&stat(i)!=='ok');
+ const tarde=pend.filter(p=>inmEstado(p)==='bad').length+rec.filter(i=>stat(i)==='bad').length;
+ if(!pend.length&&!rec.length)return `<button class="card inm-hoy hecha" data-a="ctaver" data-v="trabajo"><span class="inm-ic">${ic('card')}</span><div class="tx"><b>Plata del trabajo</b><span class="k">Rentas de ${MES[TODAY.getMonth()]} cobradas y pagos al día</span></div>${ic('chev','s')}</button>`;
  const parts=[pend.length?`${pend.length} ${pend.length===1?'renta':'rentas'} por cobrar`:'',rec.length?`${rec.length} ${rec.length===1?'pago':'pagos'} por hacer`:''].filter(Boolean);
- return `<button class="card inm-hoy ${tarde?'tarde':''}" data-a="ctaver" data-v="trabajo"><span class="inm-ic">${ic('card')}</span><div class="tx"><b>Cuentas: ${parts.join(' y ')}</b><span class="k">${[...pend.map(p=>esc(p.inq)+(inmEstado(p)==='bad'?' (atrasada)':'')),...rec.map(k=>esc(k.desc)+(recEst(k)==='bad'?' (atrasado)':''))].join(' · ')}</span></div>${ic('chev','s')}</button>`}
+ return `<button class="card inm-hoy ${tarde?'tarde':''}" data-a="ctaver" data-v="trabajo"><span class="inm-ic">${ic('card')}</span><div class="tx"><b>Trabajo: ${parts.join(' y ')}</b><span class="k">${[...pend.map(p=>esc(p.inq)+(inmEstado(p)==='bad'?' (atrasada)':'')),...rec.map(i=>esc(i.title)+(stat(i)==='bad'?' (atrasado)':''))].join(' · ')}</span></div>${ic('chev','s')}</button>`}
 const celTxt=c=>{const d=String(c||'').replace(/\D/g,'');return d.length===10?`${d.slice(0,3)} ${d.slice(3,6)} ${d.slice(6)}`:d};
 function vConfig(){const puedeT=seesInm();let tab=S.cfgTab||'familia';if(tab==='trabajo'&&!puedeT)tab='familia';
  const t=(v,i,a,b)=>`<button role="tab" aria-selected="${tab===v}" class="${tab===v?'on':''}" data-a="cfgtab" data-v="${v}">${ic(i)}<span><b>${a}</b><small>${b}</small></span></button>`;
  const head=`<div class="wrap cta-head"><button class="back" data-a="back">${ic('back','s')}Volver</button><div class="ph"><div><h1>Configurar</h1><p>Lo que se arma una vez y se cambia poco.</p></div></div>
  ${puedeT?`<div class="cta-tabs" role="tablist">${t('familia','fam','Familia','Personas y accesos')}${t('trabajo','card','Trabajo','Propiedades y contactos')}</div>`:''}</div>`;
  if(tab==='familia'){
-  const ents=Object.values(ENT).filter(e=>seesEnt(e.id)).map(e=>`<button class="cfg-row" data-a="ent" data-id="${e.id}">${entTile(e.id,'sm')}<span class="tx"><b>${esc(e.full)}</b><span class="k">${tLabel(e.type)}</span></span>${ic('chev','s')}</button>`).join('');
+  const ents=Object.values(ENT).filter(e=>seesEnt(e.id)&&e.type!=='trabajo').map(e=>`<button class="cfg-row" data-a="ent" data-id="${e.id}">${entTile(e.id,'sm')}<span class="tx"><b>${esc(e.full)}</b><span class="k">${tLabel(e.type)}</span></span>${ic('chev','s')}</button>`).join('');
   const mem=Object.values(P).map(p=>`<div class="cfg-row stat">${av(p.id,'sm')}<span class="tx"><b>${p.name}</b><span class="k">${ROLE[p.role]} · ${KIND[p.kind]}${p.status==='pendiente'?' · invitación pendiente':''}</span></span></div>`).join('');
   return head+`<div class="wrap">
-  <div class="shd"><h2>Lo que se cuida</h2><span class="c">${Object.values(ENT).filter(e=>seesEnt(e.id)).length}</span>${canEdit()?`<button class="btn gh sm empuja" data-a="addent">${ic('plus','s')}Agregar</button>`:''}</div>
+  <div class="shd"><h2>Lo que se cuida</h2><span class="c">${Object.values(ENT).filter(e=>seesEnt(e.id)&&e.type!=='trabajo').length}</span>${canEdit()?`<button class="btn gh sm empuja" data-a="addent">${ic('plus','s')}Agregar</button>`:''}</div>
   <div class="cfg-list">${ents}</div>
   <div class="shd" style="margin-top:26px"><h2>Quiénes participan</h2></div>
   <div class="cfg-list">${mem}</div>
@@ -1459,6 +1471,10 @@ function vConfig(){const puedeT=seesInm();let tab=S.cfgTab||'familia';if(tab==='
  <div class="shd" style="margin-top:26px"><h2>Inquilinos</h2><span class="c">${inqs.length}</span></div>
  <div class="cfg-list">${inqs.map(p=>`<button class="cfg-row" data-a="inqedit" data-id="${p.id}"><span class="inm-ic">${ic('id')}</span><span class="tx"><b>${esc(p.inq)}</b><span class="k">${esc(p.nombre)}${p.desde?' · desde '+desdeTxt(p.desde):''}${p.cel?' · '+celTxt(p.cel):''}</span></span>${ic('chev','s')}</button>`).join('')||'<p class="muted" style="padding:14px;margin:0">Sin inquilinos.</p>'}</div>
  <p class="muted" style="margin-top:10px">Para cambiar de inquilino o dejar una propiedad desocupada, ábrela arriba. Los anteriores quedan en su historial.</p></div>`}
+function gastoDeTarea(i,valor,file){const v=Number(String(valor||'').replace(/\D/g,''));if(!v||isCare())return '';
+ const fl=file?{file:file.name,url:file.url,mime:file.type}:{file:null};
+ if(i.ent==='trabajo'){S.inm.movs.push({id:'g'+Date.now(),prop:i.prop||null,tipo:'egreso',cat:/predial/i.test(i.title)?'Predial':/admin/i.test(i.title)?'Administración del edificio':/agua|luz|gas|servicio/i.test(i.title)?'Servicios':'Otro',desc:i.title,valor:v,fecha:TODAY,by:S.user,...fl});return 'trabajo'}
+ const tp=ENT[i.ent].type;S.casa.movs.push({id:'c'+Date.now(),tipo:'egreso',cat:tp==='persona'?'Salud':tp==='carro'||tp==='mascota'?'Otro':'Servicios',desc:i.title+(tp==='casa'?'':' · '+ENT[i.ent].name),valor:v,fecha:TODAY,by:S.user,...fl});return 'casa'}
 function vEnt(id){
  const e=ENT[id];
  if(!e||!seesEnt(id))return `<div class="wrap"><button class="back" data-a="back">${ic('back','s')}Volver</button><div class="empty" style="margin-top:16px"><h3>No tienes acceso</h3></div></div>`;
@@ -1482,7 +1498,7 @@ function vEnt(id){
  ${its.length?sec('Atrasado',g.bad,'var(--bad)')+sec('Esta semana',g.warn,'var(--warn)')+sec('Más adelante',g.neu,'var(--navy-300)')+sec('Hecho',g.ok,'var(--ok)',3)
  :`<div class="empty" style="margin-top:18px"><div class="big">${ic('plus','l')}</div><h3>Sin nada anotado todavía</h3><p>Anota la primera cita, pago o revisión.</p></div>`}
  </div><div>
- ${e.type==='casa'&&!isCare()?`<button class="card inm-hoy" data-a="ctaver" data-v="casa" style="margin-top:0"><span class="inm-ic">${ic('card')}</span><div class="tx"><b>Plata de la casa</b><span class="k">Lo que entra, sale y se paga cada mes: en Cuentas</span></div>${ic('chev','s')}</button>`:''}
+ ${e.type==='casa'&&!isCare()?`<button class="card inm-hoy" data-a="ctaver" data-v="casa" style="margin-top:0"><span class="inm-ic">${ic('card')}</span><div class="tx"><b>Plata de la casa</b><span class="k">Lo que entra, sale y se paga cada mes: en Plata</span></div>${ic('chev','s')}</button>`:''}
  <div class="shd"><h2>Papeles</h2><span class="c">${docs.length}</span></div>
  ${docs.length?`<div class="stack">${docs.map(docRow).join('')}</div>`:`<div class="empty"><div class="big">${ic('file','l')}</div><h3>Sin papeles todavía</h3><p>Guarda aquí cédulas, recibos, pólizas o certificados.</p></div>`}
  ${hist.length?`<div class="shd"><h2>Lo último</h2></div><div class="card"><div class="feed">${hist.map((x,k)=>`<div class="fi"><div class="rail"><i class="${k===0?'k':''}"></i>${k<hist.length-1?'<span></span>':''}</div><div class="bd"><div class="fx"><b>${P[x.who].short}</b> ${esc(x.x)}</div><div class="fw">${x.at}</div></div></div>`).join('')}</div></div>`:''}
@@ -1526,8 +1542,22 @@ function filePreview(f,dark){if(!f)return '';if(f.type.startsWith('image/'))retu
 const TIPOS=[['cita','Cita médica','heart','Con lugar, hora y quién acompaña','sal'],['examen','Examen o laboratorio','flask','Sangre, ecografía, rayos X','sal'],['medicamento','Remedios','pill','Una compra que se repite','sal'],['pago','Pago','card','Servicios, impuestos, cuotas','pag'],['documento','Renovar documento','id','Licencia, SOAT, pasaporte','doc'],['mascota','Mascota','paw','Veterinario, vacunas, baño','mas'],['otro','Otra cosa','plus','Cualquier otro pendiente','otr']];
 function chipsF(m,f,opts){return `<div class="chips">${opts.map(o=>`<button class="chip ${m.f[f]===o[0]?'on':''}" data-a="af" data-f="${f}" data-v="${o[0]}">${o[2]?`<span class="dt" style="background:${o[2]}"></span>`:''}${o[1]}</button>`).join('')}</div>`}
 function inF(m,id,lab,ph,type,er){return `<div class="fld"><label for="a_${id}">${lab}</label><input class="inp ${er[id]?'err':''}" id="a_${id}" type="${type||'text'}" value="${esc(m.f[id]||'')}" placeholder="${ph||''}">${er[id]?`<div class="er">${er[id]}</div>`:''}</div>`}
+const QUE={persona:[['cita','Cita médica','heart','Con lugar, hora y quién acompaña','sal'],['examen','Examen o laboratorio','flask','Sangre, ecografía, rayos X','sal'],['medicamento','Remedios','pill','Comprarlos cada mes','sal'],['documento','Trámite o documento','id','Cédula, pasaporte, licencia','doc'],['otro','Otra cosa','plus','Cualquier otro pendiente','otr']],
+ casa:[['pago','Pago','card','Gas, luz, agua, predial','pag'],['otro','Arreglo u otra cosa','plus','Plomero, electricista, compras','otr']],
+ carro:[['documento','SOAT o revisión','id','Lo que se renueva','doc'],['pago','Pago','card','Impuesto, parqueadero','pag'],['otro','Taller u otra cosa','plus','Mantenimiento, lavado','otr']],
+ mascota:[['mascota:Veterinario','Veterinario','heart','Consulta o control','mas'],['mascota:Vacuna','Vacuna','pill','Con su fecha','mas'],['mascota:Baño','Baño y peluquería','paw','Cada cuánto','mas'],['otro','Otra cosa','plus','Comida, desparasitar…','otr']],
+ trabajo:[['pago','Pago de una propiedad','card','Administración, predial, servicios','pag'],['otro','Otra cosa del trabajo','plus','Arreglo, visita, trámite','otr']]};
 function addModal(m,X){
- if(!m.tipo){return `<div class="sh"><h2>¿Qué quieres anotar?</h2>${X}</div><div class="sb"><div class="tipos">${(seesInm()||seesCasa()?[...TIPOS,['plata','Plata','card','Entró o salió plata: la casa o las propiedades','pag']]:TIPOS).map(t=>`<button class="tipo" data-a="tipo" data-v="${t[0]}"><span class="fic ${t[4]}">${ic(t[2])}</span><span class="tt"><b>${t[1]}</b><small>${t[3]}</small></span>${ic('chev','s')}</button>`).join('')}</div></div>`}
+ if(!m.tipo){
+  const plataOk=seesInm()||seesCasa();
+  if(!m.que&&!m.f.para&&plataOk)return `<div class="sh"><h2>¿Qué quieres anotar?</h2>${X}</div><div class="sb"><div class="anota2" style="margin-top:0">
+   <button class="anota hacer" data-a="que" data-v="hacer"><span class="sg">${ic('cal')}</span><b>Algo por hacer</b><small>Una cita, un pago, un trámite</small></button>
+   <button class="anota entra" data-a="tipo" data-v="plata"><span class="sg">$</span><b>Plata</b><small>Entró o salió plata</small></button></div></div>`;
+  const ents=Object.values(ENT).filter(e=>seesEnt(e.id));
+  if(!m.f.para&&ents.length===1)m.f.para=ents[0].id;
+  if(!m.f.para)return `<div class="sh"><div>${plataOk?`<button class="lnk" data-a="que" data-v="">${ic('back','s')} Volver</button>`:''}<h2 style="margin-top:6px">¿Para quién?</h2></div>${X}</div><div class="sb"><div class="para-grid">${ents.map(e=>`<button class="para-b" data-a="para" data-v="${e.id}"><span class="fpic ${e.type==='persona'?'':'sq'}">${entPic(e.id)}</span><b>${esc(e.name)}</b></button>`).join('')}</div></div>`;
+  const E_=ENT[m.f.para],ops=QUE[E_.type]||QUE.persona;
+  return `<div class="sh"><div>${m.fijo?'':`<button class="lnk" data-a="para" data-v="">${ic('back','s')} Cambiar: ${esc(E_.name)}</button>`}<h2 style="margin-top:6px">¿Qué es?</h2><span class="sobre">Para ${esc(E_.full)}</span></div>${X}</div><div class="sb"><div class="tipos">${ops.map(t=>`<button class="tipo" data-a="tipo" data-v="${t[0]}"><span class="fic ${t[4]}">${ic(t[2])}</span><span class="tt"><b>${t[1]}</b><small>${t[3]}</small></span>${ic('chev','s')}</button>`).join('')}</div></div>`}
  const er=m.err||{},t=m.tipo,T=TIPOS.find(x=>x[0]===t);
  const personas=Object.values(ENT).filter(e=>e.type==='persona'&&seesEnt(e.id)).map(e=>[e.id,e.name,e.fg]);
  const todas=Object.values(ENT).filter(e=>seesEnt(e.id)).map(e=>[e.id,e.name,e.fg]);
@@ -1537,18 +1567,18 @@ function addModal(m,X){
  const adj=`<div>${lbl('Adjuntar la orden (opcional)')}${pickers('add',!!m.file)}${m.file?`<div style="background:var(--navy-50);border-radius:14px;padding:10px;margin-top:8px">${filePreview(m.file)}</div>`:''}</div>`;
  const fecha=(l)=>`<div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px">${inF(m,'fecha',l||'Fecha','','date',er)}${inF(m,'hora','Hora','','time',er)}</div>`;
  let body='';
- if(t==='cita')body=`<div>${lbl('¿Para quién?')}${chipsF(m,'para',personas)}${er.para?'<div class="er">Elige para quién.</div>':''}</div>${inF(m,'esp','Especialidad o motivo','Ej.: cardiología, control, odontología','text',er)}${fecha()}${lugar}<div>${lbl('¿Quién acompaña? (opcional)')}${chipsF(m,'acomp',[['','Nadie']].concat(Object.values(P).filter(p=>p.status==='activo').map(p=>[p.id,p.short])))}</div>${inF(m,'prep','Preparación (opcional)','Ej.: llevar los exámenes anteriores','text',er)}${adj}`;
- if(t==='examen')body=`<div>${lbl('¿Para quién?')}${chipsF(m,'para',personas)}${er.para?'<div class="er">Elige para quién.</div>':''}</div>${inF(m,'esp','¿Qué examen?','Ej.: exámenes de sangre, ecografía','text',er)}${fecha()}${lugar}<div class="setrow" style="padding:4px 0;border:0"><div class="tx"><div class="t">En ayunas</div></div><button class="tg ${m.f.ayunas?'on':''}" data-a="af" data-f="ayunas" data-v="${m.f.ayunas?'':'1'}" aria-pressed="${!!m.f.ayunas}" aria-label="En ayunas"></button></div>${adj}`;
- if(t==='medicamento')body=`<div>${lbl('¿Para quién?')}${chipsF(m,'para',personas)}${er.para?'<div class="er">Elige para quién.</div>':''}</div>${inF(m,'fecha','Próxima compra','','date',er)}<div>${lbl('¿Cada cuánto?')}${chipsF(m,'rec',[['Cada mes','Cada mes'],['Cada 15 días','Cada 15 días'],['Una vez','Una vez']])}</div><div>${lbl('Fórmula (opcional)')}${pickers('add',!!m.file)}${m.file?`<div style="background:var(--navy-50);border-radius:14px;padding:10px;margin-top:8px">${filePreview(m.file)}</div>`:''}</div>`;
- if(t==='pago')body=`<div>${lbl('¿De qué?')}${chipsF(m,'para',todas.filter(x=>ENT[x[0]].type!=='persona').concat(todas.filter(x=>ENT[x[0]].type==='persona')))}${er.para?'<div class="er">Elige de qué es.</div>':''}</div>${inF(m,'esp','¿Qué se paga?','Ej.: internet, administración, gas','text',er)}${inF(m,'valor','Valor (opcional)','Ej.: 86400','text',er)}${inF(m,'fecha','Fecha límite','','date',er)}<div>${lbl('¿Se repite?')}${chipsF(m,'rec',[['Cada mes','Cada mes'],['Cada año','Cada año'],['Una vez','Una vez']])}</div>`;
- if(t==='documento')body=`<div>${lbl('¿De quién?')}${chipsF(m,'para',todas.filter(x=>ENT[x[0]].type!=='casa'))}${er.para?'<div class="er">Elige de quién.</div>':''}</div>${inF(m,'esp','¿Qué documento?','Ej.: licencia de conducción, pasaporte','text',er)}${inF(m,'fecha','¿Cuándo vence?','','date',er)}<p class="help" style="margin:0">Se recuerda desde un mes antes.</p>`;
- if(t==='mascota')body=`<div>${lbl('¿Cuál mascota?')}${chipsF(m,'para',Object.values(ENT).filter(e=>e.type==='mascota').map(e=>[e.id,e.name,e.fg]))}${er.para?'<div class="er">Elige la mascota.</div>':''}</div><div>${lbl('¿Qué es?')}${chipsF(m,'esp',[['Veterinario','Veterinario'],['Vacuna','Vacuna'],['Baño','Baño y peluquería'],['Desparasitación','Desparasitación'],['Comida','Comprar comida']])}${er.esp?'<div class="er">Elige qué es.</div>':''}</div>${fecha()}${['Veterinario','Vacuna'].includes(m.f.esp)?lugar:''}<div>${lbl('¿Se repite?')}${chipsF(m,'rec',[['Una vez','Una vez'],['Cada mes','Cada mes'],['Cada 3 meses','Cada 3 meses'],['Cada año','Cada año']])}</div>${adj}`;
- if(t==='otro')body=`${inF(m,'esp','¿Qué hay que hacer?','Ej.: llevar el televisor a arreglar','text',er)}<div>${lbl('¿Para quién o para qué?')}${chipsF(m,'para',todas)}${er.para?'<div class="er">Elige uno.</div>':''}</div>${fecha()}${inF(m,'lugar','Lugar (opcional)','','text',er)}`;
- return `<div class="sh"><div><button class="lnk" data-a="tipo" data-v="">${ic('back','s')} Cambiar tipo</button><h2 style="margin-top:6px">${T[1]}</h2></div>${X}</div><div class="sb">${body}<p class="help" style="margin:0">Lo ve toda la familia y cualquiera lo puede gestionar.</p><button class="btn pri big full" data-a="saveadd">Guardar</button></div>`;
+ if(t==='cita')body=`${m.f.para?'':`<div>${lbl('¿Para quién?')}${chipsF(m,'para',personas)}${er.para?'<div class="er">Elige para quién.</div>':''}</div>`}${inF(m,'esp','Especialidad o motivo','Ej.: cardiología, control, odontología','text',er)}${fecha()}${lugar}<div>${lbl('¿Quién acompaña? (opcional)')}${chipsF(m,'acomp',[['','Nadie']].concat(Object.values(P).filter(p=>p.status==='activo').map(p=>[p.id,p.short])))}</div>${inF(m,'prep','Preparación (opcional)','Ej.: llevar los exámenes anteriores','text',er)}${adj}`;
+ if(t==='examen')body=`${m.f.para?'':`<div>${lbl('¿Para quién?')}${chipsF(m,'para',personas)}${er.para?'<div class="er">Elige para quién.</div>':''}</div>`}${inF(m,'esp','¿Qué examen?','Ej.: exámenes de sangre, ecografía','text',er)}${fecha()}${lugar}<div class="setrow" style="padding:4px 0;border:0"><div class="tx"><div class="t">En ayunas</div></div><button class="tg ${m.f.ayunas?'on':''}" data-a="af" data-f="ayunas" data-v="${m.f.ayunas?'':'1'}" aria-pressed="${!!m.f.ayunas}" aria-label="En ayunas"></button></div>${adj}`;
+ if(t==='medicamento')body=`${m.f.para?'':`<div>${lbl('¿Para quién?')}${chipsF(m,'para',personas)}${er.para?'<div class="er">Elige para quién.</div>':''}</div>`}${inF(m,'fecha','Próxima compra','','date',er)}<div>${lbl('¿Cada cuánto?')}${chipsF(m,'rec',[['Cada mes','Cada mes'],['Cada 15 días','Cada 15 días'],['Una vez','Una vez']])}</div><div>${lbl('Fórmula (opcional)')}${pickers('add',!!m.file)}${m.file?`<div style="background:var(--navy-50);border-radius:14px;padding:10px;margin-top:8px">${filePreview(m.file)}</div>`:''}</div>`;
+ if(t==='pago')body=`${m.f.para?'':`<div>${lbl('¿De qué?')}${chipsF(m,'para',todas.filter(x=>ENT[x[0]].type!=='persona').concat(todas.filter(x=>ENT[x[0]].type==='persona')))}${er.para?'<div class="er">Elige de qué es.</div>':''}</div>`}${m.f.para==='trabajo'?`<div>${lbl('¿De qué propiedad?')}${chipsF(m,'prop',S.inm.props.map(p=>[p.id,p.nombre]))}${er.prop?'<div class="er">Elige la propiedad.</div>':''}</div>`:''}${inF(m,'esp','¿Qué se paga?','Ej.: internet, administración, gas','text',er)}${inF(m,'valor','Valor (opcional)','Ej.: 86400','text',er)}${inF(m,'fecha','Fecha límite','','date',er)}<div>${lbl('¿Se repite?')}${chipsF(m,'rec',[['Cada mes','Cada mes'],['Cada año','Cada año'],['Una vez','Una vez']])}</div>`;
+ if(t==='documento')body=`${m.f.para?'':`<div>${lbl('¿De quién?')}${chipsF(m,'para',todas.filter(x=>ENT[x[0]].type!=='casa'))}${er.para?'<div class="er">Elige de quién.</div>':''}</div>`}${inF(m,'esp','¿Qué documento?','Ej.: licencia de conducción, pasaporte','text',er)}${inF(m,'fecha','¿Cuándo vence?','','date',er)}<p class="help" style="margin:0">Se recuerda desde un mes antes.</p>`;
+ if(t==='mascota')body=`${m.f.para?'':`<div>${lbl('¿Cuál mascota?')}${chipsF(m,'para',Object.values(ENT).filter(e=>e.type==='mascota').map(e=>[e.id,e.name,e.fg]))}${er.para?'<div class="er">Elige la mascota.</div>':''}</div>`}<div>${lbl('¿Qué es?')}${chipsF(m,'esp',[['Veterinario','Veterinario'],['Vacuna','Vacuna'],['Baño','Baño y peluquería'],['Desparasitación','Desparasitación'],['Comida','Comprar comida']])}${er.esp?'<div class="er">Elige qué es.</div>':''}</div>${fecha()}${['Veterinario','Vacuna'].includes(m.f.esp)?lugar:''}<div>${lbl('¿Se repite?')}${chipsF(m,'rec',[['Una vez','Una vez'],['Cada mes','Cada mes'],['Cada 3 meses','Cada 3 meses'],['Cada año','Cada año']])}</div>${adj}`;
+ if(t==='otro')body=`${inF(m,'esp','¿Qué hay que hacer?','Ej.: llevar el televisor a arreglar','text',er)}${m.f.para?'':`<div>${lbl('¿Para quién o para qué?')}${chipsF(m,'para',todas)}${er.para?'<div class="er">Elige uno.</div>':''}</div>`}${fecha()}${inF(m,'lugar','Lugar (opcional)','','text',er)}`;
+ return `<div class="sh"><div><button class="lnk" data-a="tipo" data-v="">${ic('back','s')} Cambiar</button><h2 style="margin-top:6px">${T[1]}</h2>${m.f.para?`<span class="sobre">Para ${esc(ENT[m.f.para].full)}</span>`:''}</div>${X}</div><div class="sb">${body}<p class="help" style="margin:0">Lo ve toda la familia y cualquiera lo puede gestionar.</p><button class="btn pri big full" data-a="saveadd">Guardar</button></div>`;
 }
 function feedbackModal(m,X){
  const i=IT(m.id),E_=ENT[i.ent];
- if(m.done){const fu=m.how==='Me pidieron algo más';return `<div class="sb"><div class="done"><div class="big">${ic('check')}</div><h2>${m.res==='cambio'?'Listo, cita movida.':'Listo, quedó registrado.'}</h2><p class="muted" style="font-size:17px;margin:0">${m.res==='cambio'?`Nueva fecha: ${fdate(i.due)}${i.time?', '+i.time:''}. Los recordatorios se ajustaron.`:'Toda la familia ya lo puede ver.'}</p>
+ if(m.done){const fu=m.how==='Me pidieron algo más';return `<div class="sb"><div class="done"><div class="big">${ic('check')}</div><h2>${m.res==='cambio'?'Listo, cita movida.':'Listo, quedó registrado.'}</h2><p class="muted" style="font-size:17px;margin:0">${m.plata?`Lo que costó quedó en Plata › ${m.plata==='trabajo'?'Trabajo':'Casa'}. `:''}${m.res==='cambio'?`Nueva fecha: ${fdate(i.due)}${i.time?', '+i.time:''}. Los recordatorios se ajustaron.`:'Toda la familia ya lo puede ver.'}</p>
   ${fu?`<div style="width:100%"><span class="lbl">¿Qué le pidieron?</span><div class="stack"><button class="btn gh full" data-a="followup" data-v="cita" data-ent="${i.ent}">${ic('heart','s')}Anotar nueva cita</button><button class="btn gh full" data-a="followup" data-v="examen" data-ent="${i.ent}">${ic('flask','s')}Anotar exámenes</button><button class="btn gh full" data-a="followup" data-v="medicamento" data-ent="${i.ent}">${ic('pill','s')}Anotar remedios</button></div></div>`:''}
   <button class="btn pri big full" data-a="close">Volver</button></div></div>`}
  const head=`<div class="sh"><div style="display:flex;gap:12px;align-items:center">${entTile(i.ent,'sm')}<div><div class="eb dk">${esc(i.title)} · ${E_.name}</div><div class="muted">${fdate(i.due)}${i.time?', '+i.time:''}${PL(i)?' · '+esc(PL(i).name):''}</div></div></div>${X}</div>`;
@@ -1564,6 +1594,7 @@ function feedbackModal(m,X){
   <div class="fld"><label for="fbnote">Cuéntalo en pocas palabras</label><textarea class="inp" id="fbnote" placeholder="Ej.: todo bien, cambió la dosis, control en 3 meses">${esc(m.note||'')}</textarea></div>
   ${recUI(m,'O deja un audio')}
   <div><span class="lbl">Foto de lo que le dieron (opcional)</span><div class="help" style="margin:-4px 0 8px">Orden, fórmula, resultados o constancia.</div>${pickers('report',!!m.file)}${m.file?`<div style="background:var(--navy-50);border-radius:14px;padding:10px;margin-top:8px">${filePreview(m.file)}</div>`:''}</div>
+  ${!isCare()?`<div><label class="lbl" for="gval">¿Costó algo? (opcional)</label><div class="monto-in"><span>$</span><input id="gval" size="4" inputmode="numeric" autocomplete="off" placeholder="0" value="${esc(miles(m.valor??(i.amount||'')))}" aria-describedby="gvalw"></div><div class="monto-w" id="gvalw" aria-live="polite">${palabrasPesos(m.valor??(i.amount||''))}</div><p class="help" style="margin:4px 0 0">${i.ent==='trabajo'?'Se anota como gasto en Plata › Trabajo'+(i.prop&&(S.inm.props.find(p=>p.id===i.prop)||{}).dueno?' y se le descuenta al dueño.':'.'):'Se anota como gasto en Plata › Casa.'}</p></div>`:''}
   ${er?`<div class="banner bad">${ic('alert','s')}<div>${er}</div></div>`:''}
   <button class="btn pri big full" data-a="fbsave">Guardar y cerrar la cita</button></div>`;
  if(m.res==='cambio')return head+`<div class="sb"><h2>¿Para cuándo quedó?</h2><div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px"><div class="fld"><label for="fbd">Nueva fecha</label><input class="inp ${er?'err':''}" type="date" id="fbd" value="${m.d||''}"></div><div class="fld"><label for="fbh">Hora</label><input class="inp" type="time" id="fbh" value="${m.h||''}"></div></div>${er?`<div class="er">${er}</div>`:''}<button class="btn pri big full" data-a="fbcambio">Guardar nueva fecha</button></div>`;
@@ -1606,7 +1637,7 @@ function modal(){
   const i=IT(m.id),v=VERB[i.cat];
   if(m.done){
    const others=Object.values(P).filter(p=>p.id!==S.user&&p.kind!=='cuidador'&&p.status==='activo').map(p=>p.short);
-   h=`<div class="sb"><div class="done"><div class="big">${ic('check')}</div><h2>Listo, ${me().short}. Quedó cerrado.</h2><p class="muted" style="font-size:17px;margin:0">${m.offline?'Está guardado en el teléfono. Se envía solo cuando vuelva el internet.':`${others.slice(0,-1).join(', ')} y ${others.slice(-1)} ya lo pueden ver. El soporte quedó en Papeles.`}</p>
+   h=`<div class="sb"><div class="done"><div class="big">${ic('check')}</div><h2>Listo, ${me().short}. Quedó cerrado.</h2><p class="muted" style="font-size:17px;margin:0">${m.offline?'Está guardado en el teléfono. Se envía solo cuando vuelva el internet.':`${others.slice(0,-1).join(', ')} y ${others.slice(-1)} ya lo pueden ver. El soporte quedó en Papeles.`}${m.plata?` Lo que costó quedó en Plata › ${m.plata==='trabajo'?'Trabajo':'Casa'}.`:''}</p>
    ${m.offline?`<button class="btn gh full" data-a="sync">${ic('refresh','s')}Ya volvió el internet</button>`:''}
    <button class="btn pri big full" data-a="close">Volver</button></div></div>`;
   } else {
@@ -1621,6 +1652,7 @@ function modal(){
    ${i.cat==='cita'?`<button class="lnk" style="align-self:center" data-a="kind" data-v="voz">No me dieron papel</button>`:`<button class="lnk" style="align-self:center" data-a="nopaper">No tengo el papel</button>`}`}
    ${m.err?`<div class="banner bad">${ic('alert','s')}<div>${m.err}</div></div>`:''}
    ${v[2]&&!m.err?`<p class="help" style="margin:0">${v[2]}</p>`:''}
+   ${!isCare()?`<div><label class="lbl" for="gval">¿Costó algo? (opcional)</label><div class="monto-in"><span>$</span><input id="gval" size="4" inputmode="numeric" autocomplete="off" placeholder="0" value="${esc(miles(m.valor??(i.amount||'')))}" aria-describedby="gvalw"></div><div class="monto-w" id="gvalw" aria-live="polite">${palabrasPesos(m.valor??(i.amount||''))}</div><p class="help" style="margin:4px 0 0">${i.ent==='trabajo'?'Se anota como gasto en Plata › Trabajo'+(i.prop&&(S.inm.props.find(p=>p.id===i.prop)||{}).dueno?' y se le descuenta al dueño.':'.'):'Se anota como gasto en Plata › Casa.'}</p></div>`:''}
    <div class="fld"><label for="note">¿Algo para contar? (opcional)</label><input class="inp" id="note" value="${esc(m.note||'')}" placeholder="Ej.: pagué en el banco de la esquina"></div>
    <button class="btn pri big full" data-a="send">${v[0]}</button>
    <button class="lnk" style="align-self:center;font-size:13px;color:var(--fg-3)" data-a="send" data-off="1">Simular: sin internet</button></div>`;
@@ -1927,9 +1959,10 @@ function render(){
  let c='';
  if(v==='home')c=remote()?vHomeRemote():vHomeLocal();
  else if(v==='item')c=vItem(S.arg);else if(v==='cal')c=vCal();else if(v==='docs')c=vDocs();else if(v==='fam')c=vFamily();else if(v==='ent')c=vEnt(S.arg);else if(v==='set')c=vSet();else if(v==='inmo')c=vPlata();else if(v==='inmores')c=vInmoRes();else if(v==='cuentas')c=vCuentas(S.arg);else if(v==='config')c=vConfig();
- const act=v==='item'?'home':v==='ent'?'fam':v==='inmores'||v==='cuentas'?'inmo':v==='config'?'fam':v;
- const navs=[['home','home',remote()?'Desde afuera':'Hoy'],['cal','cal','Calendario'],['docs','file','Papeles'],['fam','fam','Familia']];
- const navsSide=seesInm()?[...navs.slice(0,2),['inmo','card','Cuentas'],...navs.slice(2)]:navs;
+ const act=v==='item'?'home':v==='ent'?'fam':v==='inmores'||v==='cuentas'?'inmo':v==='config'?'fam':v==='docs'&&!isCare()&&innerWidth<900?'fam':v;
+ const plataOk=!isCare();
+ const navs=[['home','home',remote()?'Desde afuera':'Hoy'],['cal','cal','Calendario'],plataOk?['inmo','card','Plata']:['docs','file','Papeles'],['fam','fam','Familia']];
+ const navsSide=plataOk?[...navs.slice(0,3),['docs','file','Papeles'],navs[3]]:navs;
  const z=SCALE[S.font[S.user]||'grande'];
  document.getElementById('app').innerHTML=`
  <div class="pbar"><b>PROTOTIPO</b><span>Demo · datos ficticios</span></div>
@@ -1948,7 +1981,7 @@ function adminsLeft(except,newRole){return Object.values(P).filter(p=>p.status==
 document.addEventListener('input',e=>{const t=e.target;if(t.id!=='gval'&&t.id!=='gadm')return;const f=miles(t.value);t.value=f;const w=document.getElementById(t.id+'w');if(w)w.textContent=palabrasPesos(f);if(S.modal){if(S.modal.k==='prop'){if(t.id==='gadm')S.modal.f.admin=f;else S.modal.f.renta=f}else S.modal.valor=f}});
 document.addEventListener('change',e=>{const t=e.target,a=t.dataset.a;
  if(a==='photoin'){const f=t.files&&t.files[0];if(!f)return;if(!f.type.startsWith('image/')){toast('Elige una imagen (foto)');return}const id=t.dataset.id,u=URL.createObjectURL(f);if(ENT[id])ENT[id].photo=u;if(P[id])P[id].photo=u;if(S.modal&&S.modal.k==='editent'){const f2={};document.querySelectorAll('[id^=f_]').forEach(x=>f2[x.id.slice(2)]=x.value.trim());S.modal.f=f2}render();toast('Foto actualizada');return}
- if(a==='filein'){const f=t.files&&t.files[0];const m=S.modal;if(!f||!m)return;
+ if(a==='filein'){const f=t.files&&t.files[0];const m=S.modal;if(!f||!m)return;if(m.k==='report'&&document.getElementById('gval'))m.valor=val('gval');
   if(!(f.type.startsWith('image/')||f.type==='application/pdf')){m.err=t.dataset.ctx==='report'?'Ese archivo no sirve. Usa una foto o un PDF.':null;if(m.k==='adddoc'){m.err={f:1}}render();return}
   if(f.size>15*1024*1024){if(m.k==='report')m.err='El archivo pesa más de 15 MB. Prueba con una foto.';render();return}
   if(m.k==='report'&&!isAppt(IT(m.id))){m.note=val('note');m.kind=t.dataset.kind;m.err=null;m.rec=false}
@@ -1975,7 +2008,7 @@ document.addEventListener('click',e=>{
  if(!t)return;const a=t.dataset.a;
  if(['who','fontsel','hora','role'].includes(a))return;
  if(a==='scrim'&&e.target!==t)return;
- const m=S.modal;
+ const m=S.modal;if(m&&m.k==='report'&&document.getElementById('gval'))m.valor=val('gval');
  switch(a){
  case 'kebab':{const r=t.getBoundingClientRect();S.menu=S.menu&&S.menu.id===t.dataset.id&&S.menu.k===t.dataset.k?null:{k:t.dataset.k,id:t.dataset.id,r:r.right,b:r.bottom,t:r.top};render();break}
  case 'm-edit-ent':{const e=ENT[t.dataset.id];S.menu=null;S.modal={k:'editent',id:e.id,f:e.type==='carro'?{marca:e.marca,modelo:e.modelo,anio:e.anio,placa:e.placa}:e.type==='mascota'?{full:e.full,especie:e.especie,raza:e.raza,nace:e.nace,vet:e.vet}:e.type==='casa'?{nombre:e.nombre||e.full,dir:e.dir,ciudad:e.ciudad}:Object.assign({full:e.full,short:e.name},e.perfil||{})};render();break}
@@ -2100,22 +2133,24 @@ document.addEventListener('click',e=>{
  case 'recvoice':m.note=val('note')||val('fbnote');m.err=null;m.audio=null;startRec(m);break;
  case 'recstop':if(REC)REC.mr.stop();break;
  case 'nopaper':m.note=val('note');m.err=IT(m.id).cat==='pago'?'Para un pago necesitamos el recibo. Si pagaste por internet, sube el pantallazo. Si se perdió, pide un duplicado en la empresa o avísale a Diego.':'Sin papel no se puede cerrar. Si lo tienes en el correo, súbelo como archivo.';render();break;
- case 'send':{if(m.recording)break;m.note=val('note');const i=IT(m.id);
+ case 'send':{if(m.recording)break;m.note=val('note');if(document.getElementById('gval'))m.valor=val('gval');const i=IT(m.id);
   if(!m.kind||(m.kind==='voz'&&!m.rec)||(m.kind!=='voz'&&!m.file)){m.err=m.kind==='voz'?'Graba el audio contando qué hiciste.':'Falta la foto. Sin el papel no queda cerrado.';render();break}
   i.open=false;i.closed={ts:Date.now(),by:S.user,at:nowS(),kind:m.kind,audio:m.audio||null,file:m.file?m.file.name:null,url:m.file?m.file.url:null,mime:m.file?m.file.type:null,note:m.note};
   i.reopened=null;
   i.hist.push(['Hoy',me().short,`Lo cerró con ${m.kind==='foto'?'foto':m.kind==='archivo'?'archivo':'audio (sin papel)'}`]);
-  addFeed(`cerró “${i.title}”`,i.id,m.kind);
+  addFeed(`cerró “${i.title}”`,i.id,m.kind);m.plata=gastoDeTarea(i,m.valor,m.file);
   m.done=true;m.offline=!!t.dataset.off;render();break}
  case 'sync':S.modal=null;render();toast('Enviado. La familia ya lo puede ver');break;
- case 'add':S.modal={k:'add',f:{para:t.dataset.ent||null,rec:null},tipo:null};render();break;
+ case 'add':S.modal={k:'add',f:{para:t.dataset.ent||null,rec:null},tipo:null,fijo:!!t.dataset.ent};render();break;
  case 'followup':S.modal={k:'add',tipo:t.dataset.v,f:{para:t.dataset.ent,rec:t.dataset.v==='medicamento'?'Cada mes':null}};render();break;
- case 'tipo':if(t.dataset.v==='plata'){S.modal={k:'plata',tipo:null,err:null};render();break}collectA(m);m.tipo=t.dataset.v||null;m.err=null;if(m.tipo==='pago'&&!m.f.rec)m.f.rec='Cada mes';if(m.tipo==='medicamento'&&!m.f.rec)m.f.rec='Cada mes';render();break;
+ case 'tipo':if(t.dataset.v==='plata'){S.modal={k:'plata',tipo:null,err:null};render();break}collectA(m);m.tipo=t.dataset.v||null;if(m.tipo&&m.tipo.startsWith('mascota:')){m.f.esp=m.tipo.split(':')[1];m.tipo='mascota'}m.err=null;if(m.tipo==='pago'&&!m.f.rec)m.f.rec='Cada mes';if(m.tipo==='medicamento'&&!m.f.rec)m.f.rec='Cada mes';render();break;
+ case 'que':m.que=t.dataset.v||null;render();break;
+ case 'para':m.f.para=t.dataset.v||null;m.tipo=null;render();break;
  case 'af':collectA(m);m.f[t.dataset.f]=t.dataset.v;if(m.err)m.err[t.dataset.f]=0;render();break;
  case 'saveadd':{collectA(m);const f=m.f,tp=m.tipo,er={};
   if(!f.para)er.para=1;
   if(['cita','examen','pago','documento','otro','mascota'].includes(tp)&&!f.esp)er.esp=tp==='otro'?'Escribe qué hay que hacer.':'Completa este dato.';
-  if(!f.fecha)er.fecha='Indica la fecha.';
+  if(!f.fecha)er.fecha='Indica la fecha.';if(f.para==='trabajo'&&tp==='pago'&&!f.prop)er.prop=1;
   const vet=tp==='mascota'&&['Veterinario','Vacuna'].includes(f.esp);
   if((tp==='cita'||tp==='examen'||vet)){if(!f.hora)er.hora='Indica la hora.';if(!f.place)er.place='Elige el lugar.';if(f.place==='nuevo'&&!f.pname)er.pname='Escribe el nombre del lugar.'}
   if(Object.keys(er).length){m.err=er;render();break}
@@ -2128,6 +2163,7 @@ document.addEventListener('click',e=>{
   if(tp==='mascota'){if(vet)it.place=place;it.rec=f.rec&&f.rec!=='Una vez'?f.rec:undefined}
   if(tp==='cita'||tp==='examen'){it.place=place;it.acomp=f.acomp||undefined;it.prep=f.prep||undefined;it.ayunas=!!f.ayunas;it.sens=true}
   if(tp==='medicamento'){it.sens=true;it.rec=f.rec==='Una vez'?undefined:f.rec}
+  if(f.para==='trabajo'&&f.prop){const pp=S.inm.props.find(x=>x.id===f.prop);it.prop=f.prop;it.sub=pp.nombre+(pp.dueno?' · se descuenta a '+DUE(pp.dueno).nombre.split(' ')[0]:'')}
   if(tp==='pago'){it.rec=f.rec==='Una vez'?undefined:f.rec;if(f.valor)it.amount='$ '+Number(String(f.valor).replace(/\D/g,'')).toLocaleString('es-CO')}
   if(m.file){it.attach={name:m.file.name,url:m.file.url};S.docs.push({id:'d'+Date.now(),ent,cat:tp==='pago'?'Recibos':'Salud',name:(tp==='medicamento'?'Fórmula · ':'Orden · ')+it.title,fmt:m.file.type.includes('pdf')?'PDF':'JPG',by:S.user,url:m.file.url,mime:m.file.type,log:[]})}
   S.items.push(it);addFeed(`anotó “${it.title}”${tp==='cita'||tp==='examen'?' para el '+due.getDate()+' de '+MES[due.getMonth()]:''}`,id);S.modal=null;render();toast('Anotado. Ya lo ve toda la familia');break}
@@ -2136,10 +2172,10 @@ document.addEventListener('click',e=>{
  case 'fbacomp':m.note=val('fbnote');m.acomp=t.dataset.v;render();break;
  case 'fbhow':m.note=val('fbnote');m.how=t.dataset.v;m.err=null;render();break;
  case 'fbwhy':m.d=val('fbd');m.why=t.dataset.v;m.err=null;render();break;
- case 'fbsave':{if(m.recording){m.err='Detén la grabación primero.';render();break}m.note=val('fbnote');const i=IT(m.id);if(!m.how){m.err='Elige cómo le fue.';render();break}if(!m.note&&!m.rec&&!m.file){m.err='Cuéntalo con una nota, un audio o una foto. Así queda la constancia.';render();break}
+ case 'fbsave':{if(m.recording){m.err='Detén la grabación primero.';render();break}m.note=val('fbnote');if(document.getElementById('gval'))m.valor=val('gval');const i=IT(m.id);if(!m.how){m.err='Elige cómo le fue.';render();break}if(!m.note&&!m.rec&&!m.file){m.err='Cuéntalo con una nota, un audio o una foto. Así queda la constancia.';render();break}
   i.open=false;i.closed={ts:Date.now(),by:S.user,at:nowS(),acomp:(m.acomp??(i.acomp||''))||null,audio:m.audio||null,kind:m.file?'foto':m.rec?'voz':'nota',file:m.file?m.file.name:null,url:m.file?m.file.url:null,mime:m.file?m.file.type:null,note:m.note,how:m.how};i.reopened=null;
   i.hist.push(['Hoy',me().short,`${S.user===i.ent?'Contó cómo le fue':'Contó cómo le fue a '+ENT[i.ent].name}: ${m.how.toLowerCase()}${m.note?' · '+m.note:''}`]);
-  addFeed(`${S.user===i.ent?'contó cómo le fue en':'contó cómo le fue a '+ENT[i.ent].name+' en'} “${i.title}”: ${m.how.toLowerCase()}`,i.id,m.file?'foto':m.rec?'voz':null);m.done=true;render();break}
+  addFeed(`${S.user===i.ent?'contó cómo le fue en':'contó cómo le fue a '+ENT[i.ent].name+' en'} “${i.title}”: ${m.how.toLowerCase()}`,i.id,m.file?'foto':m.rec?'voz':null);m.plata=gastoDeTarea(i,m.valor,m.file);m.done=true;render();break}
  case 'fbcambio':{m.d=val('fbd');m.h=val('fbh');if(!m.d){m.err='Indica la nueva fecha.';render();break}const i=IT(m.id);const old=fshort(i.due);i.due=fromIso(m.d);if(m.h)i.time=fmtTime(m.h);i.hist.push(['Hoy',me().short,`Cambió la fecha: ${old} → ${fshort(i.due)}`]);addFeed(`movió “${i.title}” al ${i.due.getDate()} de ${MES[i.due.getMonth()]}`,i.id);m.done=true;render();break}
  case 'fbnofui':{m.d=val('fbd');if(!m.why){m.err='Elige qué pasó.';render();break}const i=IT(m.id);
   if(m.d){const old=fshort(i.due);i.due=fromIso(m.d);i.hist.push(['Hoy',me().short,`No asistió (${m.why.toLowerCase()}). Se reprogramó: ${old} → ${fshort(i.due)}`]);addFeed(`reprogramó “${i.title}”`,i.id);S.modal=null;render();toast('Reprogramada. Los recordatorios siguen');break}
