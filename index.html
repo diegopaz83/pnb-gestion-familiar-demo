@@ -839,6 +839,16 @@ main{container:main/inline-size}
 .cp-acc{margin-top:0}.cp-acc .anota{flex-direction:row;align-items:center;padding:10px 14px}.cp-acc .anota .sg{margin:0;width:36px;height:36px;font-size:22px}
 .casa-plata .cp-tot b{font-size:clamp(16px,4.2vw,20px)}
 @media(min-width:900px){.casa-plata .cp-tot{grid-template-columns:minmax(0,1fr)}}
+.cta-head{padding-bottom:0}
+.cta-tabs{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px}
+.cta-tabs button{display:flex;align-items:center;gap:12px;border:2px solid var(--line);background:var(--white);border-radius:18px;padding:12px 14px;text-align:left;color:var(--fg-2);min-width:0}
+.cta-tabs button span{display:flex;flex-direction:column;min-width:0}.cta-tabs b{font-size:19px;color:inherit}.cta-tabs small{font-size:14px;color:var(--fg-3)}
+.cta-tabs button.on{background:var(--navy-800);border-color:var(--navy-800);color:var(--on-1)}.cta-tabs button.on small{color:var(--gold-300,#e8cf86)}
+.rec-row{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px 12px;align-items:center;background:var(--white);border-radius:18px;padding:14px 16px;box-shadow:var(--sh-sm);border:1px solid transparent}
+.rec-row.tarde{background:#fdf3f1;border-color:#f6dcd6}
+.rec-tx{grid-column:1/-1;display:flex;flex-direction:column;background:none;border:0;padding:0;text-align:left;color:inherit;min-width:0}
+.rec-tx b{color:var(--fg-1);font-size:17px;overflow-wrap:anywhere}
+.rec-row .pill{justify-self:start}
 </style>
 </head>
 <body>
@@ -903,6 +913,7 @@ function seed(){P=baseP();ENT=baseEnt();return{
  inm:{
   duenos:[{id:'d1',nombre:'Gloria Restrepo',cel:'3105551122'},{id:'d2',nombre:'Hernán Castillo',cel:'3157778899'}],
   liq:[],
+  recur:[{id:'k1',prop:'p2',cat:'Administración del edificio',desc:'Administración del edificio',valor:180000,cada:'Cada mes',prox:D(11,10)},{id:'k2',prop:'p3',cat:'Servicios',desc:'Agua del local',valor:95000,cada:'Cada mes',prox:D(11,25)},{id:'k3',prop:'p1',cat:'Predial',desc:'Predial',valor:310000,cada:'Cada 3 meses',prox:D(12,6)}],
   props:[
    {id:'p1',dueno:'d1',admin:120000,nombre:'Casa San Fernando',dir:'Calle 5 # 34-20',inq:'Martha Gómez',cel:'3001112233',desde:'2024-03-01',renta:1200000,dia:5,hist:[{inq:'Carlos Mejía',cel:'3009990000',desde:'2021-02-01',hasta:'2024-02-29'}]},
    {id:'p2',dueno:null,admin:0,nombre:'Apartamento 302',dir:'Edificio Los Álamos',inq:'Jorge Ruiz',cel:'3004445566',desde:'2025-07-01',renta:950000,dia:10,hist:[]},
@@ -1026,8 +1037,8 @@ function entTile(e,cls=''){const E_=ENT[e];return `<span class="tile pic ${cls} 
 function av(id,cls=''){const p=P[id];if(p.status==='pendiente')return `<span class="av ${cls} pend">${p.ini}</span>`;return `<span class="av pic ${cls}" title="${esc(p.name)}">${photoOf(id)?imgTag(photoOf(id)):portrait(id,p.kind==='afuera'?'#e4e9f1':p.bg)}</span>`}
 function counts(eid){const its=S.items.filter(i=>i.ent===eid&&i.open&&seesItem(i));return {late:its.filter(i=>stat(i)==='bad').length,week:its.filter(i=>stat(i)==='warn').length,open:its.length}}
 function facesRow(remoteMode){const L_=Object.values(ENT).filter(e=>seesEnt(e.id));return `<div class="faces" style="--n:${Math.min(L_.length+(!isCare()?1:0),6)}">${L_.map(e=>{const c=counts(e.id);const n=c.late||c.week;return `<button class="face" data-a="ent" data-id="${e.id}"><span class="fpic ${e.type==='persona'?'':'sq'}">${entPic(e.id)}</span>${n?`<span class="fb ${c.late?'bad':'warn'}">${n}</span>`:''}<b>${esc(e.name)}</b>${remoteMode?`<small>${c.late?c.late+' atrasado':c.week?c.week+' esta semana':'Al día'}</small>`:''}</button>`}).join('')}${inmFace(remoteMode)}</div>`}
-function inmFace(remoteMode){if(typeof seesInm!=='function'||!seesInm()||!S.inm)return '';const pend=S.inm.props.filter(p=>inmPend(p)),late=pend.filter(p=>inmEstado(p)==='bad').length;
- return `<button class="face" data-a="nav" data-v="inmo"><span class="fpic sq inm-face">${ic('card')}</span>${pend.length?`<span class="fb ${late?'bad':'warn'}">${pend.length}</span>`:''}<b>Inmobiliaria</b>${remoteMode?`<small>${late?late+' renta atrasada':pend.length?pend.length+' por cobrar':'Al día'}</small>`:''}</button>`}
+function inmFace(remoteMode){if(typeof seesInm!=='function'||!S.inm||isCare())return '';const pend=seesInm()?S.inm.props.filter(p=>inmPend(p)):[],rec=seesInm()?S.inm.recur.filter(k=>recEst(k)==='bad'):[],late=pend.filter(p=>inmEstado(p)==='bad').length+rec.length,n=pend.length+rec.length;
+ return `<button class="face" data-a="nav" data-v="inmo"><span class="fpic sq inm-face">${ic('card')}</span>${n?`<span class="fb ${late?'bad':'warn'}">${n}</span>`:''}<b>Cuentas</b>${remoteMode?`<small>${late?late+' atrasado':n?n+' por hacer':'Al día'}</small>`:''}</button>`}
 /* alcance */
 function seesEnt(eid,u=S.user){const p=P[u];if(p.kind!=='cuidador')return true;return (p.scope||[]).includes(eid)}
 function seesItem(i,u=S.user){if(!seesEnt(i.ent,u))return false;if(i.sens&&isCare(u)&&!P[u].salud)return i.resp===u;return true}
@@ -1325,8 +1336,8 @@ function luisMes(y,mo){const mv=inmMovs().filter(x=>x.fecha.getMonth()===mo&&x.f
 function cuentasTexto(did){const d=DUE(did),c=cuentas(did),L=[`Hola ${d.nombre.split(' ')[0]}, estas son las cuentas de ${MES[TODAY.getMonth()]}:`,''];
  c.secs.forEach(x=>{L.push(x.p.nombre);x.lin.forEach(l=>L.push(`${l.v<0?'−':'+'} ${l.t}: ${COP(Math.abs(l.v))}`));if(inmPend(x.p))L.push(`(Falta cobrar ${COP(x.p.renta-pgVal(x.p))} de la renta)`);L.push(`Queda: ${COPs(x.sub)}`,'')});
  L.push(`Total: ${COPs(c.total)}`);if(c.hecho)L.push(`Ya transferido: ${COP(c.hecho)}`);L.push(c.falta>=0?`Por transferir: ${COP(c.falta)}`:`Usted le debe a ${P.luis.short}: ${COP(-c.falta)}`,'',P.luis.short);return L.join('\n')}
-function vCuentas(did){const d=DUE(did);if(!d)return vInmo();const c=cuentas(did),wa=d.cel?`https://wa.me/57${d.cel}?text=${encodeURIComponent(cuentasTexto(did))}`:'';
- return `<div class="wrap"><button class="back" data-a="back">${ic('back','s')}Inmobiliaria</button>
+function vCuentas(did){const d=DUE(did);if(!d)return vPlata();const c=cuentas(did),wa=d.cel?`https://wa.me/57${d.cel}?text=${encodeURIComponent(cuentasTexto(did))}`:'';
+ return `<div class="wrap"><button class="back" data-a="back">${ic('back','s')}Cuentas</button>
  <div class="ph"><div><div class="eb dk">Las cuentas de ${MES[TODAY.getMonth()]}</div><h1>${esc(d.nombre)}</h1><p>Dueño de ${c.props.map(p=>esc(p.nombre)).join(' y ')}.</p></div></div>
  <div class="cta-grid">${c.secs.map(x=>`<div class="card cta-prop"><h2>${esc(x.p.nombre)}</h2>
   ${x.lin.length?x.lin.map(l=>`<div class="cl ${l.v<0?'menos':'mas'} ${l.adm?'adm':''}"><span>${esc(l.t)}</span><b>${l.v<0?'−':'+'} ${COP(Math.abs(l.v))}</b></div>`).join(''):'<p class="muted" style="margin:0">Nada anotado este mes.</p>'}
@@ -1346,7 +1357,18 @@ function casaPlata(){const mo=TODAY.getMonth(),y=TODAY.getFullYear(),xs=S.casa.m
  ${seesCasa()?`<div class="anota2 cp-acc"><button class="anota sale" data-a="casamov" data-v="egreso"><span class="sg">−</span><b>Salió</b></button><button class="anota entra" data-a="casamov" data-v="ingreso"><span class="sg">+</span><b>Entró</b></button></div>
  <div class="grp">${xs.length?xs.map(x=>`<button class="mov ${x.tipo}" data-a="casaver" data-id="${x.id}"><span class="sig">${x.tipo==='ingreso'?'+':'−'}</span><span class="tx"><b>${esc(x.desc)}</b><span class="k">${esc(x.cat)} · ${fshort(x.fecha)} · ${P[x.by].short}</span></span><b class="val">${x.tipo==='ingreso'?'+':'−'} ${COP(x.valor)}</b></button>`).join(''):'<p class="muted" style="padding:16px;margin:0">Nada anotado este mes.</p>'}</div>`
  :`<p class="muted" style="margin:0">El detalle lo ven ${P.luis.short} y ${P.lucero.short}.</p>`}</div>`}
-function vInmo(){
+const CADA={'Cada mes':1,'Cada 3 meses':3,'Cada 6 meses':6,'Cada año':12};
+function recEst(k){const n=days(k.prox);return n<0?'bad':n<=5?'warn':'neu'}
+function vPlata(){const puedeT=seesInm();let tab=S.ctaTab||(puedeT?'trabajo':'casa');if(tab==='trabajo'&&!puedeT)tab='casa';
+ const t=(v,i,a,b)=>`<button role="tab" aria-selected="${tab===v}" class="${tab===v?'on':''}" data-a="ctatab" data-v="${v}">${ic(i)}<span><b>${a}</b><small>${b}</small></span></button>`;
+ return `<div class="wrap cta-head"><button class="back" data-a="back">${ic('back','s')}Volver</button><div class="ph"><div><h1>Cuentas</h1><p>La plata que entra y sale, y los pagos que se repiten.</p></div></div>
+ ${puedeT?`<div class="cta-tabs" role="tablist">${t('casa','house','Casa','Familia')}${t('trabajo','card','Trabajo','Inmobiliaria')}</div>`:''}</div>`+(tab==='casa'?vCasaCta():vTrabajo())}
+function vCasaCta(){const pagos=S.items.filter(i=>i.ent==='casa'&&i.cat==='pago'&&i.open&&seesItem(i)).sort((a,b)=>a.due-b.due);
+ return `<div class="wrap">${seesCasa()||!isCare()?casaPlata():''}
+ <div class="shd" style="margin-top:26px"><h2>Pagos que se repiten</h2><span class="c">${pagos.length}</span><button class="btn gh sm empuja" data-a="add" data-ent="casa">${ic('plus','s')}Agregar</button></div>
+ ${pagos.length?`<div class="stack">${pagos.map(i=>taskRow(i)).join('')}</div>`:'<p class="muted">No hay pagos pendientes de la casa.</p>'}
+ <p class="muted" style="margin-top:12px">Gas, agua, luz, predial… Cuando se pagan se marcan con «Ya lo hice» y su comprobante; ${P.diego.short} y ${P.adriana.short} los ven desde afuera.</p></div>`}
+function vTrabajo(){
  const mes=TODAY.getMonth(),mv=inmMovs().filter(x=>x.fecha.getMonth()===mes&&x.fecha.getFullYear()===TODAY.getFullYear()).filter(x=>!S.inmF||x.tipo===S.inmF);
  const propName=id=>id?(S.inm.props.find(p=>p.id===id)||{}).nombre:'General';
  const desdeTxt=f=>{if(!f)return '';const [y,m]=f.split('-');return MES[+m-1]+' de '+y};
@@ -1361,7 +1383,9 @@ function vInmo(){
    :`<div class="inm-acc"><button class="btn pri sm" data-a="inmpago" data-id="${p.id}">${ic('check','s')}Ya pagó</button><a class="btn gh sm wa" href="${wa}" target="_blank" rel="noopener">${ic('msg','s')}Recordarle</a></div>`}
   <button class="lnk inm-edit" data-a="propedit" data-id="${p.id}">${ic('edit','s')}Editar propiedad o inquilino</button>
   </div>`};
- return `<div class="wrap"><button class="back" data-a="back">${ic('back','s')}Volver</button><div class="ph"><div><div class="eb dk">Trabajo de ${P.luis.short}</div><h1>Inmobiliaria</h1><p>Rentas por cobrar, gastos de cada propiedad y las cuentas de cada dueño.</p></div></div>
+ const recs=S.inm.recur.slice().sort((a,b)=>a.prox-b.prox);
+ const recRow=k=>{const p=S.inm.props.find(x=>x.id===k.prop),n=days(k.prox),st=recEst(k);return `<div class="rec-row ${st==='bad'?'tarde':''}"><button class="rec-tx" data-a="recur" data-id="${k.id}"><b>${esc(k.desc)} · ${COP(k.valor)}</b><span class="k">${p?esc(p.nombre)+(p.dueno?' · se descuenta a '+esc(DUE(p.dueno).nombre.split(' ')[0]):''):'General'} · ${esc(k.cada).toLowerCase()}</span></button><span class="pill ${st}">${n<0?`Atrasado ${-n} ${-n===1?'día':'días'}`:n===0?'Vence hoy':'Vence el '+fshort(k.prox)}</span><button class="btn pri sm" data-a="recpagar" data-id="${k.id}">${ic('check','s')}Ya lo pagué</button></div>`};
+ return `<div class="wrap">
  <div class="anota2">
   <button class="anota sale" data-a="inmgasto" data-v="egreso"><span class="sg">−</span><b>Sale plata</b><small>Un gasto: toma foto del recibo</small></button>
   <button class="anota entra" data-a="inmgasto" data-v="ingreso"><span class="sg">+</span><b>Entra plata</b><small>Otro ingreso que no sea la renta</small></button>
@@ -1370,6 +1394,8 @@ function vInmo(){
  <div class="shd" style="margin-top:26px"><h2>Propiedades</h2><span class="c">${S.inm.props.length}</span><button class="btn gh sm empuja" data-a="propedit" data-id="">${ic('plus','s')}Agregar</button></div>
  <div class="inm-grid">${S.inm.props.map(card).join('')}</div>
  ${S.inm.duenos.some(d=>S.inm.props.some(p=>p.dueno===d.id))?`<div class="shd" style="margin-top:26px"><h2>Cuentas de los dueños</h2></div><div class="inm-grid">${S.inm.duenos.filter(d=>S.inm.props.some(p=>p.dueno===d.id)).map(d=>{const c=cuentas(d.id),n=c.props.length;return `<button class="card due ${c.falta<=0&&c.hecho>0?'hecha':''}" data-a="cuentas" data-id="${d.id}"><span class="inm-ic">${ic('fam')}</span><span class="tx"><b>${esc(d.nombre)}</b><span class="k">${n} ${n===1?'propiedad':'propiedades'} · ${c.falta>0?'Falta transferirle '+COP(c.falta):c.falta<0?'Le debe a '+P.luis.short+' '+COP(-c.falta):c.hecho?'Ya se le transfirió':'Nada este mes'}</span></span>${ic('chev','s')}</button>`}).join('')}</div>`:''}
+ <div class="shd" style="margin-top:26px"><h2>Pagos que se repiten</h2><span class="c">${recs.length}</span><button class="btn gh sm empuja" data-a="recur" data-id="">${ic('plus','s')}Agregar</button></div>
+ ${recs.length?`<div class="stack">${recs.map(recRow).join('')}</div>`:'<p class="muted">Administración del edificio, predial, servicios: anótalos aquí para que no se olviden.</p>'}
  <div class="shd" style="margin-top:26px"><h2>Movimientos de ${MES[TODAY.getMonth()]}</h2></div>
  <div class="chips" style="margin-bottom:12px">${[['','Todo'],['ingreso','Entra plata'],['egreso','Sale plata']].map(o=>`<button class="chip ${(S.inmF||'')===o[0]?'on':''}" data-a="inmf" data-v="${o[0]}">${o[1]}</button>`).join('')}</div>
  <div class="grp">${mv.length?mv.map(x=>`<button class="mov ${x.tipo}" data-a="movver" data-id="${x.id}"><span class="sig">${x.tipo==='ingreso'?'+':'−'}</span><span class="tx"><b>${esc(x.desc)}</b><span class="k">${x.dueno?'Cuentas de '+esc(DUE(x.dueno).nombre.split(' ')[0]):esc(propName(x.prop))} · ${fshort(x.fecha)}${x.file?` · ${ic('file','s')}`:''}</span></span><b class="val">${x.tipo==='ingreso'?'+':'−'} ${COP(x.valor)}</b></button>`).join(''):'<p class="muted" style="padding:16px">No hay movimientos con ese filtro.</p>'}</div>
@@ -1382,7 +1408,7 @@ function vInmoRes(){
  const L=luisMes(y,m),q=L.ent-L.sal,por=esHoy?S.inm.props.filter(p=>inmPend(p)):[];
  const ds=S.inm.duenos.filter(d=>S.inm.props.some(p=>p.dueno===d.id)).map(d=>({d,c:cuentas(d.id,y,m)})).filter(x=>x.c.total||x.c.hecho);
  const fila=(t,v,sg)=>v?`<div class="rl"><div class="rl-n"><b>${t}</b></div><div class="rl-q"><b>${sg} ${COP(v)}</b></div></div>`:'';
- return `<div class="wrap"><button class="back" data-a="nav" data-v="inmo">${ic('back','s')}Inmobiliaria</button>
+ return `<div class="wrap"><button class="back" data-a="nav" data-v="inmo">${ic('back','s')}Cuentas</button>
  <div class="res-cab"><h1>¿Cuánto le quedó a ${P.luis.short}?</h1>
   <div class="res-mes"><button data-a="resmes" data-d="-1" aria-label="Mes anterior">${ic('back')}</button><b>${MES[m].charAt(0).toUpperCase()+MES[m].slice(1)} ${y}</b><button data-a="resmes" data-d="1" aria-label="Mes siguiente" ${esHoy?'disabled':''}>${ic('chev')}</button></div></div>
  <div class="res-big" style="margin-top:16px">
@@ -1399,9 +1425,11 @@ function vInmoRes(){
 function desdeTxt(f){if(!f)return '';const [y,m]=String(f).split('-');return MES[+m-1]+' de '+y}
 function propCollect(m){const g=id=>{const e=document.getElementById(id);return e?e.value.trim():undefined};const f=m.f;
  [['pn','nombre'],['pd','dir'],['gval','renta'],['gadm','admin'],['pdia','dia'],['qn','inq'],['qc','cel'],['qd','desde'],['dn','dnom'],['dc','dcel']].forEach(([id,k])=>{const v=g(id);if(v!==undefined)f[k]=v})}
-function inmHoy(){if(!seesInm())return '';const pend=S.inm.props.filter(p=>inmPend(p));if(!pend.length)return `<button class="card inm-hoy hecha" data-a="nav" data-v="inmo"><span class="inm-ic">${ic('house')}</span><div class="tx"><b>Inmobiliaria</b><span class="k">Todas las rentas de ${MES[TODAY.getMonth()]} cobradas</span></div>${ic('chev','s')}</button>`;
- const tarde=pend.filter(p=>inmEstado(p)==='bad');
- return `<button class="card inm-hoy ${tarde.length?'tarde':''}" data-a="nav" data-v="inmo"><span class="inm-ic">${ic('house')}</span><div class="tx"><b>Rentas por cobrar: ${pend.length}</b><span class="k">${pend.map(p=>esc(p.inq)+(inmEstado(p)==='bad'?' (atrasada)':'')).join(' · ')}</span></div>${ic('chev','s')}</button>`}
+function inmHoy(){if(!seesInm())return '';const pend=S.inm.props.filter(p=>inmPend(p)),rec=S.inm.recur.filter(k=>recEst(k)!=='neu');
+ const tarde=pend.filter(p=>inmEstado(p)==='bad').length+rec.filter(k=>recEst(k)==='bad').length;
+ if(!pend.length&&!rec.length)return `<button class="card inm-hoy hecha" data-a="ctaver" data-v="trabajo"><span class="inm-ic">${ic('card')}</span><div class="tx"><b>Cuentas del trabajo</b><span class="k">Rentas de ${MES[TODAY.getMonth()]} cobradas y pagos al día</span></div>${ic('chev','s')}</button>`;
+ const parts=[pend.length?`${pend.length} ${pend.length===1?'renta':'rentas'} por cobrar`:'',rec.length?`${rec.length} ${rec.length===1?'pago':'pagos'} por hacer`:''].filter(Boolean);
+ return `<button class="card inm-hoy ${tarde?'tarde':''}" data-a="ctaver" data-v="trabajo"><span class="inm-ic">${ic('card')}</span><div class="tx"><b>Cuentas: ${parts.join(' y ')}</b><span class="k">${[...pend.map(p=>esc(p.inq)+(inmEstado(p)==='bad'?' (atrasada)':'')),...rec.map(k=>esc(k.desc)+(recEst(k)==='bad'?' (atrasado)':''))].join(' · ')}</span></div>${ic('chev','s')}</button>`}
 function vEnt(id){
  const e=ENT[id];
  if(!e||!seesEnt(id))return `<div class="wrap"><button class="back" data-a="back">${ic('back','s')}Volver</button><div class="empty" style="margin-top:16px"><h3>No tienes acceso</h3></div></div>`;
@@ -1425,7 +1453,7 @@ function vEnt(id){
  ${its.length?sec('Atrasado',g.bad,'var(--bad)')+sec('Esta semana',g.warn,'var(--warn)')+sec('Más adelante',g.neu,'var(--navy-300)')+sec('Hecho',g.ok,'var(--ok)',3)
  :`<div class="empty" style="margin-top:18px"><div class="big">${ic('plus','l')}</div><h3>Sin nada anotado todavía</h3><p>Anota la primera cita, pago o revisión.</p></div>`}
  </div><div>
- ${e.type==='casa'&&!isCare()?casaPlata():''}
+ ${e.type==='casa'&&!isCare()?`<button class="card inm-hoy" data-a="ctaver" data-v="casa" style="margin-top:0"><span class="inm-ic">${ic('card')}</span><div class="tx"><b>Plata de la casa</b><span class="k">Lo que entra, sale y se paga cada mes: en Cuentas</span></div>${ic('chev','s')}</button>`:''}
  <div class="shd"><h2>Papeles</h2><span class="c">${docs.length}</span></div>
  ${docs.length?`<div class="stack">${docs.map(docRow).join('')}</div>`:`<div class="empty"><div class="big">${ic('file','l')}</div><h3>Sin papeles todavía</h3><p>Guarda aquí cédulas, recibos, pólizas o certificados.</p></div>`}
  ${hist.length?`<div class="shd"><h2>Lo último</h2></div><div class="card"><div class="feed">${hist.map((x,k)=>`<div class="fi"><div class="rail"><i class="${k===0?'k':''}"></i>${k<hist.length-1?'<span></span>':''}</div><div class="bd"><div class="fx"><b>${P[x.who].short}</b> ${esc(x.x)}</div><div class="fw">${x.at}</div></div></div>`).join('')}</div></div>`:''}
@@ -1623,8 +1651,8 @@ function modal(){
   <div class="anota2" style="margin-top:0"><button class="anota sale" data-a="setf" data-f="tipo" data-v="egreso"><span class="sg">−</span><b>Salió plata</b><small>Un gasto o un pago</small></button><button class="anota entra" data-a="setf" data-f="tipo" data-v="ingreso"><span class="sg">+</span><b>Entró plata</b><small>Le pagaron o recibió</small></button></div>
   ${seesInm()&&S.inm.props.some(p=>inmPend(p))?`<p class="lbl" style="margin:8px 0 0">¿Pagaron una renta?</p><div class="chips">${S.inm.props.filter(p=>inmPend(p)).map(p=>`<button class="chip" data-a="inmpago" data-id="${p.id}">${esc(p.inq)} · ${esc(p.nombre)}</button>`).join('')}</div>`:''}</div>`;
   else h=`<div class="sh"><div><span class="sobre">${m.tipo==='egreso'?'Salió plata':'Entró plata'}</span><h2>¿De qué fue?</h2></div>${X}</div><div class="sb"><div class="tipos">
-  ${seesCasa()?`<button class="tipo" data-a="plataamb" data-v="casa"><span class="fic otr">${ic('house')}</span><span class="tt"><b>La casa</b><small>${m.tipo==='egreso'?'Pan, mercado, almuerzo, transporte…':'Pensión, ayuda de la familia…'}</small></span>${ic('chev','s')}</button>`:''}
-  ${seesInm()?`<button class="tipo" data-a="plataamb" data-v="inm"><span class="fic pag">${ic('card')}</span><span class="tt"><b>Las propiedades</b><small>${m.tipo==='egreso'?'Arreglos, predial, servicios, transporte…':'Depósito u otro ingreso'}</small></span>${ic('chev','s')}</button>`:''}
+  ${seesCasa()?`<button class="tipo" data-a="plataamb" data-v="casa"><span class="fic otr">${ic('house')}</span><span class="tt"><b>Casa · familia</b><small>${m.tipo==='egreso'?'Pan, mercado, almuerzo, transporte…':'Pensión, ayuda de la familia…'}</small></span>${ic('chev','s')}</button>`:''}
+  ${seesInm()?`<button class="tipo" data-a="plataamb" data-v="inm"><span class="fic pag">${ic('card')}</span><span class="tt"><b>Trabajo · inmobiliaria</b><small>${m.tipo==='egreso'?'Arreglos, predial, servicios, transporte…':'Depósito u otro ingreso'}</small></span>${ic('chev','s')}</button>`:''}
   </div><button class="lnk" data-a="setf" data-f="tipo" data-v="">${ic('back','s')}Cambiar: entró o salió</button></div>`}
  if(m.k==='casamov'){const eg=m.tipo!=='ingreso',cats=eg?CASA_G:CASA_I;
   h=`<div class="sh"><div><span class="sobre">La casa</span><h2>${m.edit?'Corregir':eg?'Salió plata':'Entró plata'}</h2></div>${X}</div><div class="sb">
@@ -1651,6 +1679,17 @@ function modal(){
   <div><span class="lbl">¿Cómo?</span><div class="chips">${['Transferencia','Efectivo','Consignación'].map(o=>`<button class="chip ${m.medio===o?'on':''}" data-a="setf" data-f="medio" data-v="${o}">${o}</button>`).join('')}</div>${m.err&&m.err.medio?'<div class="er">Elige cómo.</div>':''}</div>
   <div><span class="lbl">Comprobante (opcional)</span>${pickers('transfer',!!m.file)}${m.file?`<div style="background:var(--navy-50);border-radius:14px;padding:10px;margin-top:8px">${filePreview(m.file)}</div>`:''}</div>
   <button class="btn pri big full" data-a="transfersave">${ic('check')}Guardar</button></div>`}
+ if(m.k==='recur'){const k=m.id?S.inm.recur.find(x=>x.id===m.id):null;
+  if(m.borrar&&k)h=`<div class="sh"><h2>¿Quitar este pago?</h2>${X}</div><div class="sb"><div class="aviso-borrar">${ic('alert')}<div><b>${esc(k.desc)} · ${COP(k.valor)}</b><p>Deja de recordarse. Lo que ya se anotó como pagado se conserva.</p></div></div><button class="btn big full peligro" data-a="recdelok">Sí, quitarlo</button><button class="btn gh big full" data-a="setf" data-f="borrar" data-v="">No, volver</button></div>`;
+  else h=`<div class="sh"><div><span class="sobre">Trabajo · pago que se repite</span><h2>${k?'Editar':'Agregar un pago que se repite'}</h2></div>${X}</div><div class="sb">
+  <div><span class="lbl">¿Qué se paga?</span><input class="inp" id="rdesc" placeholder="Ej.: Administración del edificio" value="${esc(m.desc||'')}">${m.err&&m.err.desc?'<div class="er">Escribe qué se paga.</div>':''}</div>
+  <div><span class="lbl">¿De qué propiedad?</span><div class="chips">${[...S.inm.props.map(p=>[p.id,p.nombre]),['gen','General']].map(o=>`<button class="chip ${m.prop===o[0]?'on':''}" data-a="setf" data-f="prop" data-v="${o[0]}">${esc(o[1])}</button>`).join('')}</div>${m.err&&m.err.prop?'<div class="er">Elige la propiedad o «General».</div>':''}</div>
+  <div><span class="lbl">Tipo</span><div class="chips">${CATG.map(o=>`<button class="chip ${m.cat===o?'on':''}" data-a="setf" data-f="cat" data-v="${o}">${o}</button>`).join('')}</div>${m.err&&m.err.cat?'<div class="er">Elige el tipo.</div>':''}</div>
+  <div><label class="lbl" for="gval">Valor de cada pago</label><div class="monto-in"><span>$</span><input id="gval" size="4" inputmode="numeric" autocomplete="off" placeholder="0" value="${esc(miles(m.valor||''))}" aria-describedby="gvalw"></div><div class="monto-w" id="gvalw" aria-live="polite">${palabrasPesos(m.valor)}</div>${m.err&&m.err.valor?'<div class="er">Escribe el valor.</div>':''}</div>
+  <div><span class="lbl">¿Cada cuánto?</span><div class="chips">${Object.keys(CADA).map(o=>`<button class="chip ${m.cada===o?'on':''}" data-a="setf" data-f="cada" data-v="${o}">${o}</button>`).join('')}</div>${m.err&&m.err.cada?'<div class="er">Elige cada cuánto.</div>':''}</div>
+  <div><label class="lbl" for="rfecha">¿Cuándo es el próximo?</label><input class="inp" type="date" id="rfecha" value="${esc(m.prox||'')}">${m.err&&m.err.prox?'<div class="er">Elige la fecha.</div>':''}</div>
+  <button class="btn pri big full" data-a="recsave">${ic('check')}Guardar</button>
+  ${k?'<button class="enlace peligro-t" data-a="setf" data-f="borrar" data-v="1">Quitar este pago</button>':''}</div>`}
  if(m.k==='inmgasto'&&!m.tipo){
   h=`<div class="sh"><h2>Inmobiliaria</h2>${X}</div><div class="sb"><p style="margin:0;font-size:18px;font-weight:700;color:var(--fg-1)">¿Entró o salió plata?</p>
   <div class="anota2" style="margin-top:0"><button class="anota sale" data-a="setf" data-f="tipo" data-v="egreso"><span class="sg">−</span><b>Salió plata</b><small>Un gasto: foto del recibo</small></button><button class="anota entra" data-a="setf" data-f="tipo" data-v="ingreso"><span class="sg">+</span><b>Entró plata</b><small>Otro ingreso</small></button></div>
@@ -1840,10 +1879,10 @@ function render(){
  if(v==='landing'){document.getElementById('app').innerHTML=`<div class="pbar"><b>PROTOTIPO</b><span>Demo · datos ficticios</span></div>${vLanding()}`;return}
  let c='';
  if(v==='home')c=remote()?vHomeRemote():vHomeLocal();
- else if(v==='item')c=vItem(S.arg);else if(v==='cal')c=vCal();else if(v==='docs')c=vDocs();else if(v==='fam')c=vFamily();else if(v==='ent')c=vEnt(S.arg);else if(v==='set')c=vSet();else if(v==='inmo')c=vInmo();else if(v==='inmores')c=vInmoRes();else if(v==='cuentas')c=vCuentas(S.arg);
+ else if(v==='item')c=vItem(S.arg);else if(v==='cal')c=vCal();else if(v==='docs')c=vDocs();else if(v==='fam')c=vFamily();else if(v==='ent')c=vEnt(S.arg);else if(v==='set')c=vSet();else if(v==='inmo')c=vPlata();else if(v==='inmores')c=vInmoRes();else if(v==='cuentas')c=vCuentas(S.arg);
  const act=v==='item'?'home':v==='ent'?'fam':v==='inmores'||v==='cuentas'?'inmo':v;
  const navs=[['home','home',remote()?'Desde afuera':'Hoy'],['cal','cal','Calendario'],['docs','file','Papeles'],['fam','fam','Familia']];
- const navsSide=seesInm()?[...navs.slice(0,2),['inmo','card','Inmobiliaria'],...navs.slice(2)]:navs;
+ const navsSide=seesInm()?[...navs.slice(0,2),['inmo','card','Cuentas'],...navs.slice(2)]:navs;
  const z=SCALE[S.font[S.user]||'grande'];
  document.getElementById('app').innerHTML=`
  <div class="pbar"><b>PROTOTIPO</b><span>Demo · datos ficticios</span></div>
@@ -1980,6 +2019,13 @@ document.addEventListener('click',e=>{
   const fl=m.file?{file:m.file.name,url:m.file.url,mime:m.file.type}:{};
   if(m.edit){Object.assign(S.inm.liq.find(l=>l.id===m.edit),{valor:v,medio:m.medio,fecha:deISO(m.fecha)},fl);S.modal=null;render();toast('Transferencia corregida');break}
   S.inm.liq.push({id:Date.now(),dueno:m.did,valor:v,medio:m.medio,fecha:deISO(m.fecha),by:S.user,file:null,...fl});S.modal=null;render();toast('Transferencia a '+DUE(m.did).nombre+' registrada');break}
+ case 'ctatab':S.ctaTab=t.dataset.v;render();break;
+ case 'ctaver':S.ctaTab=t.dataset.v;nav('inmo');break;
+ case 'recur':{const k=t.dataset.id?S.inm.recur.find(x=>x.id===t.dataset.id):null;S.modal=k?{k:'recur',id:k.id,desc:k.desc,prop:k.prop||'gen',cat:k.cat,valor:String(k.valor),cada:k.cada,prox:isoD(k.prox),err:null}:{k:'recur',cada:'Cada mes',err:null};render();break}
+ case 'recsave':{m.valor=val('gval');m.desc=val('rdesc');m.prox=val('rfecha');const v=Number(String(m.valor).replace(/\D/g,'')),er={};if(!m.desc)er.desc=1;if(!m.prop)er.prop=1;if(!m.cat)er.cat=1;if(!v)er.valor=1;if(!m.cada)er.cada=1;if(!m.prox)er.prox=1;if(Object.keys(er).length){m.err=er;render();break}
+  const o={desc:m.desc,prop:m.prop==='gen'?null:m.prop,cat:m.cat,valor:v,cada:m.cada,prox:deISO(m.prox)};if(m.id)Object.assign(S.inm.recur.find(x=>x.id===m.id),o);else S.inm.recur.push({id:'k'+Date.now(),...o});S.modal=null;render();toast(m.id?'Pago actualizado':'Pago agregado: se recordará '+m.cada.toLowerCase());break}
+ case 'recdelok':S.inm.recur=S.inm.recur.filter(x=>x.id!==m.id);S.modal=null;render();toast('Pago quitado');break;
+ case 'recpagar':{const k=S.inm.recur.find(x=>x.id===t.dataset.id);S.modal={k:'inmgasto',tipo:'egreso',prop:k.prop||'gen',cat:k.cat,desc:k.desc,valor:String(k.valor),recur:k.id,err:null};render();break}
  case 'inmf':S.inmF=t.dataset.v||null;render();break;
  case 'inmpago':S.modal={k:'inmpago',id:t.dataset.id,err:null};render();break;
  case 'inmgasto':S.modal={k:'inmgasto',tipo:t.dataset.v==='ingreso'?'ingreso':'egreso',err:null};render();break;
@@ -1988,7 +2034,7 @@ document.addEventListener('click',e=>{
  case 'inmpagosave':{m.note=val('inmnote');m.valor=val('gval');const p=S.inm.props.find(x=>x.id===m.id),old=S.inm.pagos[p.id]||{},ya=m.edit?0:pgVal(p),v=Number(String(m.valor).replace(/\D/g,'')),er={};if(!fechaOk(m))er.fecha=1;if(!m.medio)er.medio=1;if(!v)er.valor=1;else if(v>p.renta-ya)er.valor=2;if(Object.keys(er).length){m.err=er;render();break}S.inm.pagos[p.id]={valor:ya+v,fecha:deISO(m.fecha),at:m.edit?old.at:nowS(),by:m.edit?old.by:S.user,medio:m.medio,file:m.file?m.file.name:(m.edit?old.file:null),url:m.file?m.file.url:(m.edit?old.url:null),mime:m.file?m.file.type:(m.edit?old.mime:null),nota:m.note};S.modal=null;render();toast(m.edit?'Pago corregido':ya+v<p.renta?`Abono de ${p.inq} registrado: falta ${COP(p.renta-ya-v)}`:`Renta de ${p.inq} registrada`);break}
  case 'inmgastosave':{m.valor=val('gval');m.desc=val('gdesc');const er={};if(!fechaOk(m))er.fecha=1;const v=Number(String(m.valor).replace(/\D/g,''));if(!v)er.valor=1;if(!m.prop)er.prop=1;if(m.tipo!=='ingreso'&&!m.cat)er.cat=1;if(Object.keys(er).length){m.err=er;render();break}
   if(m.edit){const g=S.inm.movs.find(y=>y.id===m.edit);Object.assign(g,{prop:m.prop==='gen'?null:m.prop,tipo:m.tipo==='ingreso'?'ingreso':'egreso',cat:m.tipo==='ingreso'?(CATI.includes(m.cat)?m.cat:'Otro ingreso'):m.cat,desc:m.desc||g.desc,valor:v,fecha:deISO(m.fecha)});if(m.file)Object.assign(g,{file:m.file.name,url:m.file.url,mime:m.file.type});S.modal=null;render();toast('Movimiento corregido');break}
-  S.inm.movs.push({id:'g'+Date.now(),prop:m.prop==='gen'?null:m.prop,tipo:m.tipo==='ingreso'?'ingreso':'egreso',cat:m.tipo==='ingreso'?(CATI.includes(m.cat)?m.cat:'Otro ingreso'):m.cat,desc:m.desc||(m.tipo==='ingreso'?(CATI.includes(m.cat)?m.cat:'Ingreso'):m.cat),valor:v,fecha:deISO(m.fecha),by:S.user,file:m.file?m.file.name:null,url:m.file&&m.file.url,mime:m.file&&m.file.type});S.modal=null;render();toast(m.tipo==='ingreso'?'Ingreso anotado':'Gasto anotado');break}
+  S.inm.movs.push({id:'g'+Date.now(),prop:m.prop==='gen'?null:m.prop,tipo:m.tipo==='ingreso'?'ingreso':'egreso',cat:m.tipo==='ingreso'?(CATI.includes(m.cat)?m.cat:'Otro ingreso'):m.cat,desc:m.desc||(m.tipo==='ingreso'?(CATI.includes(m.cat)?m.cat:'Ingreso'):m.cat),valor:v,fecha:deISO(m.fecha),by:S.user,file:m.file?m.file.name:null,url:m.file&&m.file.url,mime:m.file&&m.file.type});const rk=m.recur&&S.inm.recur.find(x=>x.id===m.recur);if(rk)rk.prox=new Date(rk.prox.getFullYear(),rk.prox.getMonth()+CADA[rk.cada],rk.prox.getDate());S.modal=null;render();toast(rk?`Pagado. El próximo es el ${fshort(rk.prox)}`:m.tipo==='ingreso'?'Ingreso anotado':'Gasto anotado');break}
  case 'calf':S.calF=t.dataset.v||null;render();break;
  case 'moredone':S.moreDone=!S.moreDone;render();break;
  case 'apapel':S.modal={k:'apapel',id:t.dataset.id,cat:null};render();break;
@@ -2029,7 +2075,7 @@ document.addEventListener('click',e=>{
   if(tp==='pago'){it.rec=f.rec==='Una vez'?undefined:f.rec;if(f.valor)it.amount='$ '+Number(String(f.valor).replace(/\D/g,'')).toLocaleString('es-CO')}
   if(m.file){it.attach={name:m.file.name,url:m.file.url};S.docs.push({id:'d'+Date.now(),ent,cat:tp==='pago'?'Recibos':'Salud',name:(tp==='medicamento'?'Fórmula · ':'Orden · ')+it.title,fmt:m.file.type.includes('pdf')?'PDF':'JPG',by:S.user,url:m.file.url,mime:m.file.type,log:[]})}
   S.items.push(it);addFeed(`anotó “${it.title}”${tp==='cita'||tp==='examen'?' para el '+due.getDate()+' de '+MES[due.getMonth()]:''}`,id);S.modal=null;render();toast('Anotado. Ya lo ve toda la familia');break}
- case 'setf':if(m.k==='prop')propCollect(m);if(['inmpago','inmgasto','casamov','transfer'].includes(m.k)&&document.getElementById('gfecha'))m.fecha=val('gfecha');if(m.k==='inmpago'){m.note=val('inmnote');m.valor=val('gval')}if(m.k==='casamov'||m.k==='transfer'){m.valor=val('gval');m.desc=val('gdesc')}if(m.k==='inmgasto'){m.valor=val('gval');m.desc=val('gdesc')}if(m.k==='adddoc'){m.n=val('dname');m.v=val('dvence')}if(m.k==='invite'){m.n=val('iname');m.c=val('icontact')}if(m.k==='addent')m.n=val('ename');if(m.k==='edititem'){m.t=val('et');m.d=val('ed');m.h=val('eh')}if(m.k==='editdoc'){m.n=val('dn');m.v=val('dv')}if(m.k==='delitem'&&m.r==='Otro')m.o=val('dr');m[t.dataset.f]=t.dataset.v;if(m.err)m.err[t.dataset.f]=0;render();break;
+ case 'setf':if(m.k==='prop')propCollect(m);if(['inmpago','inmgasto','casamov','transfer'].includes(m.k)&&document.getElementById('gfecha'))m.fecha=val('gfecha');if(m.k==='inmpago'){m.note=val('inmnote');m.valor=val('gval')}if(m.k==='casamov'||m.k==='transfer'){m.valor=val('gval');m.desc=val('gdesc')}if(m.k==='recur'){m.valor=val('gval');m.desc=val('rdesc');m.prox=val('rfecha')}if(m.k==='inmgasto'){m.valor=val('gval');m.desc=val('gdesc')}if(m.k==='adddoc'){m.n=val('dname');m.v=val('dvence')}if(m.k==='invite'){m.n=val('iname');m.c=val('icontact')}if(m.k==='addent')m.n=val('ename');if(m.k==='edititem'){m.t=val('et');m.d=val('ed');m.h=val('eh')}if(m.k==='editdoc'){m.n=val('dn');m.v=val('dv')}if(m.k==='delitem'&&m.r==='Otro')m.o=val('dr');m[t.dataset.f]=t.dataset.v;if(m.err)m.err[t.dataset.f]=0;render();break;
  case 'fbres':m.res=t.dataset.v;m.err=null;render();break;
  case 'fbacomp':m.note=val('fbnote');m.acomp=t.dataset.v;render();break;
  case 'fbhow':m.note=val('fbnote');m.how=t.dataset.v;m.err=null;render();break;
