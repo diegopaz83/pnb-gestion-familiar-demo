@@ -1292,6 +1292,11 @@ const COPs=n=>(n<0?'− ':'')+COP(Math.abs(n));
 const CATG=['Arreglos','Materiales','Mano de obra','Predial','Servicios','Administración del edificio','Transporte','Otro'];
 const CATI=['Depósito','Otro ingreso'],CASA_G=['Mercado','Comida','Transporte','Servicios','Salud','Otro'],CASA_I=['Pensión','Ayuda de la familia','Otro ingreso'];
 const DUE=id=>S.inm.duenos.find(d=>d.id===id);
+const isoD=d=>`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+const deISO=t=>{const [y,mo,d]=String(t).split('-').map(Number);return new Date(y,mo-1,d)};
+function campoFecha(m){const hoy=isoD(TODAY),ayer=isoD(new Date(TODAY.getFullYear(),TODAY.getMonth(),TODAY.getDate()-1)),v=m.fecha||hoy;
+ return `<div><label class="lbl" for="gfecha">¿Cuándo fue?</label><div class="chips" style="margin-bottom:8px"><button class="chip ${v===hoy?'on':''}" data-a="setf" data-f="fecha" data-v="${hoy}">Hoy</button><button class="chip ${v===ayer?'on':''}" data-a="setf" data-f="fecha" data-v="${ayer}">Ayer</button></div><input class="inp" type="date" id="gfecha" max="${hoy}" value="${v}" aria-label="Otra fecha">${m.err&&m.err.fecha?'<div class="er">La fecha no puede ser después de hoy.</div>':''}</div>`}
+const fechaOk=m=>{m.fecha=val('gfecha')||m.fecha||isoD(TODAY);return m.fecha<=isoD(TODAY)};
 const seesCasa=()=>S.user==='luis'||S.user==='lucero';
 function pgVal(p){const g=S.inm.pagos[p.id];return g?(g.valor??p.renta):0}
 function inmPend(p){return !!p.inq&&pgVal(p)<p.renta}
@@ -1299,7 +1304,7 @@ const seesInm=()=>!isCare();
 function inmVence(p){return new Date(TODAY.getFullYear(),TODAY.getMonth(),p.dia)}
 function inmEstado(p){if(!p.inq)return 'vacia';const v=pgVal(p);if(v>=p.renta)return 'ok';if(v>0)return 'parcial';const n=days(inmVence(p));return n<0?'bad':n<=5?'warn':'neu'}
 function inmMovs(){
- const ing=S.inm.props.filter(p=>S.inm.pagos[p.id]).map(p=>({id:'r'+p.id,prop:p.id,tipo:'ingreso',cat:'Renta',desc:'Renta · '+p.inq,valor:pgVal(p),fecha:inmVence(p),by:S.inm.pagos[p.id].by,file:S.inm.pagos[p.id].file,url:S.inm.pagos[p.id].url,mime:S.inm.pagos[p.id].mime,at:S.inm.pagos[p.id].at}));
+ const ing=S.inm.props.filter(p=>S.inm.pagos[p.id]).map(p=>({id:'r'+p.id,prop:p.id,tipo:'ingreso',cat:'Renta',desc:'Renta · '+p.inq,valor:pgVal(p),fecha:S.inm.pagos[p.id].fecha||inmVence(p),by:S.inm.pagos[p.id].by,file:S.inm.pagos[p.id].file,url:S.inm.pagos[p.id].url,mime:S.inm.pagos[p.id].mime,at:S.inm.pagos[p.id].at}));
  const tr=S.inm.liq.map(l=>({id:'t'+l.id,prop:null,dueno:l.dueno,tipo:'egreso',cat:'Transferencia al dueño',desc:'Transferencia a '+(DUE(l.dueno)||{}).nombre,valor:l.valor,fecha:l.fecha,by:l.by,file:l.file,url:l.url,mime:l.mime,medio:l.medio}));
  return [...ing,...S.inm.movs,...tr].sort((a,b)=>b.fecha-a.fecha)}
 function inmResumen(){const mv=inmMovs();const rec=mv.filter(x=>x.tipo==='ingreso').reduce((s,x)=>s+x.valor,0),gas=mv.filter(x=>x.tipo==='egreso').reduce((s,x)=>s+x.valor,0);
@@ -1607,6 +1612,7 @@ function modal(){
   h=`<div class="sh"><div><span class="sobre">${esc(p.nombre)} · ${esc(p.inq)}</span><h2>${m.edit?'Corregir el pago':ya?'¿Pagó lo que faltaba?':`¿Pagó la renta de ${MES[TODAY.getMonth()]}?`}</h2></div>${X}</div><div class="sb">
   <div class="inm-monto"><span class="k">Renta</span><b>${COP(p.renta)}</b></div>${ya?`<p class="muted" style="margin:0">Ya pagó ${COP(ya)}. Falta ${COP(falta)}.</p>`:''}
   <div><label class="lbl" for="gval">¿Cuánto pagó?</label><div class="monto-in"><span>$</span><input id="gval" size="4" inputmode="numeric" autocomplete="off" placeholder="0" value="${esc(miles(m.valor||''))}" aria-describedby="gvalw"></div><div class="monto-w" id="gvalw" aria-live="polite">${palabrasPesos(m.valor)}</div>${m.err&&m.err.valor?`<div class="er">${m.err.valor===2?'No puede ser más de '+COP(falta)+'.':'Escribe cuánto pagó.'}</div>`:''}</div>
+  ${campoFecha(m)}
   <p class="muted" style="margin:0">Si pagó solo una parte, escribe lo que pagó: lo que falta queda por cobrar.${p.dueno?' Es plata de '+esc(DUE(p.dueno).nombre)+': suma en sus cuentas.':''}</p>
   <div><span class="lbl">¿Cómo pagó?</span><div class="chips">${['Transferencia','Efectivo','Consignación'].map(o=>`<button class="chip ${m.medio===o?'on':''}" data-a="setf" data-f="medio" data-v="${o}">${o}</button>`).join('')}</div>${m.err&&m.err.medio?'<div class="er">Elige cómo pagó.</div>':''}</div>
   <div><span class="lbl">Comprobante (opcional)</span>${pickers('inmpago',!!m.file)}${m.file?`<div style="background:var(--navy-50);border-radius:14px;padding:10px;margin-top:8px">${filePreview(m.file)}</div>`:''}</div>
@@ -1624,6 +1630,7 @@ function modal(){
   h=`<div class="sh"><div><span class="sobre">La casa</span><h2>${m.edit?'Corregir':eg?'Salió plata':'Entró plata'}</h2></div>${X}</div><div class="sb">
   <div class="seg" role="group" aria-label="Tipo de movimiento"><button class="${eg?'on out':''}" data-a="setf" data-f="tipo" data-v="egreso">− Salió</button><button class="${!eg?'on in':''}" data-a="setf" data-f="tipo" data-v="ingreso">+ Entró</button></div>
   <div><label class="lbl" for="gval">¿Cuánto?</label><div class="monto-in"><span>$</span><input id="gval" size="4" inputmode="numeric" autocomplete="off" placeholder="0" value="${esc(miles(m.valor||''))}" aria-describedby="gvalw"></div><div class="monto-w" id="gvalw" aria-live="polite">${palabrasPesos(m.valor)}</div>${m.err&&m.err.valor?'<div class="er">Escribe cuánto fue.</div>':''}</div>
+  ${campoFecha(m)}
   <div><span class="lbl">${eg?'¿En qué?':'¿De dónde?'}</span><div class="chips">${cats.map(o=>`<button class="chip ${m.cat===o?'on':''}" data-a="setf" data-f="cat" data-v="${o}">${o}</button>`).join('')}</div>${m.err&&m.err.cat?'<div class="er">Elige una opción.</div>':''}</div>
   <div><span class="lbl">Detalle (opcional)</span><input class="inp" id="gdesc" placeholder="${eg?'Ej.: pan y leche':'Ej.: pensión de noviembre'}" value="${esc(m.desc||'')}"></div>
   <div><span class="lbl">Foto del recibo (opcional)</span>${pickers('casamov',!!m.file)}${m.file?`<div style="background:var(--navy-50);border-radius:14px;padding:10px;margin-top:8px">${filePreview(m.file)}</div>`:''}</div>
@@ -1640,6 +1647,7 @@ function modal(){
  if(m.k==='transfer'){const d=DUE(m.did);
   h=`<div class="sh"><div><span class="sobre">Cuentas de ${MES[TODAY.getMonth()]}</span><h2>${m.edit?'Corregir la transferencia':'¿Cuánto le transferiste a '+esc(d.nombre.split(' ')[0])+'?'}</h2></div>${X}</div><div class="sb">
   <div><label class="lbl" for="gval">Valor</label><div class="monto-in"><span>$</span><input id="gval" size="4" inputmode="numeric" autocomplete="off" placeholder="0" value="${esc(miles(m.valor||''))}" aria-describedby="gvalw"></div><div class="monto-w" id="gvalw" aria-live="polite">${palabrasPesos(m.valor)}</div>${m.err&&m.err.valor?'<div class="er">Escribe cuánto le transferiste.</div>':''}</div>
+  ${campoFecha(m)}
   <div><span class="lbl">¿Cómo?</span><div class="chips">${['Transferencia','Efectivo','Consignación'].map(o=>`<button class="chip ${m.medio===o?'on':''}" data-a="setf" data-f="medio" data-v="${o}">${o}</button>`).join('')}</div>${m.err&&m.err.medio?'<div class="er">Elige cómo.</div>':''}</div>
   <div><span class="lbl">Comprobante (opcional)</span>${pickers('transfer',!!m.file)}${m.file?`<div style="background:var(--navy-50);border-radius:14px;padding:10px;margin-top:8px">${filePreview(m.file)}</div>`:''}</div>
   <button class="btn pri big full" data-a="transfersave">${ic('check')}Guardar</button></div>`}
@@ -1654,6 +1662,7 @@ function modal(){
   <div class="seg" role="group" aria-label="Tipo de movimiento"><button class="${eg?'on out':''}" data-a="setf" data-f="tipo" data-v="egreso">− Sale plata</button><button class="${!eg?'on in':''}" data-a="setf" data-f="tipo" data-v="ingreso">+ Entra plata</button></div>
   <div><span class="lbl">${eg?'Foto del recibo':'Soporte (opcional)'}</span>${pickers('inmgasto',!!m.file)}${m.file?`<div style="background:var(--navy-50);border-radius:14px;padding:10px;margin-top:8px">${filePreview(m.file)}</div>`:''}</div>
   <div><label class="lbl" for="gval">¿Cuánto fue?</label><div class="monto-in"><span>$</span><input id="gval" size="4" inputmode="numeric" autocomplete="off" placeholder="0" value="${esc(miles(m.valor||''))}" aria-describedby="gvalw"></div><div class="monto-w" id="gvalw" aria-live="polite">${palabrasPesos(m.valor)}</div>${m.err&&m.err.valor?'<div class="er">Escribe cuánto fue.</div>':''}</div>
+  ${campoFecha(m)}
   <div><span class="lbl">¿De qué propiedad?</span><div class="chips">${[...S.inm.props.map(p=>[p.id,p.nombre]),['gen','General']].map(o=>`<button class="chip ${m.prop===o[0]?'on':''}" data-a="setf" data-f="prop" data-v="${o[0]}">${esc(o[1])}</button>`).join('')}</div>${m.err&&m.err.prop?'<div class="er">Elige la propiedad o «General».</div>':''}
   ${(()=>{const pp=S.inm.props.find(x=>x.id===m.prop);return pp&&pp.dueno?`<p class="hint-due">${ic('fam','s')}${eg?'Se le descuenta a '+esc(DUE(pp.dueno).nombre)+' en sus cuentas.':'Es plata de '+esc(DUE(pp.dueno).nombre)+': suma en sus cuentas.'}</p>`:m.prop==='gen'?`<p class="hint-due">${ic('card','s')}${eg?'Gasto de '+P.luis.short+', no de un dueño.':'Ingreso de '+P.luis.short+'.'}</p>`:''})()}</div>
   ${!eg?`<div><span class="lbl">¿Qué es?</span><div class="chips">${CATI.map(o=>`<button class="chip ${m.cat===o?'on':''}" data-a="setf" data-f="cat" data-v="${o}">${o}</button>`).join('')}</div></div>`:''}${eg?`<div><span class="lbl">¿De qué es?</span><div class="chips">${CATG.map(o=>`<button class="chip ${m.cat===o?'on':''}" data-a="setf" data-f="cat" data-v="${o}">${o}</button>`).join('')}</div>${m.err&&m.err.cat?'<div class="er">Elige de qué es.</div>':''}</div>`:''}
@@ -1859,6 +1868,7 @@ document.addEventListener('change',e=>{const t=e.target,a=t.dataset.a;
   if(m.k==='report'&&!isAppt(IT(m.id))){m.note=val('note');m.kind=t.dataset.kind;m.err=null;m.rec=false}
   if(m.k==='add'){collectA(m)}
   if(m.k==='apunte'){m.note=val('apnote');m.err=null}
+  if(['inmpago','inmgasto','casamov','transfer'].includes(m.k)&&document.getElementById('gfecha'))m.fecha=val('gfecha');
   if(m.k==='inmpago'){m.note=val('inmnote');m.valor=val('gval')}
   if(m.k==='casamov'||m.k==='transfer'){m.valor=val('gval');m.desc=val('gdesc')}
   if(m.k==='inmgasto'){m.valor=val('gval');m.desc=val('gdesc')}
@@ -1953,32 +1963,32 @@ document.addEventListener('click',e=>{
  case 'movver':S.modal={k:'movver',id:t.dataset.id};render();break;
  case 'movdel':S.modal={k:'movdel',id:t.dataset.id};render();break;
  case 'movdelok':{const id=t.dataset.id;S.modal=null;if(id[0]==='t'){S.inm.liq=S.inm.liq.filter(l=>'t'+l.id!==id);toast('Transferencia borrada');render();break}if(id.startsWith('r')){const pid=id.slice(1);delete S.inm.pagos[pid];toast('Pago deshecho: la renta vuelve a estar por cobrar')}else{S.inm.movs=S.inm.movs.filter(y=>y.id!==id);toast('Movimiento borrado')}S.modal=null;render();break}
- case 'movedit':{const id=t.dataset.id;if(id[0]==='t'){const l=S.inm.liq.find(y=>'t'+y.id===id);S.modal={k:'transfer',did:l.dueno,edit:l.id,valor:String(l.valor),medio:l.medio,err:null};render();break}if(id.startsWith('r')){const pid=id.slice(1),pg=S.inm.pagos[pid];S.modal={k:'inmpago',id:pid,edit:true,valor:String(pgVal(S.inm.props.find(x=>x.id===pid))),medio:pg.medio,note:pg.nota||'',err:null}}else{const g=S.inm.movs.find(y=>y.id===id);S.modal={k:'inmgasto',edit:id,tipo:g.tipo,valor:String(g.valor),prop:g.prop||'gen',cat:g.cat,desc:g.desc,err:null}}render();break}
+ case 'movedit':{const id=t.dataset.id;if(id[0]==='t'){const l=S.inm.liq.find(y=>'t'+y.id===id);S.modal={k:'transfer',did:l.dueno,edit:l.id,fecha:isoD(l.fecha),valor:String(l.valor),medio:l.medio,err:null};render();break}if(id.startsWith('r')){const pid=id.slice(1),pg=S.inm.pagos[pid];S.modal={k:'inmpago',id:pid,edit:true,fecha:isoD(pg.fecha||inmVence(S.inm.props.find(x=>x.id===pid))),valor:String(pgVal(S.inm.props.find(x=>x.id===pid))),medio:pg.medio,note:pg.nota||'',err:null}}else{const g=S.inm.movs.find(y=>y.id===id);S.modal={k:'inmgasto',edit:id,fecha:isoD(g.fecha),tipo:g.tipo,valor:String(g.valor),prop:g.prop||'gen',cat:g.cat,desc:g.desc,err:null}}render();break}
  case 'plataamb':{const tp=m.tipo;S.modal=t.dataset.v==='casa'?{k:'casamov',tipo:tp,err:null}:{k:'inmgasto',tipo:tp,err:null};render();break}
  case 'casamov':S.modal={k:'casamov',tipo:t.dataset.v==='ingreso'?'ingreso':'egreso',err:null};render();break;
  case 'casaver':S.modal={k:'casaver',id:t.dataset.id};render();break;
  case 'casadel':S.modal={k:'casadel',id:t.dataset.id};render();break;
  case 'casadelok':S.casa.movs=S.casa.movs.filter(x=>x.id!==t.dataset.id);S.modal=null;render();toast('Movimiento borrado');break;
- case 'casaedit':{const x=S.casa.movs.find(y=>y.id===t.dataset.id);S.modal={k:'casamov',edit:x.id,tipo:x.tipo,valor:String(x.valor),cat:x.cat,desc:x.desc===x.cat?'':x.desc,err:null};render();break}
- case 'casasave':{m.valor=val('gval');m.desc=val('gdesc');const v=Number(String(m.valor).replace(/\D/g,'')),cats=m.tipo==='ingreso'?CASA_I:CASA_G,er={};if(!v)er.valor=1;if(!cats.includes(m.cat))er.cat=1;if(Object.keys(er).length){m.err=er;render();break}
+ case 'casaedit':{const x=S.casa.movs.find(y=>y.id===t.dataset.id);S.modal={k:'casamov',edit:x.id,fecha:isoD(x.fecha),tipo:x.tipo,valor:String(x.valor),cat:x.cat,desc:x.desc===x.cat?'':x.desc,err:null};render();break}
+ case 'casasave':{m.valor=val('gval');m.desc=val('gdesc');const v=Number(String(m.valor).replace(/\D/g,'')),cats=m.tipo==='ingreso'?CASA_I:CASA_G,er={};if(!fechaOk(m))er.fecha=1;if(!v)er.valor=1;if(!cats.includes(m.cat))er.cat=1;if(Object.keys(er).length){m.err=er;render();break}
   const fl=m.file?{file:m.file.name,url:m.file.url,mime:m.file.type}:{};
-  if(m.edit){Object.assign(S.casa.movs.find(y=>y.id===m.edit),{tipo:m.tipo==='ingreso'?'ingreso':'egreso',cat:m.cat,desc:m.desc||m.cat,valor:v},fl);S.modal=null;render();toast('Movimiento corregido');break}
-  S.casa.movs.push({id:'c'+Date.now(),tipo:m.tipo==='ingreso'?'ingreso':'egreso',cat:m.cat,desc:m.desc||m.cat,valor:v,fecha:TODAY,by:S.user,file:null,...fl});S.modal=null;render();toast(m.tipo==='ingreso'?'Anotado: entró plata a la casa':'Anotado: salió plata de la casa');break}
+  if(m.edit){Object.assign(S.casa.movs.find(y=>y.id===m.edit),{tipo:m.tipo==='ingreso'?'ingreso':'egreso',cat:m.cat,desc:m.desc||m.cat,valor:v,fecha:deISO(m.fecha)},fl);S.modal=null;render();toast('Movimiento corregido');break}
+  S.casa.movs.push({id:'c'+Date.now(),tipo:m.tipo==='ingreso'?'ingreso':'egreso',cat:m.cat,desc:m.desc||m.cat,valor:v,fecha:deISO(m.fecha),by:S.user,file:null,...fl});S.modal=null;render();toast(m.tipo==='ingreso'?'Anotado: entró plata a la casa':'Anotado: salió plata de la casa');break}
  case 'cuentas':nav('cuentas',t.dataset.id);break;
  case 'transfer':{const c=cuentas(t.dataset.id);S.modal={k:'transfer',did:t.dataset.id,valor:String(Math.max(0,c.falta)),err:null};render();break}
- case 'transfersave':{m.valor=val('gval');const v=Number(String(m.valor).replace(/\D/g,'')),er={};if(!v)er.valor=1;if(!m.medio)er.medio=1;if(Object.keys(er).length){m.err=er;render();break}
+ case 'transfersave':{m.valor=val('gval');const v=Number(String(m.valor).replace(/\D/g,'')),er={};if(!fechaOk(m))er.fecha=1;if(!v)er.valor=1;if(!m.medio)er.medio=1;if(Object.keys(er).length){m.err=er;render();break}
   const fl=m.file?{file:m.file.name,url:m.file.url,mime:m.file.type}:{};
-  if(m.edit){Object.assign(S.inm.liq.find(l=>l.id===m.edit),{valor:v,medio:m.medio},fl);S.modal=null;render();toast('Transferencia corregida');break}
-  S.inm.liq.push({id:Date.now(),dueno:m.did,valor:v,medio:m.medio,fecha:TODAY,by:S.user,file:null,...fl});S.modal=null;render();toast('Transferencia a '+DUE(m.did).nombre+' registrada');break}
+  if(m.edit){Object.assign(S.inm.liq.find(l=>l.id===m.edit),{valor:v,medio:m.medio,fecha:deISO(m.fecha)},fl);S.modal=null;render();toast('Transferencia corregida');break}
+  S.inm.liq.push({id:Date.now(),dueno:m.did,valor:v,medio:m.medio,fecha:deISO(m.fecha),by:S.user,file:null,...fl});S.modal=null;render();toast('Transferencia a '+DUE(m.did).nombre+' registrada');break}
  case 'inmf':S.inmF=t.dataset.v||null;render();break;
  case 'inmpago':S.modal={k:'inmpago',id:t.dataset.id,err:null};render();break;
  case 'inmgasto':S.modal={k:'inmgasto',tipo:t.dataset.v==='ingreso'?'ingreso':'egreso',err:null};render();break;
  case 'resmes':{const k=S.resM+ +t.dataset.d;S.resM=Math.min(TODAY.getFullYear()*12+TODAY.getMonth(),k);render();break}
  case 'resprop':S.resP=t.dataset.v||null;render();break;
- case 'inmpagosave':{m.note=val('inmnote');m.valor=val('gval');const p=S.inm.props.find(x=>x.id===m.id),old=S.inm.pagos[p.id]||{},ya=m.edit?0:pgVal(p),v=Number(String(m.valor).replace(/\D/g,'')),er={};if(!m.medio)er.medio=1;if(!v)er.valor=1;else if(v>p.renta-ya)er.valor=2;if(Object.keys(er).length){m.err=er;render();break}S.inm.pagos[p.id]={valor:ya+v,at:m.edit?old.at:nowS(),by:m.edit?old.by:S.user,medio:m.medio,file:m.file?m.file.name:(m.edit?old.file:null),url:m.file?m.file.url:(m.edit?old.url:null),mime:m.file?m.file.type:(m.edit?old.mime:null),nota:m.note};S.modal=null;render();toast(m.edit?'Pago corregido':ya+v<p.renta?`Abono de ${p.inq} registrado: falta ${COP(p.renta-ya-v)}`:`Renta de ${p.inq} registrada`);break}
- case 'inmgastosave':{m.valor=val('gval');m.desc=val('gdesc');const er={};const v=Number(String(m.valor).replace(/\D/g,''));if(!v)er.valor=1;if(!m.prop)er.prop=1;if(m.tipo!=='ingreso'&&!m.cat)er.cat=1;if(Object.keys(er).length){m.err=er;render();break}
-  if(m.edit){const g=S.inm.movs.find(y=>y.id===m.edit);Object.assign(g,{prop:m.prop==='gen'?null:m.prop,tipo:m.tipo==='ingreso'?'ingreso':'egreso',cat:m.tipo==='ingreso'?(CATI.includes(m.cat)?m.cat:'Otro ingreso'):m.cat,desc:m.desc||g.desc,valor:v});if(m.file)Object.assign(g,{file:m.file.name,url:m.file.url,mime:m.file.type});S.modal=null;render();toast('Movimiento corregido');break}
-  S.inm.movs.push({id:'g'+Date.now(),prop:m.prop==='gen'?null:m.prop,tipo:m.tipo==='ingreso'?'ingreso':'egreso',cat:m.tipo==='ingreso'?(CATI.includes(m.cat)?m.cat:'Otro ingreso'):m.cat,desc:m.desc||(m.tipo==='ingreso'?(CATI.includes(m.cat)?m.cat:'Ingreso'):m.cat),valor:v,fecha:TODAY,by:S.user,file:m.file?m.file.name:null,url:m.file&&m.file.url,mime:m.file&&m.file.type});S.modal=null;render();toast(m.tipo==='ingreso'?'Ingreso anotado':'Gasto anotado');break}
+ case 'inmpagosave':{m.note=val('inmnote');m.valor=val('gval');const p=S.inm.props.find(x=>x.id===m.id),old=S.inm.pagos[p.id]||{},ya=m.edit?0:pgVal(p),v=Number(String(m.valor).replace(/\D/g,'')),er={};if(!fechaOk(m))er.fecha=1;if(!m.medio)er.medio=1;if(!v)er.valor=1;else if(v>p.renta-ya)er.valor=2;if(Object.keys(er).length){m.err=er;render();break}S.inm.pagos[p.id]={valor:ya+v,fecha:deISO(m.fecha),at:m.edit?old.at:nowS(),by:m.edit?old.by:S.user,medio:m.medio,file:m.file?m.file.name:(m.edit?old.file:null),url:m.file?m.file.url:(m.edit?old.url:null),mime:m.file?m.file.type:(m.edit?old.mime:null),nota:m.note};S.modal=null;render();toast(m.edit?'Pago corregido':ya+v<p.renta?`Abono de ${p.inq} registrado: falta ${COP(p.renta-ya-v)}`:`Renta de ${p.inq} registrada`);break}
+ case 'inmgastosave':{m.valor=val('gval');m.desc=val('gdesc');const er={};if(!fechaOk(m))er.fecha=1;const v=Number(String(m.valor).replace(/\D/g,''));if(!v)er.valor=1;if(!m.prop)er.prop=1;if(m.tipo!=='ingreso'&&!m.cat)er.cat=1;if(Object.keys(er).length){m.err=er;render();break}
+  if(m.edit){const g=S.inm.movs.find(y=>y.id===m.edit);Object.assign(g,{prop:m.prop==='gen'?null:m.prop,tipo:m.tipo==='ingreso'?'ingreso':'egreso',cat:m.tipo==='ingreso'?(CATI.includes(m.cat)?m.cat:'Otro ingreso'):m.cat,desc:m.desc||g.desc,valor:v,fecha:deISO(m.fecha)});if(m.file)Object.assign(g,{file:m.file.name,url:m.file.url,mime:m.file.type});S.modal=null;render();toast('Movimiento corregido');break}
+  S.inm.movs.push({id:'g'+Date.now(),prop:m.prop==='gen'?null:m.prop,tipo:m.tipo==='ingreso'?'ingreso':'egreso',cat:m.tipo==='ingreso'?(CATI.includes(m.cat)?m.cat:'Otro ingreso'):m.cat,desc:m.desc||(m.tipo==='ingreso'?(CATI.includes(m.cat)?m.cat:'Ingreso'):m.cat),valor:v,fecha:deISO(m.fecha),by:S.user,file:m.file?m.file.name:null,url:m.file&&m.file.url,mime:m.file&&m.file.type});S.modal=null;render();toast(m.tipo==='ingreso'?'Ingreso anotado':'Gasto anotado');break}
  case 'calf':S.calF=t.dataset.v||null;render();break;
  case 'moredone':S.moreDone=!S.moreDone;render();break;
  case 'apapel':S.modal={k:'apapel',id:t.dataset.id,cat:null};render();break;
@@ -2019,7 +2029,7 @@ document.addEventListener('click',e=>{
   if(tp==='pago'){it.rec=f.rec==='Una vez'?undefined:f.rec;if(f.valor)it.amount='$ '+Number(String(f.valor).replace(/\D/g,'')).toLocaleString('es-CO')}
   if(m.file){it.attach={name:m.file.name,url:m.file.url};S.docs.push({id:'d'+Date.now(),ent,cat:tp==='pago'?'Recibos':'Salud',name:(tp==='medicamento'?'Fórmula · ':'Orden · ')+it.title,fmt:m.file.type.includes('pdf')?'PDF':'JPG',by:S.user,url:m.file.url,mime:m.file.type,log:[]})}
   S.items.push(it);addFeed(`anotó “${it.title}”${tp==='cita'||tp==='examen'?' para el '+due.getDate()+' de '+MES[due.getMonth()]:''}`,id);S.modal=null;render();toast('Anotado. Ya lo ve toda la familia');break}
- case 'setf':if(m.k==='prop')propCollect(m);if(m.k==='inmpago'){m.note=val('inmnote');m.valor=val('gval')}if(m.k==='casamov'||m.k==='transfer'){m.valor=val('gval');m.desc=val('gdesc')}if(m.k==='inmgasto'){m.valor=val('gval');m.desc=val('gdesc')}if(m.k==='adddoc'){m.n=val('dname');m.v=val('dvence')}if(m.k==='invite'){m.n=val('iname');m.c=val('icontact')}if(m.k==='addent')m.n=val('ename');if(m.k==='edititem'){m.t=val('et');m.d=val('ed');m.h=val('eh')}if(m.k==='editdoc'){m.n=val('dn');m.v=val('dv')}if(m.k==='delitem'&&m.r==='Otro')m.o=val('dr');m[t.dataset.f]=t.dataset.v;if(m.err)m.err[t.dataset.f]=0;render();break;
+ case 'setf':if(m.k==='prop')propCollect(m);if(['inmpago','inmgasto','casamov','transfer'].includes(m.k)&&document.getElementById('gfecha'))m.fecha=val('gfecha');if(m.k==='inmpago'){m.note=val('inmnote');m.valor=val('gval')}if(m.k==='casamov'||m.k==='transfer'){m.valor=val('gval');m.desc=val('gdesc')}if(m.k==='inmgasto'){m.valor=val('gval');m.desc=val('gdesc')}if(m.k==='adddoc'){m.n=val('dname');m.v=val('dvence')}if(m.k==='invite'){m.n=val('iname');m.c=val('icontact')}if(m.k==='addent')m.n=val('ename');if(m.k==='edititem'){m.t=val('et');m.d=val('ed');m.h=val('eh')}if(m.k==='editdoc'){m.n=val('dn');m.v=val('dv')}if(m.k==='delitem'&&m.r==='Otro')m.o=val('dr');m[t.dataset.f]=t.dataset.v;if(m.err)m.err[t.dataset.f]=0;render();break;
  case 'fbres':m.res=t.dataset.v;m.err=null;render();break;
  case 'fbacomp':m.note=val('fbnote');m.acomp=t.dataset.v;render();break;
  case 'fbhow':m.note=val('fbnote');m.how=t.dataset.v;m.err=null;render();break;
